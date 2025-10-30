@@ -344,6 +344,7 @@ exports.runCrawler = onRequest({
         await batch.commit();
 
         // Add chunks to vector index for semantic search
+        console.log('Starting vector embedding process...');
         try {
           const vectorDocs = chunks.map(chunk => ({
             id: chunk.id,
@@ -356,10 +357,12 @@ exports.runCrawler = onRequest({
             }
           }));
 
+          console.log(`Attempting to add ${vectorDocs.length} documents to vector index`);
           const vectorResult = await addDocumentsToIndex(vectorDocs);
-          console.log(`Added ${vectorDocs.length} documents to vector index: ${vectorResult.fileName}`);
+          console.log(`SUCCESS: Added ${vectorDocs.length} documents to vector index: ${vectorResult.fileName}`);
         } catch (vectorError) {
-          console.error('Error adding to vector index:', vectorError);
+          console.error('ERROR adding to vector index:', vectorError);
+          console.error('Vector error stack:', vectorError.stack);
           // Continue processing even if vector indexing fails
         }
 

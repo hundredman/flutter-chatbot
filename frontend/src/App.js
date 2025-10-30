@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import HomePage from './components/HomePage';
-import ChatInterface from './components/ChatInterface';
 import AuthPage from './components/AuthPage';
+import ChatLayout from './components/ChatLayout';
 import { auth } from './firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { signOutUser } from './firebase/authService';
 
 function App() {
-  const [currentView, setCurrentView] = useState('auth');
-  const [conversation, setConversation] = useState(null);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Listen for authentication state changes
   useEffect(() => {
@@ -24,14 +22,12 @@ function App() {
         };
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
-        setCurrentView('home');
       } else {
         // User is signed out
         setUser(null);
         localStorage.removeItem('user');
-        setCurrentView('auth');
-        setConversation(null);
       }
+      setIsLoading(false);
     });
 
     // Cleanup subscription on unmount
@@ -40,7 +36,6 @@ function App() {
 
   const handleAuthSuccess = (userData) => {
     setUser(userData);
-    setCurrentView('home');
   };
 
   const handleSignOut = async () => {
@@ -52,40 +47,24 @@ function App() {
     }
   };
 
-  const startConversation = (weekData) => {
-    setConversation({
-      id: Date.now().toString(),
-      week: weekData.week,
-      title: weekData.title,
-      initialPrompt: weekData.prompt,
-      messages: [],
-      userId: user.id
-    });
-    setCurrentView('chat');
-  };
-
-  const goHome = () => {
-    setCurrentView('home');
-    setConversation(null);
-  };
+  // Show loading screen while checking auth state
+  if (isLoading) {
+    return (
+      <div className="App">
+        <div className="loading-screen">
+          <div className="loading-spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
-      {currentView === 'auth' ? (
-        <AuthPage onAuthSuccess={handleAuthSuccess} />
-      ) : currentView === 'home' ? (
-        <HomePage
-          onStartConversation={startConversation}
-          user={user}
-          onSignOut={handleSignOut}
-        />
+      {user ? (
+        <ChatLayout user={user} onSignOut={handleSignOut} />
       ) : (
-        <ChatInterface
-          conversation={conversation}
-          onGoHome={goHome}
-          onUpdateConversation={setConversation}
-          user={user}
-        />
+        <AuthPage onAuthSuccess={handleAuthSuccess} />
       )}
     </div>
   );

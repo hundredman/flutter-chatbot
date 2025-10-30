@@ -3,7 +3,7 @@ import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
 
-const ChatInterface = ({ conversation, onGoHome, onUpdateConversation }) => {
+const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, showBackButton = true }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -110,12 +110,14 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation }) => {
   return (
     <div className="chat-interface">
       <header className="chat-header">
-        <button className="back-btn" onClick={onGoHome}>
-          ← Back to Home
-        </button>
+        {showBackButton && (
+          <button className="back-btn" onClick={onGoHome}>
+            ← Back to Home
+          </button>
+        )}
         <div className="chat-title">
           <h2>{conversation?.title || 'Flutter Chat'}</h2>
-          {conversation?.week && conversation?.week !== 'quick' && (
+          {conversation?.week && conversation?.week !== 'quick' && conversation?.week !== 'new' && (
             <span className="week-badge">Week {conversation.week}</span>
           )}
         </div>
