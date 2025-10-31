@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
+import { addMessageToConversation } from '../firebase/chatService';
 
 const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, showBackButton = true }) => {
   const [messages, setMessages] = useState([]);
@@ -17,6 +18,15 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Load messages from conversation when it changes
+    if (conversation && conversation.messages) {
+      setMessages(conversation.messages);
+    } else {
+      setMessages([]);
+    }
+  }, [conversation]);
 
   useEffect(() => {
     // Send initial prompt if this is a new conversation
@@ -38,6 +48,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
 
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
+
+    // Save user message to Firestore immediately
+    if (conversation?.id) {
+      await addMessageToConversation(conversation.id, userMessage);
+    }
 
     if (!isInitial) {
       setInputValue('');
@@ -76,6 +91,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       const updatedMessages = [...newMessages, botMessage];
       setMessages(updatedMessages);
 
+      // Save bot message to Firestore immediately
+      if (conversation?.id) {
+        await addMessageToConversation(conversation.id, botMessage);
+      }
+
       // Update conversation
       onUpdateConversation({
         ...conversation,
@@ -95,6 +115,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
 
       const updatedMessages = [...newMessages, errorMessage];
       setMessages(updatedMessages);
+
+      // Save error message to Firestore immediately
+      if (conversation?.id) {
+        await addMessageToConversation(conversation.id, errorMessage);
+      }
     }
 
     setIsLoading(false);

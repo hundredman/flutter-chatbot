@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './AuthPage.css';
 import { signUpWithEmail, signInWithEmail, signInWithGoogle } from '../firebase/authService';
 
-const AuthPage = ({ onAuthSuccess }) => {
+const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -71,9 +71,8 @@ const AuthPage = ({ onAuthSuccess }) => {
       }
 
       if (result.success) {
-        // Store user in localStorage for persistence
-        localStorage.setItem('user', JSON.stringify(result.user));
-        onAuthSuccess(result.user);
+        // Firebase onAuthStateChanged will automatically handle the user state
+        // No need to manually call onAuthSuccess or set localStorage
       } else {
         setError(result.error);
       }
@@ -92,9 +91,8 @@ const AuthPage = ({ onAuthSuccess }) => {
       const result = await signInWithGoogle();
 
       if (result.success) {
-        // Store user in localStorage for persistence
-        localStorage.setItem('user', JSON.stringify(result.user));
-        onAuthSuccess(result.user);
+        // Firebase onAuthStateChanged will automatically handle the user state
+        // No need to manually call onAuthSuccess or set localStorage
       } else {
         setError(result.error);
       }

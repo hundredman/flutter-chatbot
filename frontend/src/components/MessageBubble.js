@@ -5,7 +5,28 @@ const MessageBubble = ({ message, language }) => {
   const [showSources, setShowSources] = useState(false);
 
   const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], {
+    let date;
+
+    // Handle different timestamp formats
+    if (timestamp instanceof Date) {
+      date = timestamp;
+    } else if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+      // Firestore timestamp object
+      date = new Date(timestamp.seconds * 1000);
+    } else if (timestamp) {
+      // String or number timestamp
+      date = new Date(timestamp);
+    } else {
+      // Fallback to current time
+      date = new Date();
+    }
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Now';
+    }
+
+    return date.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit'
     });

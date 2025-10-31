@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Sidebar.css';
 
 const Sidebar = ({
@@ -17,14 +17,38 @@ const Sidebar = ({
   };
 
   const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    let date;
 
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
+    // Handle different timestamp formats
+    if (timestamp instanceof Date) {
+      date = timestamp;
+    } else if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+      // Firestore timestamp object
+      date = new Date(timestamp.seconds * 1000);
+    } else if (timestamp) {
+      // String or number timestamp
+      date = new Date(timestamp);
+    } else {
+      // Fallback to current date
+      date = new Date();
+    }
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Recent';
+    }
+
+    const now = new Date();
+
+    // Check if it's the same day (more reliable)
+    const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const daysDiff = Math.floor((nowDate - compareDate) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff === 0) return 'Today';
+    if (daysDiff === 1) return 'Yesterday';
+    if (daysDiff > 0 && daysDiff < 7) return `${daysDiff} days ago`;
+    if (daysDiff < 0) return 'Future'; // Handle future dates
 
     return date.toLocaleDateString();
   };
@@ -38,7 +62,9 @@ const Sidebar = ({
     const groups = {};
 
     conversations.forEach(conv => {
-      const dateKey = formatDate(conv.createdAt || conv.id);
+      // Use updatedAt for more recent activity, fallback to createdAt
+      const dateToUse = conv.updatedAt || conv.createdAt;
+      const dateKey = formatDate(dateToUse);
       if (!groups[dateKey]) {
         groups[dateKey] = [];
       }
@@ -49,6 +75,9 @@ const Sidebar = ({
   };
 
   const groupedConversations = groupConversationsByDate(conversations);
+
+  // Clean up: Remove debug logging
+  // console.log('Sidebar - conversations prop:', conversations);
 
   return (
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>

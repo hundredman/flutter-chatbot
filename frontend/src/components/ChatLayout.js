@@ -3,55 +3,74 @@ import './ChatLayout.css';
 import Sidebar from './Sidebar';
 import ChatInterface from './ChatInterface';
 import HomePage from './HomePage';
+import {
+  createConversation,
+  getUserConversations,
+  updateConversation,
+  deleteConversation,
+  generateConversationTitle
+} from '../firebase/chatService';
+import { createTestConversations, testConversationRetrieval } from '../firebase/testConversations';
 
 const ChatLayout = ({ user, onSignOut }) => {
   const [conversations, setConversations] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [currentView, setCurrentView] = useState('home');
+  const [loading, setLoading] = useState(true);
 
-  // Load conversations from localStorage on mount
+  // Load conversations from Firestore on mount
   useEffect(() => {
-    const savedConversations = localStorage.getItem(`conversations_${user.id}`);
-    if (savedConversations) {
-      const parsed = JSON.parse(savedConversations);
-      setConversations(parsed);
-    }
-  }, [user.id]);
-
-  // Save conversations to localStorage whenever they change
-  useEffect(() => {
-    if (conversations.length > 0) {
-      localStorage.setItem(`conversations_${user.id}`, JSON.stringify(conversations));
-    }
-  }, [conversations, user.id]);
-
-  const createNewChat = (initialData = null) => {
-    const newConversation = {
-      id: Date.now().toString(),
-      title: initialData?.title || 'New Chat',
-      messages: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      userId: user.id,
-      week: initialData?.week,
-      initialPrompt: initialData?.initialPrompt
+    const loadConversations = async () => {
+      if (user?.id) {
+        setLoading(true);
+        const result = await getUserConversations(user.id);
+        if (result.success) {
+          setConversations(result.conversations);
+        } else {
+          console.error('Failed to load conversations:', result.error);
+        }
+        setLoading(false);
+      }
     };
 
-    setConversations(prev => [newConversation, ...prev]);
-    setCurrentConversation(newConversation);
-    setCurrentView('chat');
+    loadConversations();
+  }, [user?.id]);
 
-    return newConversation;
+  const createNewChat = async (initialData = null) => {
+    if (!user?.id) return null;
+
+    const title = initialData?.title || 'New Chat';
+    const initialPrompt = initialData?.initialPrompt;
+
+    const result = await createConversation(user.id, title, initialPrompt);
+    if (result.success) {
+      const newConversation = {
+        ...result.conversation,
+        week: initialData?.week,
+        initialPrompt: initialData?.initialPrompt
+      };
+
+      setConversations(prev => [newConversation, ...prev]);
+      setCurrentConversation(newConversation);
+      setCurrentView('chat');
+
+      return newConversation;
+    } else {
+      console.error('Failed to create conversation:', result.error);
+      return null;
+    }
   };
 
-  const handleStartConversation = (weekData) => {
-    const newConv = createNewChat({
+  const handleStartConversation = async (weekData) => {
+    const newConv = await createNewChat({
       title: weekData.title,
       week: weekData.week,
       initialPrompt: weekData.initialPrompt
     });
-    setCurrentConversation(newConv);
-    setCurrentView('chat');
+    if (newConv) {
+      setCurrentConversation(newConv);
+      setCurrentView('chat');
+    }
   };
 
   const handleSelectConversation = (conversation) => {
@@ -59,45 +78,65 @@ const ChatLayout = ({ user, onSignOut }) => {
     setCurrentView('chat');
   };
 
-  const handleUpdateConversation = (updatedConversation) => {
-    setConversations(prev =>
-      prev.map(conv =>
-        conv.id === updatedConversation.id
-          ? { ...updatedConversation, updatedAt: Date.now() }
-          : conv
-      )
-    );
-    setCurrentConversation(updatedConversation);
+  const handleUpdateConversation = async (updatedConversation) => {
+    // Update in Firestore
+    const result = await updateConversation(updatedConversation.id, {
+      messages: updatedConversation.messages,
+      title: updatedConversation.title
+    });
 
-    // Update title if it's still "New Chat" and we have messages
-    if (
-      updatedConversation.title === 'New Chat' &&
-      updatedConversation.messages.length > 0
-    ) {
-      const firstUserMessage = updatedConversation.messages.find(m => m.type === 'user');
-      if (firstUserMessage) {
-        const newTitle = generateTitle(firstUserMessage.content);
-        const conversationWithTitle = {
-          ...updatedConversation,
-          title: newTitle
-        };
+    if (result.success) {
+      // Update local state
+      setConversations(prev =>
+        prev.map(conv =>
+          conv.id === updatedConversation.id
+            ? { ...updatedConversation, updatedAt: new Date() }
+            : conv
+        )
+      );
+      setCurrentConversation(updatedConversation);
 
-        setConversations(prev =>
-          prev.map(conv =>
-            conv.id === updatedConversation.id ? conversationWithTitle : conv
-          )
-        );
-        setCurrentConversation(conversationWithTitle);
+      // Update title if it's still "New Chat" and we have messages
+      if (
+        updatedConversation.title === 'New Chat' &&
+        updatedConversation.messages.length > 0
+      ) {
+        const firstUserMessage = updatedConversation.messages.find(m => m.type === 'user');
+        if (firstUserMessage) {
+          const newTitle = generateConversationTitle(firstUserMessage);
+          const conversationWithTitle = {
+            ...updatedConversation,
+            title: newTitle
+          };
+
+          // Update title in Firestore
+          await updateConversation(updatedConversation.id, { title: newTitle });
+
+          setConversations(prev =>
+            prev.map(conv =>
+              conv.id === updatedConversation.id ? conversationWithTitle : conv
+            )
+          );
+          setCurrentConversation(conversationWithTitle);
+        }
       }
+    } else {
+      console.error('Failed to update conversation:', result.error);
     }
   };
 
-  const handleDeleteConversation = (conversationId) => {
-    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+  const handleDeleteConversation = async (conversationId) => {
+    const result = await deleteConversation(conversationId);
 
-    if (currentConversation?.id === conversationId) {
-      setCurrentConversation(null);
-      setCurrentView('home');
+    if (result.success) {
+      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+
+      if (currentConversation?.id === conversationId) {
+        setCurrentConversation(null);
+        setCurrentView('home');
+      }
+    } else {
+      console.error('Failed to delete conversation:', result.error);
     }
   };
 
@@ -106,14 +145,35 @@ const ChatLayout = ({ user, onSignOut }) => {
     setCurrentConversation(null);
   };
 
-  const generateTitle = (firstMessage) => {
-    const words = firstMessage.split(' ').slice(0, 6);
-    let title = words.join(' ');
-    if (firstMessage.split(' ').length > 6) {
-      title += '...';
+  // Debug function to test conversation functionality
+  const handleTestConversations = async () => {
+    console.log('Testing conversations...');
+    await createTestConversations(user.id);
+
+    // Reload conversations after creating test data
+    const result = await getUserConversations(user.id);
+    if (result.success) {
+      setConversations(result.conversations);
     }
-    return title;
   };
+
+  const handleTestRetrieval = async () => {
+    console.log('Testing conversation retrieval...');
+    const result = await testConversationRetrieval(user.id);
+    console.log('Test retrieval result:', result);
+  };
+
+  // Show loading while conversations are being fetched
+  if (loading) {
+    return (
+      <div className="chat-layout">
+        <div className="loading-screen">
+          <div className="loading-spinner"></div>
+          <p>Loading conversations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-layout">
@@ -135,6 +195,8 @@ const ChatLayout = ({ user, onSignOut }) => {
               user={user}
               onSignOut={onSignOut}
               isCompact={true} // Add compact mode for sidebar layout
+              onTestConversations={handleTestConversations}
+              onTestRetrieval={handleTestRetrieval}
             />
           </div>
         ) : (

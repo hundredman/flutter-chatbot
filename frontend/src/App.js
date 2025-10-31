@@ -34,9 +34,6 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleAuthSuccess = (userData) => {
-    setUser(userData);
-  };
 
   const handleSignOut = async () => {
     try {
@@ -64,7 +61,7 @@ function App() {
       {user ? (
         <ChatLayout user={user} onSignOut={handleSignOut} />
       ) : (
-        <AuthPage onAuthSuccess={handleAuthSuccess} />
+        <AuthPage />
       )}
     </div>
   );
