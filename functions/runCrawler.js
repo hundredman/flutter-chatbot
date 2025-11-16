@@ -25,7 +25,7 @@ async function fetchSitemap() {
     const $ = cheerio.load(response.data, { xmlMode: true });
     const urls = [];
 
-    $('url').each((index, element) => {
+    $('url').each((_, element) => {
       const loc = $(element).find('loc').text();
       const lastmod = $(element).find('lastmod').text();
 
@@ -53,24 +53,66 @@ async function fetchSitemap() {
 }
 
 /**
+ * Check if URL needs to be re-scraped based on last modified date
+ * @param {string} url - URL to check
+ * @param {string} lastModified - Last modified date from sitemap
+ * @returns {Promise<boolean>} True if URL needs to be scraped
+ */
+async function needsRefresh(url, lastModified) {
+  try {
+    const db = admin.firestore();
+    const statusDoc = await db.collection('crawl_status').doc(encodeURIComponent(url)).get();
+
+    if (!statusDoc.exists) {
+      return true; // New URL, needs to be scraped
+    }
+
+    const statusData = statusDoc.data();
+    const lastScraped = statusData.lastScraped;
+    const sitemapLastModified = new Date(lastModified);
+    const lastScrapedDate = lastScraped ? lastScraped.toDate() : new Date(0);
+
+    // If sitemap shows content was modified after our last scrape, we need to refresh
+    return sitemapLastModified > lastScrapedDate;
+
+  } catch (error) {
+    console.error(`Error checking freshness for ${url}:`, error);
+    return true; // On error, default to scraping
+  }
+}
+
+/**
+ * Update crawl status in Firestore
+ * @param {string} url - URL that was scraped
+ * @param {string} lastModified - Last modified date from sitemap
+ * @param {boolean} success - Whether scraping was successful
+ */
+async function updateCrawlStatus(url, lastModified, success) {
+  try {
+    const db = admin.firestore();
+    await db.collection('crawl_status').doc(encodeURIComponent(url)).set({
+      url: url,
+      lastScraped: admin.firestore.FieldValue.serverTimestamp(),
+      sitemapLastModified: new Date(lastModified),
+      lastScrapeSuccess: success,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error(`Error updating crawl status for ${url}:`, error);
+  }
+}
+
+/**
  * Scrape content from a single documentation page
  * @param {string} url - URL to scrape
+ * @param {Object} browser - Shared browser instance
  * @returns {Promise<Object>} Scraped content data
  */
-async function scrapePage(url) {
-  let browser;
+async function scrapePage(url, browser) {
+  let page;
 
   try {
     console.log(`Scraping: ${url}`);
-
-    // Launch browser with optimized settings
-    browser = await puppeteer.launch({
-      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true
-    });
 
     const page = await browser.newPage();
 
@@ -169,8 +211,8 @@ async function scrapePage(url) {
     console.error(`Error scraping ${url}:`, error.message);
     throw error;
   } finally {
-    if (browser) {
-      await browser.close();
+    if (page) {
+      await page.close();
     }
   }
 }
@@ -316,6 +358,7 @@ exports.runCrawler = onRequest({
     const results = {
       processed: 0,
       failed: 0,
+      skipped: 0,
       totalChunks: 0,
       urls: []
     };
@@ -323,27 +366,29 @@ exports.runCrawler = onRequest({
     // Process each URL
     for (const urlData of urlsToProcess) {
       try {
+        // Check if page needs refresh based on last modified date
+        const needsUpdate = await needsRefresh(urlData.url, urlData.lastModified);
+
+        if (!needsUpdate) {
+          console.log(`⏭️  Skipping ${urlData.url} (no changes since last crawl)`);
+          results.skipped++;
+          results.urls.push({
+            url: urlData.url,
+            status: 'skipped',
+            reason: 'No changes since last crawl'
+          });
+          continue;
+        }
+
+        console.log(`🔄 Processing ${urlData.url} (updated: ${urlData.lastModified})`);
+
         // Scrape page content
         const pageData = await scrapePage(urlData.url);
 
         // Process and chunk content
         const chunks = await processDocument(pageData);
 
-        // Store chunks in Firestore for now (vector index not ready yet)
-        const db = admin.firestore();
-        const batch = db.batch();
-
-        chunks.forEach(chunk => {
-          const docRef = db.collection('document_chunks').doc(chunk.id);
-          batch.set(docRef, {
-            ...chunk,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
-          });
-        });
-
-        await batch.commit();
-
-        // Add chunks to vector index for semantic search
+        // Add chunks to vector index for semantic search (single source of truth)
         console.log('Starting vector embedding process...');
         try {
           const vectorDocs = chunks.map(chunk => ({
@@ -366,13 +411,17 @@ exports.runCrawler = onRequest({
           // Continue processing even if vector indexing fails
         }
 
+        // Update crawl status
+        await updateCrawlStatus(urlData.url, urlData.lastModified, true);
+
         results.processed++;
         results.totalChunks += chunks.length;
         results.urls.push({
           url: urlData.url,
           status: 'success',
           chunks: chunks.length,
-          title: pageData.title
+          title: pageData.title,
+          lastModified: urlData.lastModified
         });
 
         console.log(`✓ Processed: ${pageData.title} (${chunks.length} chunks)`);
@@ -382,11 +431,16 @@ exports.runCrawler = onRequest({
 
       } catch (error) {
         console.error(`✗ Failed to process ${urlData.url}:`, error.message);
+
+        // Update crawl status even for failed attempts
+        await updateCrawlStatus(urlData.url, urlData.lastModified, false);
+
         results.failed++;
         results.urls.push({
           url: urlData.url,
           status: 'failed',
-          error: error.message
+          error: error.message,
+          lastModified: urlData.lastModified
         });
       }
     }
