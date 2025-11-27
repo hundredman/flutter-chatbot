@@ -438,6 +438,14 @@ exports.runCrawler = onRequest({
             status: "skipped",
             reason: "No changes since last crawl",
           });
+
+          // Update progress for skipped pages (if not in test mode)
+          if (!testMode) {
+            await updateCrawlProgress({
+              lastProcessedIndex: currentIndex,
+            });
+          }
+
           continue;
         }
 
