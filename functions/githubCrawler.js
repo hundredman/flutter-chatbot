@@ -240,6 +240,37 @@ function parseMarkdownFile(content, filePath) {
 }
 
 /**
+ * Simple rule-based content classification (faster, no API calls)
+ * @param {string} filePath - File path
+ * @param {string} content - Content to classify
+ * @return {string} - Content type
+ */
+function classifyContentSimple(filePath, content) {
+  // Classify based on file path
+  if (filePath.includes("/cookbook/")) return "cookbook";
+  if (filePath.includes("/api/") || filePath.includes("/reference/")) return "api";
+  if (filePath.includes("/tutorial/")) return "tutorial";
+
+  // Classify based on content patterns
+  const contentLower = content.toLowerCase().substring(0, 500);
+
+  if (contentLower.includes("step 1") || contentLower.includes("step-by-step")) {
+    return "tutorial";
+  }
+
+  if (contentLower.includes("class ") || contentLower.includes("method") || contentLower.includes("parameter")) {
+    return "api";
+  }
+
+  if (contentLower.includes("recipe") || contentLower.includes("example")) {
+    return "cookbook";
+  }
+
+  // Default to guide
+  return "guide";
+}
+
+/**
  * Process document and create chunks
  * @param {Object} fileData - Parsed file data
  * @param {string} filePath - File path
@@ -270,7 +301,8 @@ async function processDocument(fileData, filePath, commitSha) {
         if (currentChunk.length + paragraph.length > maxChunkSize && currentChunk.length > 0) {
           // Create chunk
           const chunkId = `${filePath.replace(/\//g, "_").replace(".md", "")}_chunk_${chunkIndex}`;
-          const contentType = await classifyContent(currentChunk);
+          // Simple rule-based classification to avoid API calls
+          const contentType = classifyContentSimple(filePath, currentChunk);
 
           chunks.push({
             id: chunkId,
@@ -303,9 +335,11 @@ async function processDocument(fileData, filePath, commitSha) {
       }
 
       // Add final chunk if there's remaining content
-      if (currentChunk.trim().length > 100) {
+      // Reduced minimum length from 100 to 20 to capture index.md files
+      if (currentChunk.trim().length > 20) {
         const chunkId = `${filePath.replace(/\//g, "_").replace(".md", "")}_chunk_${chunkIndex}`;
-        const contentType = await classifyContent(currentChunk);
+        // Simple rule-based classification to avoid API calls
+        const contentType = classifyContentSimple(filePath, currentChunk);
 
         chunks.push({
           id: chunkId,
@@ -327,6 +361,35 @@ async function processDocument(fileData, filePath, commitSha) {
           },
         });
         chunkIndex++;
+      }
+    }
+
+    // If no chunks were created but we have frontmatter with title/description, create at least one chunk
+    if (chunks.length === 0 && (title || description)) {
+      const fallbackContent = [title, description].filter(Boolean).join("\n\n");
+      if (fallbackContent.trim().length > 0) {
+        const chunkId = `${filePath.replace(/\//g, "_").replace(".md", "")}_chunk_0`;
+        const contentType = classifyContentSimple(filePath, fallbackContent);
+
+        chunks.push({
+          id: chunkId,
+          githubPath: filePath,
+          url: githubUrl,
+          title: title || "Untitled",
+          content: fallbackContent.trim(),
+          contentType: contentType,
+          chunkIndex: 0,
+          lastUpdated: new Date().toISOString(),
+          metadata: {
+            title: title,
+            section: "Introduction",
+            description: description,
+            tags: tags,
+            type: contentType,
+            commitSha: commitSha,
+            wordCount: fallbackContent.trim().split(/\s+/).length,
+          },
+        });
       }
     }
 
@@ -427,7 +490,7 @@ async function updateSyncProgress(updates) {
  */
 exports.runGitHubSync = onRequest({
   cors: true,
-  timeoutSeconds: 540,
+  timeoutSeconds: 3600, // 60 minutes - maximum for Cloud Functions v2
   memory: "2GiB",
 }, async (req, res) => {
   try {
@@ -577,7 +640,10 @@ exports.runGitHubSync = onRequest({
         // Save chunks to Firestore
         const db = admin.firestore();
         for (const chunk of chunks) {
-          await db.collection("document_chunks").doc(chunk.id).set(chunk);
+          await db.collection("document_chunks").doc(chunk.id).set({
+            ...chunk,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
         }
 
         // Update sync status

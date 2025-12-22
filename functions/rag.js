@@ -132,10 +132,12 @@ async function findSimilarDocuments(query, topK = 5) {
       const db = admin.firestore();
 
       // Get all document chunks from Firestore
+      // NOTE: This is inefficient and should be replaced with Vertex AI Vector Search
+      // We need to get ALL documents since we can't predict which ones are relevant
       const snapshot = await db.collection("document_chunks")
-          .orderBy("createdAt", "desc")
-          .limit(topK * 3) // Get more docs for similarity calculation
           .get();
+
+      console.log(`Total documents in Firestore: ${snapshot.size}`);
 
       if (snapshot.empty) {
         console.log("No crawled documents found, returning empty results");
@@ -144,22 +146,99 @@ async function findSimilarDocuments(query, topK = 5) {
 
       const documents = [];
 
-      // Calculate similarity for each document
+      // Use simple text-based similarity (faster, no embedding generation needed)
+      const queryLower = query.toLowerCase();
+      const queryTerms = queryLower.split(/\s+/).filter((t) => t.length > 2);
+
+      console.log(`Query: "${query}", Terms: [${queryTerms.join(", ")}]`);
+
+      // Extract key terms (remove common words)
+      const commonWords = new Set(["what", "is", "the", "a", "an", "how", "to", "in", "on", "at", "for", "with", "about"]);
+      const keyTerms = queryTerms.filter((term) => !commonWords.has(term));
+
+      console.log(`Key terms after filtering: [${keyTerms.join(", ")}]`);
+
+      // Check if query is very general (like "What is Flutter?")
+      const isGeneralQuery = keyTerms.length === 1 && ["flutter", "dart", "widget"].includes(keyTerms[0]);
+
       for (const doc of snapshot.docs) {
         const data = doc.data();
+        const contentLower = (data.content || "").toLowerCase();
+        const titleLower = (data.title || "").toLowerCase();
+        const urlLower = (data.url || "").toLowerCase();
+        const githubPath = (data.githubPath || "").toLowerCase();
 
-        // Generate embedding for document content
-        const docEmbedding = await generateEmbedding(data.content);
+        let similarity = 0;
+        const matches = [];
 
-        // Calculate cosine similarity
-        const similarity = calculateCosineSimilarity(queryEmbedding, docEmbedding);
+        // For general queries, prioritize intro content FIRST before other scoring
+        if (isGeneralQuery) {
+          // Very strong boost for get-started pages
+          if (githubPath.includes("get-started/fundamentals") || githubPath.includes("get-started/index")) {
+            similarity += 10.0;
+            matches.push("get_started_page");
+          } else if (githubPath.includes("get-started/")) {
+            similarity += 5.0;
+            matches.push("get_started_section");
+          }
 
+          // Penalize _includes and add-to-app heavily for general queries
+          if (githubPath.includes("_includes/") || githubPath.includes("add-to-app/")) {
+            similarity -= 5.0;
+            matches.push("penalized_includes");
+          }
+        }
+
+        // Exact phrase match in title gets very high score
+        if (titleLower.includes(queryLower)) {
+          similarity += 2.0;
+          matches.push("exact_title");
+        }
+
+        // Exact phrase match in content
+        if (contentLower.includes(queryLower)) {
+          similarity += 0.5;
+          matches.push("exact_content");
+        }
+
+        // Key term matches (weighted more heavily)
+        for (const term of keyTerms) {
+          let termWeight = 1.0;
+
+          // Title matches are most important
+          if (titleLower.includes(term)) {
+            similarity += 1.0 * termWeight;
+            matches.push(`title:${term}`);
+          }
+          // URL matches
+          if (urlLower.includes(term) || githubPath.includes(term)) {
+            similarity += 0.5 * termWeight;
+            matches.push(`path:${term}`);
+          }
+          // Content matches
+          const termCount = (contentLower.match(new RegExp(term, "g")) || []).length;
+          if (termCount > 0) {
+            // More occurrences = higher score, but with diminishing returns
+            const contentScore = Math.min(0.3 * Math.log(termCount + 1), 0.8);
+            similarity += contentScore * termWeight;
+            matches.push(`content:${term}(${termCount})`);
+          }
+        }
+
+        // Boost for Flutter-specific content types
+        if (data.contentType === "api" && keyTerms.some((t) => titleLower.includes(t))) {
+          similarity += 0.5;
+          matches.push("api_doc");
+        }
+
+        // Always add documents (even with negative similarity) so we can sort and filter properly
         documents.push({
           id: data.id,
           content: data.content,
           url: data.url,
           lastUpdated: data.lastUpdated,
           similarity: similarity,
+          matches: matches,
           metadata: {
             title: data.title || data.metadata?.title || "Flutter Documentation",
             section: data.metadata?.section || "General",
@@ -174,6 +253,13 @@ async function findSimilarDocuments(query, topK = 5) {
           .slice(0, topK);
 
       console.log(`Found ${sortedDocs.length} documents with vector similarity`);
+      console.log("Top results:");
+      sortedDocs.forEach((doc, i) => {
+        console.log(`  ${i + 1}. [${doc.similarity.toFixed(2)}] ${doc.metadata.title}`);
+        console.log(`     Matches: ${doc.matches.join(", ")}`);
+        console.log(`     URL: ${doc.url}`);
+      });
+
       return sortedDocs;
     } catch (vectorError) {
       console.error("Vector search error, using basic search:", vectorError);

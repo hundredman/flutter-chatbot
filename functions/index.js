@@ -87,4 +87,8 @@ exports.getHistory = getHistory;
 const {runGitHubSync} = require("./githubCrawler");
 exports.runGitHubSync = runGitHubSync;
 
+// Export file comparison function
+const {checkMissingFiles} = require("./checkMissingFiles");
+exports.checkMissingFiles = checkMissingFiles;
+
 // Legacy web crawler removed
