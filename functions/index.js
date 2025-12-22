@@ -83,8 +83,12 @@ const {generateAnswer, getHistory} = require("./generateAnswer");
 exports.generateAnswer = generateAnswer;
 exports.getHistory = getHistory;
 
-// Export crawler function
-const {runCrawler} = require("./runCrawler");
-exports.runCrawler = runCrawler;
+// Export GitHub sync function
+const {runGitHubSync} = require("./githubCrawler");
+exports.runGitHubSync = runGitHubSync;
 
-// Content-only crawler removed
+// Export file comparison function
+const {checkMissingFiles} = require("./checkMissingFiles");
+exports.checkMissingFiles = checkMissingFiles;
+
+// Legacy web crawler removed
