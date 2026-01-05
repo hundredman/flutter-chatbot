@@ -24,6 +24,7 @@ exports.generateAnswer = onRequest({cors: true}, async (req, res) => {
       previousMessages = [],
       linkUrl,
       filePath,
+      language = "en",
     } = req.body;
 
     // Validate required fields
@@ -92,7 +93,7 @@ exports.generateAnswer = onRequest({cors: true}, async (req, res) => {
 
     // Step 5: Generate answer using Gemini
     console.log("Step 5: Generating answer with Gemini...");
-    const result = await generateAnswerFromContext(contextualQuestion, relevantDocs);
+    const result = await generateAnswerFromContext(contextualQuestion, relevantDocs, {language});
 
     // Step 6: Save to chat history (if conversationId provided)
     if (conversationId) {
