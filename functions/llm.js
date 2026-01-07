@@ -52,7 +52,7 @@ Guidelines:
 - ${langInstruction}
 - Provide accurate, practical answers based only on the context provided
 - Include code examples when relevant
-- Mention source URLs when referencing specific information
+- DO NOT include [Source X] citations in your answer - the sources will be displayed separately below your answer
 - If the context doesn't contain enough information, say so clearly
 - Keep answers concise but comprehensive
 - Use markdown formatting for code blocks
