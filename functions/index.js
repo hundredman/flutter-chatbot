@@ -91,4 +91,8 @@ exports.runGitHubSync = runGitHubSync;
 const {checkMissingFiles} = require("./checkMissingFiles");
 exports.checkMissingFiles = checkMissingFiles;
 
+// Export Pinecone bulk upload function
+const {bulkUploadToPinecone} = require("./bulkUploadToPinecone");
+exports.bulkUploadToPinecone = bulkUploadToPinecone;
+
 // Legacy web crawler removed

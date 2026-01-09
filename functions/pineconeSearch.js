@@ -1,6 +1,20 @@
 const {Pinecone} = require("@pinecone-database/pinecone");
 const {generateLocalEmbedding} = require("./localEmbeddings");
 
+/**
+ * ARCHITECTURE NOTES:
+ *
+ * - For SEARCH queries (Cloud Functions): Uses Google text-embedding-004 API
+ *   - Low memory overhead (~10MB)
+ *   - Fast and reliable
+ *   - Minimal cost per query
+ *
+ * - For UPLOAD (local script only): Uses FREE EmbeddingGemma model
+ *   - Requires ~200MB memory (too much for Cloud Functions)
+ *   - One-time operation run locally
+ *   - See uploadToPinecone.js for upload script
+ */
+
 // Initialize Pinecone client
 let pinecone = null;
 let index = null;
@@ -18,10 +32,12 @@ async function initPinecone() {
   }
 
   try {
-    const apiKey = process.env.PINECONE_API_KEY;
+    // Try to get API key from Firebase functions config or environment
+    const functions = require("firebase-functions");
+    const apiKey = process.env.PINECONE_API_KEY || functions.config().pinecone?.api_key;
 
     if (!apiKey) {
-      throw new Error("PINECONE_API_KEY not found in environment variables");
+      throw new Error("PINECONE_API_KEY not found in config or environment variables");
     }
 
     console.log("🔌 Initializing Pinecone connection...");
@@ -67,6 +83,47 @@ async function initPinecone() {
 }
 
 /**
+ * Generate embedding using Google text-embedding-004 API
+ * @param {string} text - Text to embed
+ * @return {Promise<number[]>} - 768-dimensional embedding vector
+ */
+async function generateGoogleEmbedding(text) {
+  try {
+    const {GoogleAuth} = require("google-auth-library");
+    const auth = new GoogleAuth({
+      scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+    });
+
+    const authClient = await auth.getClient();
+    const projectId = "hi-project-flutter-chatbot";
+    const location = "us-central1";
+
+    const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/text-embedding-004:predict`;
+
+    const requestBody = {
+      instances: [{
+        content: text,
+      }],
+    };
+
+    const response = await authClient.request({
+      url: url,
+      method: "POST",
+      data: requestBody,
+    });
+
+    if (response.data.predictions && response.data.predictions[0]) {
+      return response.data.predictions[0].embeddings.values;
+    } else {
+      throw new Error("Unexpected API response structure");
+    }
+  } catch (error) {
+    console.error("Error generating Google embedding:", error);
+    throw error;
+  }
+}
+
+/**
  * Search for similar documents using Pinecone vector search
  * @param {string} query - Search query text
  * @param {number} topK - Number of results to return (default: 5)
@@ -76,9 +133,9 @@ async function searchPinecone(query, topK = 5) {
   try {
     console.log(`🔍 Searching Pinecone for: "${query}"`);
 
-    // Generate embedding for the query using FREE local EmbeddingGemma
-    console.log("💰 Using FREE local EmbeddingGemma for query embedding");
-    const queryEmbedding = await generateLocalEmbedding(query);
+    // Generate embedding for the query using Google API (low memory overhead)
+    console.log("💳 Using Google text-embedding-004 for query embedding");
+    const queryEmbedding = await generateGoogleEmbedding(query);
     console.log(`✅ Generated query embedding (${queryEmbedding.length} dimensions)`);
 
     // Initialize Pinecone

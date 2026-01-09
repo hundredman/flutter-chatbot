@@ -26,6 +26,7 @@ exports.generateAnswer = onRequest({cors: true, memory: "512MiB"}, async (req, r
       linkUrl,
       fileContent,
       fileName,
+      filePath,
       language = "en",
     } = req.body;
 

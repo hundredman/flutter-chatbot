@@ -6,13 +6,27 @@
 require("dotenv").config();
 const admin = require("firebase-admin");
 const {uploadToPinecone} = require("./pineconeSearch");
+const {execSync} = require("child_process");
 
-// Initialize Firebase Admin
-const serviceAccount = require("../serviceAccountKey.json");
+// Initialize Firebase Admin using Firebase CLI token
+if (!admin.apps.length) {
+  try {
+    // Get Firebase token from CLI
+    const token = execSync("firebase login:ci", {encoding: "utf8", stdio: "pipe"}).trim();
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+    // For local development, we'll use the token to authenticate
+    process.env.FIREBASE_TOKEN = token;
+
+    admin.initializeApp({
+      projectId: "hi-project-flutter-chatbot",
+    });
+  } catch (error) {
+    console.log("⚠️  Using existing Firebase session...");
+    admin.initializeApp({
+      projectId: "hi-project-flutter-chatbot",
+    });
+  }
+}
 
 async function main() {
   try {
