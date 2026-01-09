@@ -3,15 +3,19 @@ import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
 import { addMessageToConversation } from '../firebase/chatService';
-import { HiChevronLeft, HiPaperAirplane } from 'react-icons/hi';
+import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX } from 'react-icons/hi';
 
 const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, showBackButton = true }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState('en');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [attachedFile, setAttachedFile] = useState(null);
+  const [showAttachments, setShowAttachments] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Localized messages
   const t = {
@@ -23,6 +27,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       inputHelp: 'Press Enter to send, Shift+Enter for new line',
       errorMessage: 'Sorry, I encountered an error. Please try again.',
       apiConfigError: 'API URL is not configured. Please contact support.',
+      attachLink: 'Attach Link',
+      attachFile: 'Attach File',
+      linkPlaceholder: 'Enter URL (e.g., https://example.com)',
+      removeLink: 'Remove link',
+      removeFile: 'Remove file',
     },
     ko: {
       backButton: '홈으로 돌아가기',
@@ -32,6 +41,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       inputHelp: 'Enter를 눌러 전송, Shift+Enter로 줄바꿈',
       errorMessage: '죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.',
       apiConfigError: 'API URL이 설정되지 않았습니다. 관리자에게 문의하세요.',
+      attachLink: '링크 첨부',
+      attachFile: '파일 첨부',
+      linkPlaceholder: 'URL 입력 (예: https://example.com)',
+      removeLink: '링크 제거',
+      removeFile: '파일 제거',
     },
   };
 
@@ -84,6 +98,44 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation]);
 
+  const handleFileSelect = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Only allow text files
+    const allowedTypes = ['.txt', '.md', '.dart', '.js', '.json', '.yaml', '.yml'];
+    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+    if (!allowedTypes.includes(fileExt)) {
+      alert(language === 'ko'
+        ? '텍스트 파일만 첨부 가능합니다 (.txt, .md, .dart, .js, .json, .yaml)'
+        : 'Only text files are allowed (.txt, .md, .dart, .js, .json, .yaml)');
+      return;
+    }
+
+    setAttachedFile(file);
+  };
+
+  const handleRemoveFile = () => {
+    setAttachedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveLink = () => {
+    setLinkUrl('');
+  };
+
+  const readFileContent = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (e) => reject(e);
+      reader.readAsText(file);
+    });
+  };
+
   const handleSendMessage = async (messageText = inputValue, isInitial = false) => {
     if (!messageText.trim() && !isInitial) return;
 
@@ -113,6 +165,14 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     setIsLoading(true);
 
     try {
+      // Read file content if file is attached
+      let fileContent = null;
+      let fileName = null;
+      if (attachedFile && !isInitial) {
+        fileContent = await readFileContent(attachedFile);
+        fileName = attachedFile.name;
+      }
+
       // Call generateAnswer API (real AI)
       const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -120,16 +180,27 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
         throw new Error(currentLang.apiConfigError);
       }
 
+      const requestBody = {
+        question: messageText,
+        conversationId: conversation.id,
+        language: language
+      };
+
+      // Add attachments if present
+      if (linkUrl && !isInitial) {
+        requestBody.linkUrl = linkUrl;
+      }
+      if (fileContent && !isInitial) {
+        requestBody.fileContent = fileContent;
+        requestBody.fileName = fileName;
+      }
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          question: messageText,
-          conversationId: conversation.id,
-          language: language
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -160,6 +231,12 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
         ...conversation,
         messages: updatedMessages
       });
+
+      // Clear attachments after successful send
+      if (!isInitial) {
+        setLinkUrl('');
+        handleRemoveFile();
+      }
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -327,6 +404,68 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       </div>
 
       <div className="chat-input-container">
+        {/* Attachment toolbar */}
+        <div className="attachment-toolbar">
+          <button
+            className="attachment-btn"
+            onClick={() => setShowAttachments(!showAttachments)}
+            title={currentLang.attachLink}
+          >
+            <HiLink />
+          </button>
+          <button
+            className="attachment-btn"
+            onClick={() => fileInputRef.current?.click()}
+            title={currentLang.attachFile}
+          >
+            <HiDocumentText />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".txt,.md,.dart,.js,.json,.yaml,.yml"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+        </div>
+
+        {/* Link input (shown when attachments button clicked) */}
+        {showAttachments && (
+          <div className="link-input-container">
+            <input
+              type="url"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder={currentLang.linkPlaceholder}
+              className="link-input"
+            />
+          </div>
+        )}
+
+        {/* Show attached items */}
+        {(linkUrl || attachedFile) && (
+          <div className="attached-items">
+            {linkUrl && (
+              <div className="attached-item">
+                <HiLink />
+                <span className="attached-item-text">{linkUrl}</span>
+                <button onClick={handleRemoveLink} className="remove-attachment">
+                  <HiX />
+                </button>
+              </div>
+            )}
+            {attachedFile && (
+              <div className="attached-item">
+                <HiDocumentText />
+                <span className="attached-item-text">{attachedFile.name}</span>
+                <button onClick={handleRemoveFile} className="remove-attachment">
+                  <HiX />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="chat-input">
           <textarea
             ref={textareaRef}

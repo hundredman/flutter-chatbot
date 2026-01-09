@@ -52,7 +52,9 @@ Guidelines:
 - ${langInstruction}
 - Provide accurate, practical answers based only on the context provided
 - Include code examples when relevant
-- Mention source URLs when referencing specific information
+- CRITICAL: DO NOT include ANY source citations like [Source 1], [Source 2], etc. in your answer text
+- DO NOT reference sources with brackets or numbers in your response
+- Write naturally without any inline citations - sources are shown separately
 - If the context doesn't contain enough information, say so clearly
 - Keep answers concise but comprehensive
 - Use markdown formatting for code blocks
@@ -62,7 +64,7 @@ ${context}
 
 User Question: ${question}
 
-Answer:`;
+Answer (remember: NO [Source X] citations in the text):`;
 
     // Generate response from Gemini
     const result = await model.generateContent({

@@ -2,6 +2,7 @@ const {onRequest} = require("firebase-functions/https");
 const admin = require("firebase-admin");
 const {findSimilarDocuments} = require("./rag");
 const {generateAnswerFromContext} = require("./llm");
+const {crawlUrl} = require("./urlCrawler");
 
 /**
  * Generate AI-powered answers using RAG
@@ -23,6 +24,8 @@ exports.generateAnswer = onRequest({cors: true, memory: "512MiB"}, async (req, r
       conversationId,
       previousMessages = [],
       linkUrl,
+      fileContent,
+      fileName,
       filePath,
       language = "en",
     } = req.body;
@@ -45,39 +48,71 @@ exports.generateAnswer = onRequest({cors: true, memory: "512MiB"}, async (req, r
     // Step 2: Handle link attachment (if provided)
     if (linkUrl) {
       console.log(`Processing attached link: ${linkUrl}`);
-      // TODO: Implement link crawling in Phase 1
-      // For now, add a note about the link
-      relevantDocs.unshift({
-        id: "attached_link",
-        content: `User provided link: ${linkUrl} (link processing will be implemented in Phase 1)`,
-        url: linkUrl,
-        lastUpdated: new Date().toISOString(),
-        similarity: 1.0,
-        metadata: {
-          title: "User Provided Link",
-          section: "Attachments",
-          type: "link",
-        },
-      });
+      try {
+        const crawlResult = await crawlUrl(linkUrl);
+        if (crawlResult.success && crawlResult.content) {
+          relevantDocs.unshift({
+            id: "attached_link",
+            content: crawlResult.content,
+            url: linkUrl,
+            lastUpdated: new Date().toISOString(),
+            similarity: 1.0,
+            metadata: {
+              title: crawlResult.title || "User Provided Link",
+              section: "Attachments",
+              type: "link",
+            },
+          });
+          console.log(`Successfully crawled link: ${crawlResult.title}`);
+        } else {
+          console.warn(`Failed to crawl link: ${crawlResult.error}`);
+          relevantDocs.unshift({
+            id: "attached_link",
+            content: `Unable to access the provided link (${linkUrl}). ${crawlResult.error || "Unknown error"}`,
+            url: linkUrl,
+            lastUpdated: new Date().toISOString(),
+            similarity: 1.0,
+            metadata: {
+              title: "Link Access Error",
+              section: "Attachments",
+              type: "link",
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error processing link:", error);
+        relevantDocs.unshift({
+          id: "attached_link",
+          content: `Error processing link: ${error.message}`,
+          url: linkUrl,
+          lastUpdated: new Date().toISOString(),
+          similarity: 1.0,
+          metadata: {
+            title: "Link Processing Error",
+            section: "Attachments",
+            type: "link",
+          },
+        });
+      }
     }
 
     // Step 3: Handle file attachment (if provided)
-    if (filePath) {
-      console.log(`Processing attached file: ${filePath}`);
-      // TODO: Implement file processing in Phase 2
-      // For now, add a note about the file
+    if (fileContent && fileName) {
+      console.log(`Processing attached file: ${fileName}`);
+      // File content is already read on frontend
       relevantDocs.unshift({
         id: "attached_file",
-        content: `User uploaded file: ${filePath} (file processing will be implemented in Phase 2)`,
-        url: "file://uploaded",
+        content: fileContent,
+        url: `file://${fileName}`,
         lastUpdated: new Date().toISOString(),
         similarity: 1.0,
         metadata: {
-          title: "User Uploaded File",
+          title: `Uploaded File: ${fileName}`,
           section: "Attachments",
           type: "file",
         },
       });
+      console.log(`File attached: ${fileName} (${fileContent.length} characters)`);
     }
 
     // Step 4: Include conversation context if provided
