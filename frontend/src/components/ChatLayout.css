@@ -1,0 +1,104 @@
+.chat-layout {
+  display: flex;
+  height: 100vh;
+  background: var(--color-dark-bg);
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left var(--transition-slow);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.chat-layout .sidebar.collapsed + .main-content {
+  margin-left: 70px;
+}
+
+.home-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Compact HomePage styles when in sidebar layout */
+.home-wrapper .home-page {
+  max-width: 900px;
+  margin: 0 auto;
+  background: transparent;
+}
+
+.home-wrapper .user-bar {
+  display: flex; /* Show user bar but only for language toggle */
+  justify-content: flex-end; /* Align to right */
+  margin-bottom: 20px;
+  background: transparent; /* Remove background */
+  padding: 0; /* Remove padding */
+  border: none; /* Remove border */
+}
+
+.home-wrapper .user-info {
+  display: none; /* Hide user info since it's in sidebar */
+}
+
+.home-wrapper .user-actions {
+  display: flex; /* Show user actions for language toggle */
+}
+
+.home-wrapper .sign-out-btn {
+  display: none; /* Hide sign out button since it's in sidebar */
+}
+
+.home-wrapper .home-header h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.home-wrapper .home-header p {
+  margin-bottom: 30px;
+}
+
+/* Chat interface adjustments */
+.main-content .chat-interface {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content .chat-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #2d2d2d;
+  background: #171717;
+}
+
+.main-content .chat-messages {
+  flex: 1;
+  background: black;
+}
+
+.main-content .chat-input-container {
+  background: black;
+  border-top: 1px solid #2d2d2d;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .chat-layout .sidebar.collapsed + .main-content {
+    margin-left: 0;
+  }
+
+  .home-wrapper {
+    padding: 15px;
+  }
+
+  .home-wrapper .home-page {
+    max-width: none;
+  }
+}
