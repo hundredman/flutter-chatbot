@@ -7,6 +7,7 @@ const matter = require("gray-matter");
 const admin = require("firebase-admin");
 const {classifyContent} = require("./llm");
 const {addDocumentsToIndex} = require("./rag");
+const {uploadToPinecone, isPineconeConfigured} = require("./pineconeSearch");
 
 // GitHub configuration
 const GITHUB_OWNER = "flutter";
@@ -617,7 +618,7 @@ exports.runGitHubSync = onRequest({
         // Process and chunk document
         const chunks = await processDocument(parsedData, fileData.path, commitSha);
 
-        // Add chunks to vector index
+        // Add chunks to vector index (Cloud Storage)
         console.log("Adding to vector index...");
         try {
           const vectorDocs = chunks.map((chunk) => ({
@@ -636,6 +637,29 @@ exports.runGitHubSync = onRequest({
           console.log(`✓ Added ${vectorDocs.length} documents to vector index: ${vectorResult.fileName}`);
         } catch (vectorError) {
           console.error("Error adding to vector index:", vectorError);
+        }
+
+        // Upload to Pinecone for vector search
+        if (isPineconeConfigured()) {
+          console.log("Uploading to Pinecone...");
+          try {
+            const pineconeDocs = chunks.map((chunk) => ({
+              id: chunk.id,
+              content: chunk.content,
+              url: chunk.url,
+              title: chunk.title,
+              lastUpdated: chunk.lastUpdated,
+              metadata: {
+                section: chunk.githubPath,
+                type: chunk.contentType,
+              },
+            }));
+
+            await uploadToPinecone(pineconeDocs);
+            console.log(`✓ Uploaded ${pineconeDocs.length} documents to Pinecone`);
+          } catch (pineconeError) {
+            console.error("Error uploading to Pinecone:", pineconeError);
+          }
         }
 
         // Save chunks to Firestore
@@ -822,6 +846,26 @@ exports.scheduledGitHubSync = onSchedule({
             await addDocumentsToIndex(vectorDocs);
           } catch (vectorError) {
             console.error("Error adding to vector index:", vectorError);
+          }
+
+          // Upload to Pinecone for vector search
+          if (isPineconeConfigured()) {
+            try {
+              const pineconeDocs = chunks.map((chunk) => ({
+                id: chunk.id,
+                content: chunk.content,
+                url: chunk.url,
+                title: chunk.title,
+                lastUpdated: chunk.lastUpdated,
+                metadata: {
+                  section: chunk.githubPath,
+                  type: chunk.contentType,
+                },
+              }));
+              await uploadToPinecone(pineconeDocs);
+            } catch (pineconeError) {
+              console.error("Error uploading to Pinecone:", pineconeError);
+            }
           }
 
           // Save to Firestore
