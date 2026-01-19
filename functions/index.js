@@ -83,9 +83,10 @@ const {generateAnswer, getHistory} = require("./generateAnswer");
 exports.generateAnswer = generateAnswer;
 exports.getHistory = getHistory;
 
-// Export GitHub sync function
-const {runGitHubSync} = require("./githubCrawler");
+// Export GitHub sync functions
+const {runGitHubSync, scheduledGitHubSync} = require("./githubCrawler");
 exports.runGitHubSync = runGitHubSync;
+exports.scheduledGitHubSync = scheduledGitHubSync;
 
 // Export file comparison function
 const {checkMissingFiles} = require("./checkMissingFiles");

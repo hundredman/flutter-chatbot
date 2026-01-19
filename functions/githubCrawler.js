@@ -1,4 +1,5 @@
 const {onRequest} = require("firebase-functions/v2/https");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {defineString} = require("firebase-functions/params");
 const {Octokit} = require("@octokit/rest");
 const axios = require("axios");
@@ -724,5 +725,142 @@ exports.runGitHubSync = onRequest({
       success: false,
       error: error.message,
     });
+  }
+});
+
+/**
+ * Scheduled function to automatically sync Flutter docs weekly
+ * Runs every Monday at 3:00 AM UTC (12:00 PM KST)
+ */
+exports.scheduledGitHubSync = onSchedule({
+  schedule: "0 3 * * 1", // Every Monday at 3:00 AM UTC
+  timeZone: "UTC",
+  timeoutSeconds: 3600,
+  memory: "2GiB",
+}, async (event) => {
+  console.log("🕐 Starting scheduled GitHub sync...");
+
+  try {
+    // Initialize Octokit with token
+    const token = githubToken.value() || process.env.GITHUB_TOKEN;
+    if (!token) {
+      console.warn("GITHUB_TOKEN not set, API rate limits will apply");
+    }
+
+    const octokit = new Octokit({
+      auth: token,
+    });
+
+    // Reset progress for fresh sync
+    console.log("Resetting sync progress for scheduled run...");
+    await updateSyncProgress({
+      lastProcessedIndex: -1,
+      completedFiles: 0,
+      failedFiles: 0,
+      skippedFiles: 0,
+      isComplete: false,
+    });
+
+    // Fetch file tree from GitHub
+    const githubFiles = await fetchGitHubFileTree(octokit);
+    const totalFiles = githubFiles.length;
+
+    console.log(`Found ${totalFiles} markdown files to process`);
+    await updateSyncProgress({totalFiles: totalFiles});
+
+    const batchSize = 50;
+    let processed = 0;
+    let failed = 0;
+    let skipped = 0;
+
+    // Process all files in batches
+    for (let startIndex = 0; startIndex < totalFiles; startIndex += batchSize) {
+      const endIndex = Math.min(startIndex + batchSize, totalFiles);
+      const filesToProcess = githubFiles.slice(startIndex, endIndex);
+
+      console.log(`Processing batch ${startIndex + 1} to ${endIndex} of ${totalFiles}`);
+
+      for (let i = 0; i < filesToProcess.length; i++) {
+        const fileData = filesToProcess[i];
+        const currentIndex = startIndex + i;
+
+        try {
+          const commitSha = await getLatestCommitSha(octokit, fileData.path);
+
+          if (!commitSha) {
+            skipped++;
+            continue;
+          }
+
+          const needsUpdate = await needsRefresh(fileData.path, commitSha);
+
+          if (!needsUpdate) {
+            skipped++;
+            await updateSyncProgress({lastProcessedIndex: currentIndex});
+            continue;
+          }
+
+          console.log(`🔄 Processing ${fileData.path}`);
+
+          const content = await downloadFileContent(fileData.path);
+          const parsedData = parseMarkdownFile(content, fileData.path);
+          const chunks = await processDocument(parsedData, fileData.path, commitSha);
+
+          // Add to vector index
+          try {
+            const vectorDocs = chunks.map((chunk) => ({
+              id: chunk.id,
+              text: chunk.content,
+              metadata: {
+                githubPath: chunk.githubPath,
+                url: chunk.url,
+                title: chunk.title,
+                contentType: chunk.contentType,
+                lastUpdated: chunk.lastUpdated,
+              },
+            }));
+            await addDocumentsToIndex(vectorDocs);
+          } catch (vectorError) {
+            console.error("Error adding to vector index:", vectorError);
+          }
+
+          // Save to Firestore
+          const db = admin.firestore();
+          for (const chunk of chunks) {
+            await db.collection("document_chunks").doc(chunk.id).set({
+              ...chunk,
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+          }
+
+          await updateSyncStatus(fileData.path, commitSha, true, chunks.length);
+          processed++;
+
+          await updateSyncProgress({
+            lastProcessedIndex: currentIndex,
+            completedFiles: processed,
+          });
+
+          // Rate limiting
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`✗ Failed: ${fileData.path}:`, error.message);
+          await updateSyncStatus(fileData.path, fileData.sha, false, 0);
+          failed++;
+
+          await updateSyncProgress({
+            lastProcessedIndex: currentIndex,
+            failedFiles: failed,
+          });
+        }
+      }
+    }
+
+    await updateSyncProgress({isComplete: true});
+
+    console.log(`🎉 Scheduled sync complete! Processed: ${processed}, Skipped: ${skipped}, Failed: ${failed}`);
+  } catch (error) {
+    console.error("Scheduled GitHub sync error:", error);
+    throw error;
   }
 });
