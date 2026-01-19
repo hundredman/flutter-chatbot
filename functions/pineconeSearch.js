@@ -199,7 +199,8 @@ async function uploadToPinecone(documents) {
 
       console.log(`Generating embedding ${i + 1}/${documents.length}: ${doc.id}`);
 
-      const embedding = await generateLocalEmbedding(doc.content);
+      // Use Google API instead of local model to avoid OOM
+      const embedding = await generateGoogleEmbedding(doc.content);
 
       vectors.push({
         id: doc.id,
