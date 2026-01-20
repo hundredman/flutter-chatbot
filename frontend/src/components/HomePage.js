@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './HomePage.css';
-import { HiCode, HiLightningBolt, HiSparkles } from 'react-icons/hi';
+import { HiCode, HiLightningBolt, HiSparkles, HiChevronDown, HiChevronRight } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
+import { curriculum } from '../data/curriculum';
 
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, language = 'en', onLanguageChange }) => {
+  const [expandedPart, setExpandedPart] = useState(null);
+  const [expandedChapter, setExpandedChapter] = useState(null);
+
   // Localized text
   const t = {
     en: {
@@ -12,10 +16,12 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       title: 'Flutter AI Chatbot',
       subtitle: 'Your intelligent companion for Flutter development',
       startNewChat: 'Start New Chat',
-      weeklyLearning: 'Weekly Learning Flow',
+      curriculumTitle: 'Flutter Learning Curriculum',
+      curriculumSubtitle: '16 weeks • 6 parts • 138 questions',
       quickStart: 'Quick Start Prompts',
-      week: 'Week',
-      startLearning: 'Start Learning →',
+      weeks: 'Weeks',
+      chapters: 'chapters',
+      questions: 'questions',
     },
     ko: {
       welcomeBack: '환영합니다',
@@ -23,44 +29,41 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       title: 'Flutter AI 챗봇',
       subtitle: 'Flutter 개발을 위한 똑똑한 동반자',
       startNewChat: '새 채팅 시작',
-      weeklyLearning: '주간 학습 플로우',
+      curriculumTitle: 'Flutter 학습 커리큘럼',
+      curriculumSubtitle: '16주 • 6개 파트 • 138개 질문',
       quickStart: '빠른 시작 프롬프트',
-      week: '주차',
-      startLearning: '학습 시작 →',
+      weeks: '주차',
+      chapters: '챕터',
+      questions: '질문',
     }
   };
 
   const text = t[language] || t.en;
 
-  const weeklyFlows = [
-    {
-      week: 1,
-      title: "Choosing a Template & Basic Chat",
-      description: "Learn to set up your first Flutter project and create a basic chat interface",
-      prompt: "I want to learn about choosing a Flutter template and building a basic chat interface. Can you guide me through setting up my first Flutter project?",
-      color: "#4CAF50"
-    },
-    {
-      week: 2,
-      title: "Connecting RAG & Live Data",
-      description: "Integrate real-time data sources and implement RAG for intelligent responses",
-      prompt: "How do I connect my Flutter app to external data sources and implement RAG (Retrieval-Augmented Generation) for smarter responses?",
-      color: "#2196F3"
-    },
-    {
-      week: 3,
-      title: "Freshness Filter & Deploy/Test",
-      description: "Implement data freshness filtering and deploy your app for testing",
-      prompt: "I need help implementing data freshness filters and deploying my Flutter app. What are the best practices for testing and deployment?",
-      color: "#FF9800"
-    }
+  const quickPrompts = [
+    { en: "How do I add payment functionality to Flutter?", ko: "Flutter에서 결제 기능을 어떻게 추가하나요?" },
+    { en: "What are the best Flutter widgets for UI design?", ko: "UI 디자인에 가장 좋은 Flutter 위젯은 무엇인가요?" },
+    { en: "How to implement authentication in Flutter?", ko: "Flutter에서 인증을 어떻게 구현하나요?" }
   ];
 
-  const quickPrompts = [
-    "How do I add payment functionality to Flutter?",
-    "What are the best Flutter widgets for UI design?",
-    "How to implement authentication in Flutter?"
-  ];
+  const togglePart = (partId) => {
+    setExpandedPart(expandedPart === partId ? null : partId);
+    setExpandedChapter(null);
+  };
+
+  const toggleChapter = (chapterId, e) => {
+    e.stopPropagation();
+    setExpandedChapter(expandedChapter === chapterId ? null : chapterId);
+  };
+
+  const handleQuestionClick = (question, chapter, part) => {
+    onStartConversation({
+      week: `Part ${part.id}`,
+      title: chapter.title[language] || chapter.title.en,
+      initialPrompt: question[language] || question.en,
+      prompt: question[language] || question.en
+    });
+  };
 
   return (
     <div className="home-page">
@@ -97,22 +100,72 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
         </button>
       </header>
 
-      <div className="weekly-flows">
-        <h2>{text.weeklyLearning}</h2>
-        <div className="flow-cards">
-          {weeklyFlows.map((flow) => (
-            <div
-              key={flow.week}
-              className="flow-card"
-              style={{ borderLeftColor: flow.color }}
-              onClick={() => onStartConversation(flow)}
-            >
-              <div className="flow-week">{text.week} {flow.week}</div>
-              <h3>{flow.title}</h3>
-              <p>{flow.description}</p>
-              <button className="start-btn" style={{ backgroundColor: flow.color }}>
-                {text.startLearning}
-              </button>
+      <div className="curriculum-section">
+        <h2>{text.curriculumTitle}</h2>
+        <p className="curriculum-subtitle">{text.curriculumSubtitle}</p>
+
+        <div className="curriculum-parts">
+          {curriculum.parts.map((part) => (
+            <div key={part.id} className="part-container">
+              <div
+                className={`part-header ${expandedPart === part.id ? 'expanded' : ''}`}
+                style={{ borderLeftColor: part.color }}
+                onClick={() => togglePart(part.id)}
+              >
+                <div className="part-header-content">
+                  <div className="part-badge" style={{ backgroundColor: part.color }}>
+                    Part {part.id}
+                  </div>
+                  <div className="part-info">
+                    <h3>{part.title[language] || part.title.en}</h3>
+                    <span className="part-meta">
+                      {text.weeks} {part.weeks} • {part.chapters.length} {text.chapters}
+                    </span>
+                  </div>
+                </div>
+                <span className="expand-icon">
+                  {expandedPart === part.id ? <HiChevronDown /> : <HiChevronRight />}
+                </span>
+              </div>
+
+              {expandedPart === part.id && (
+                <div className="chapters-list">
+                  {part.chapters.map((chapter) => (
+                    <div key={chapter.id} className="chapter-container">
+                      <div
+                        className={`chapter-header ${expandedChapter === chapter.id ? 'expanded' : ''}`}
+                        onClick={(e) => toggleChapter(chapter.id, e)}
+                      >
+                        <div className="chapter-info">
+                          <span className="chapter-number">Ch. {chapter.id}</span>
+                          <span className="chapter-title">{chapter.title[language] || chapter.title.en}</span>
+                        </div>
+                        <div className="chapter-meta">
+                          <span className="question-count">{chapter.questions.length} {text.questions}</span>
+                          <span className="expand-icon">
+                            {expandedChapter === chapter.id ? <HiChevronDown /> : <HiChevronRight />}
+                          </span>
+                        </div>
+                      </div>
+
+                      {expandedChapter === chapter.id && (
+                        <div className="questions-list">
+                          {chapter.questions.map((question) => (
+                            <button
+                              key={question.id}
+                              className="question-btn"
+                              onClick={() => handleQuestionClick(question, chapter, part)}
+                            >
+                              <span className="question-id">{question.id}</span>
+                              <span className="question-text">{question[language] || question.en}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -131,10 +184,11 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
               onClick={() => onStartConversation({
                 week: 'quick',
                 title: 'Quick Question',
-                initialPrompt: prompt
+                initialPrompt: prompt[language] || prompt.en,
+                prompt: prompt[language] || prompt.en
               })}
             >
-              {prompt}
+              {prompt[language] || prompt.en}
             </button>
           ))}
         </div>
