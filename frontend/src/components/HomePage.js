@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './HomePage.css';
-import { HiCode, HiLightningBolt, HiSparkles, HiChevronDown, HiChevronRight } from 'react-icons/hi';
+import { HiCode, HiSparkles, HiChevronDown, HiChevronRight } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
 
@@ -18,7 +18,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       startNewChat: 'Start New Chat',
       curriculumTitle: 'Flutter Learning Curriculum',
       curriculumSubtitle: '16 weeks • 6 parts • 138 questions',
-      quickStart: 'Quick Start Prompts',
       weeks: 'Weeks',
       chapters: 'chapters',
       questions: 'questions',
@@ -31,7 +30,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       startNewChat: '새 채팅 시작',
       curriculumTitle: 'Flutter 학습 커리큘럼',
       curriculumSubtitle: '16주 • 6개 파트 • 138개 질문',
-      quickStart: '빠른 시작 프롬프트',
       weeks: '주차',
       chapters: '챕터',
       questions: '질문',
@@ -39,12 +37,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   };
 
   const text = t[language] || t.en;
-
-  const quickPrompts = [
-    { en: "How do I add payment functionality to Flutter?", ko: "Flutter에서 결제 기능을 어떻게 추가하나요?" },
-    { en: "What are the best Flutter widgets for UI design?", ko: "UI 디자인에 가장 좋은 Flutter 위젯은 무엇인가요?" },
-    { en: "How to implement authentication in Flutter?", ko: "Flutter에서 인증을 어떻게 구현하나요?" }
-  ];
 
   const togglePart = (partId) => {
     setExpandedPart(expandedPart === partId ? null : partId);
@@ -167,29 +159,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
                 </div>
               )}
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="quick-prompts">
-        <h2>
-          <HiLightningBolt className="section-icon" />
-          {text.quickStart}
-        </h2>
-        <div className="prompt-buttons">
-          {quickPrompts.map((prompt, index) => (
-            <button
-              key={index}
-              className="prompt-btn"
-              onClick={() => onStartConversation({
-                week: 'quick',
-                title: 'Quick Question',
-                initialPrompt: prompt[language] || prompt.en,
-                prompt: prompt[language] || prompt.en
-              })}
-            >
-              {prompt[language] || prompt.en}
-            </button>
           ))}
         </div>
       </div>
