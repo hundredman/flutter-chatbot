@@ -98,6 +98,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     if (conversation?.currentQuestionIndex !== undefined) {
       setCurrentQuestionIndex(conversation.currentQuestionIndex);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation?.id]);
 
   useEffect(() => {
