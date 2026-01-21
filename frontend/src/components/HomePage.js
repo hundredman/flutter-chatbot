@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './HomePage.css';
-import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle } from 'react-icons/hi';
+import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
 import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, findNextQuestion, isChapterCompleted } from '../services/learningProgress';
 
-const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, language = 'en', onLanguageChange }) => {
+const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
   const [expandedChapter, setExpandedChapter] = useState(null);
   const [progress, setProgress] = useState(null);
@@ -13,6 +13,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   const [overallProgress, setOverallProgress] = useState({ completed: 0, total: 138, percentage: 0 });
   const [recentHistory, setRecentHistory] = useState([]);
   const [dailyTipIndex, setDailyTipIndex] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Flutter tips data - comprehensive list for daily rotation
   const flutterTips = useMemo(() => [
@@ -112,6 +113,16 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       startChapter: 'Start Chapter',
       continueLearning: 'Continue Learning',
       startFromBeginning: 'Start from Beginning',
+      // Settings
+      settings: 'Settings',
+      settingsTitle: 'Settings',
+      resetProgress: 'Reset Learning Progress',
+      resetProgressDesc: 'Clear all completed questions and start fresh',
+      deleteAllChats: 'Delete All Chats',
+      deleteAllChatsDesc: 'Remove all conversation history',
+      confirmReset: 'Are you sure? This cannot be undone.',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
     },
     ko: {
       welcomeBack: '환영합니다',
@@ -141,6 +152,16 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       startChapter: '챕터 시작',
       continueLearning: '이어서 학습하기',
       startFromBeginning: '처음부터 시작',
+      // Settings
+      settings: '설정',
+      settingsTitle: '설정',
+      resetProgress: '학습 진행 초기화',
+      resetProgressDesc: '완료한 질문을 모두 지우고 처음부터 시작합니다',
+      deleteAllChats: '모든 채팅 삭제',
+      deleteAllChatsDesc: '모든 대화 기록을 삭제합니다',
+      confirmReset: '정말로 진행하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      cancel: '취소',
+      confirm: '확인',
     }
   };
 
@@ -272,6 +293,27 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     });
   };
 
+  // Reset learning progress
+  const handleResetProgress = () => {
+    if (window.confirm(text.confirmReset)) {
+      localStorage.removeItem('flutter_learning_progress');
+      localStorage.removeItem('flutter_recent_history');
+      setRecentHistory([]);
+      loadProgress();
+      setShowSettings(false);
+    }
+  };
+
+  // Delete all conversations
+  const handleDeleteAllChats = async () => {
+    if (window.confirm(text.confirmReset)) {
+      if (onDeleteAllConversations) {
+        await onDeleteAllConversations();
+      }
+      setShowSettings(false);
+    }
+  };
+
   return (
     <div className="home-page">
       <header className="home-header">
@@ -282,6 +324,9 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
           </div>
           <div className="user-actions">
             <LanguageToggle language={language} onLanguageChange={onLanguageChange} />
+            <button className="settings-btn" onClick={() => setShowSettings(true)} title={text.settings}>
+              <HiCog />
+            </button>
             <button className="sign-out-btn" onClick={onSignOut}>
               {text.signOut}
             </button>
@@ -590,6 +635,42 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
           >
             Test Conversation Retrieval
           </button>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="settings-modal-overlay" onClick={() => setShowSettings(false)}>
+          <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="settings-modal-header">
+              <h2><HiCog /> {text.settingsTitle}</h2>
+              <button className="settings-close-btn" onClick={() => setShowSettings(false)}>
+                <HiX />
+              </button>
+            </div>
+            <div className="settings-modal-content">
+              <div className="settings-item">
+                <div className="settings-item-info">
+                  <h3><HiRefresh /> {text.resetProgress}</h3>
+                  <p>{text.resetProgressDesc}</p>
+                </div>
+                <button className="settings-danger-btn" onClick={handleResetProgress}>
+                  <HiExclamation />
+                  {text.confirm}
+                </button>
+              </div>
+              <div className="settings-item">
+                <div className="settings-item-info">
+                  <h3><HiTrash /> {text.deleteAllChats}</h3>
+                  <p>{text.deleteAllChatsDesc}</p>
+                </div>
+                <button className="settings-danger-btn" onClick={handleDeleteAllChats}>
+                  <HiExclamation />
+                  {text.confirm}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

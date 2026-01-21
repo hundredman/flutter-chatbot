@@ -176,6 +176,16 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
     console.log('Test retrieval result:', result);
   };
 
+  // Delete all conversations
+  const handleDeleteAllConversations = async () => {
+    for (const conv of conversations) {
+      await deleteConversation(conv.id);
+    }
+    setConversations([]);
+    setCurrentConversation(null);
+    setCurrentView('home');
+  };
+
   // Show loading while conversations are being fetched
   if (loading) {
     return (
@@ -211,6 +221,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
               isCompact={true} // Add compact mode for sidebar layout
               onTestConversations={handleTestConversations}
               onTestRetrieval={handleTestRetrieval}
+              onDeleteAllConversations={handleDeleteAllConversations}
               language={language}
               onLanguageChange={onLanguageChange}
             />
