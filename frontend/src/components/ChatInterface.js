@@ -3,9 +3,11 @@ import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
 import { addMessageToConversation } from '../firebase/chatService';
-import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight } from 'react-icons/hi';
+import { markQuestionCompleted, markChapterCompleted, findNextChapter } from '../services/learningProgress';
+import { curriculum } from '../data/curriculum';
+import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle } from 'react-icons/hi';
 
-const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, showBackButton = true, language = 'en', onLanguageChange }) => {
+const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, user, showBackButton = true, language = 'en', onLanguageChange }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -13,13 +15,20 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
   const [attachedFile, setAttachedFile] = useState(null);
   const [showAttachments, setShowAttachments] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [chapterCompleted, setChapterCompleted] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // Chapter questions for sequential learning
   const chapterQuestions = conversation?.chapterQuestions || null;
+  const chapterId = conversation?.chapterId || null;
+  const partId = conversation?.partId || null;
   const hasNextQuestion = chapterQuestions && currentQuestionIndex < chapterQuestions.length - 1;
+  const isLastQuestion = chapterQuestions && currentQuestionIndex === chapterQuestions.length - 1;
+
+  // Find next chapter
+  const nextChapterInfo = chapterId ? findNextChapter(chapterId, curriculum) : null;
 
   // Localized messages
   const t = {
@@ -38,6 +47,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       removeFile: 'Remove file',
       nextQuestion: 'Next Question',
       questionProgress: 'Question',
+      chapterComplete: 'Chapter Complete!',
+      chapterCompleteDesc: 'Great job! You have completed all questions in this chapter.',
+      nextChapter: 'Next Chapter',
+      goHome: 'Back to Home',
+      allChaptersComplete: 'Congratulations! You have completed all chapters!',
     },
     ko: {
       backButton: '홈으로 돌아가기',
@@ -54,6 +68,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       removeFile: '파일 제거',
       nextQuestion: '다음 질문',
       questionProgress: '질문',
+      chapterComplete: '챕터 완료!',
+      chapterCompleteDesc: '훌륭합니다! 이 챕터의 모든 질문을 완료했습니다.',
+      nextChapter: '다음 챕터',
+      goHome: '홈으로 돌아가기',
+      allChaptersComplete: '축하합니다! 모든 챕터를 완료했습니다!',
     },
   };
 
@@ -93,11 +112,12 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     }
   }, [conversation]);
 
-  // Reset question index only when conversation ID changes (new conversation)
+  // Reset question index and chapter completion only when conversation ID changes (new conversation)
   useEffect(() => {
     if (conversation?.currentQuestionIndex !== undefined) {
       setCurrentQuestionIndex(conversation.currentQuestionIndex);
     }
+    setChapterCompleted(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation?.id]);
 
@@ -377,13 +397,58 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     }
   };
 
+  // Mark current question as completed and save progress
+  const markCurrentQuestionComplete = () => {
+    if (chapterQuestions && chapterId && partId) {
+      const currentQuestion = chapterQuestions[currentQuestionIndex];
+      if (currentQuestion) {
+        markQuestionCompleted(currentQuestion.id, chapterId, partId);
+      }
+    }
+  };
+
   // Handle next question in chapter learning mode
   const handleNextQuestion = () => {
+    // Mark current question as completed
+    markCurrentQuestionComplete();
+
     if (hasNextQuestion) {
       const nextIndex = currentQuestionIndex + 1;
       const nextQuestion = chapterQuestions[nextIndex];
       setCurrentQuestionIndex(nextIndex);
       handleSendMessage(nextQuestion.text, true);
+    }
+  };
+
+  // Handle chapter completion
+  const handleCompleteChapter = () => {
+    // Mark last question as completed
+    markCurrentQuestionComplete();
+
+    if (chapterId) {
+      markChapterCompleted(chapterId);
+    }
+    setChapterCompleted(true);
+  };
+
+  // Handle starting next chapter
+  const handleNextChapter = () => {
+    if (nextChapterInfo && onStartNewChapter) {
+      const { chapter, part } = nextChapterInfo;
+      const chapterQs = chapter.questions.map(q => ({
+        id: q.id,
+        text: q[language] || q.en
+      }));
+      onStartNewChapter({
+        week: `Part ${part.id}`,
+        title: chapter.title[language] || chapter.title.en,
+        initialPrompt: chapterQs[0].text,
+        prompt: chapterQs[0].text,
+        chapterQuestions: chapterQs,
+        currentQuestionIndex: 0,
+        chapterId: chapter.id,
+        partId: part.id
+      });
     }
   };
 
@@ -529,6 +594,47 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
             <span>{currentLang.nextQuestion}</span>
             <HiArrowRight />
           </button>
+        )}
+
+        {/* Complete Chapter Button - shown on last question */}
+        {isLastQuestion && !hasNextQuestion && !chapterCompleted && !isLoading && (
+          <button
+            className="complete-chapter-btn"
+            onClick={handleCompleteChapter}
+          >
+            <HiCheckCircle />
+            <span>{currentLang.chapterComplete}</span>
+          </button>
+        )}
+
+        {/* Chapter Completed - show next chapter or home buttons */}
+        {chapterCompleted && (
+          <div className="chapter-complete-section">
+            <div className="chapter-complete-message">
+              <HiCheckCircle className="complete-icon" />
+              <h3>{currentLang.chapterComplete}</h3>
+              <p>{currentLang.chapterCompleteDesc}</p>
+            </div>
+            <div className="chapter-complete-actions">
+              {nextChapterInfo ? (
+                <button
+                  className="next-chapter-btn"
+                  onClick={handleNextChapter}
+                >
+                  <span>{currentLang.nextChapter}: {nextChapterInfo.chapter.title[language] || nextChapterInfo.chapter.title.en}</span>
+                  <HiArrowRight />
+                </button>
+              ) : (
+                <p className="all-complete-message">{currentLang.allChaptersComplete}</p>
+              )}
+              <button
+                className="go-home-btn"
+                onClick={onGoHome}
+              >
+                {currentLang.goHome}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

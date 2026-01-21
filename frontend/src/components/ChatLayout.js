@@ -49,7 +49,9 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
         week: initialData?.week,
         initialPrompt: initialData?.initialPrompt,
         chapterQuestions: initialData?.chapterQuestions || null,
-        currentQuestionIndex: initialData?.currentQuestionIndex || 0
+        currentQuestionIndex: initialData?.currentQuestionIndex || 0,
+        chapterId: initialData?.chapterId || null,
+        partId: initialData?.partId || null
       };
 
       setConversations(prev => [newConversation, ...prev]);
@@ -69,12 +71,19 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
       week: weekData.week,
       initialPrompt: weekData.initialPrompt,
       chapterQuestions: weekData.chapterQuestions,
-      currentQuestionIndex: weekData.currentQuestionIndex
+      currentQuestionIndex: weekData.currentQuestionIndex,
+      chapterId: weekData.chapterId,
+      partId: weekData.partId
     });
     if (newConv) {
       setCurrentConversation(newConv);
       setCurrentView('chat');
     }
+  };
+
+  // Handle starting a new chapter from ChatInterface
+  const handleStartNewChapter = async (chapterData) => {
+    await handleStartConversation(chapterData);
   };
 
   const handleSelectConversation = (conversation) => {
@@ -211,6 +220,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
             conversation={currentConversation}
             onGoHome={handleGoHome}
             onUpdateConversation={handleUpdateConversation}
+            onStartNewChapter={handleStartNewChapter}
             user={user}
             showBackButton={false} // Remove back button since we have sidebar
             language={language}

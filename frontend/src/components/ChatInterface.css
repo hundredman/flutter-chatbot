@@ -268,6 +268,122 @@
   transform: translateY(0);
 }
 
+/* Complete Chapter Button */
+.complete-chapter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.complete-chapter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Chapter Complete Section */
+.chapter-complete-section {
+  margin-top: 16px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
+}
+
+.chapter-complete-message {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.chapter-complete-message .complete-icon {
+  font-size: 3rem;
+  color: #10b981;
+  margin-bottom: 12px;
+}
+
+.chapter-complete-message h3 {
+  color: #10b981;
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+}
+
+.chapter-complete-message p {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.chapter-complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.next-chapter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.next-chapter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.go-home-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.go-home-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.all-complete-message {
+  text-align: center;
+  color: #10b981;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 8px;
+  margin: 0;
+}
+
 /* Attachment toolbar */
 .attachment-toolbar {
   display: flex;

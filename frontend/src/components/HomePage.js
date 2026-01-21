@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './HomePage.css';
-import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight } from 'react-icons/hi';
+import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
+import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, findNextQuestion, isChapterCompleted } from '../services/learningProgress';
 
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
   const [expandedChapter, setExpandedChapter] = useState(null);
-  const [completedQuestions, setCompletedQuestions] = useState([]);
+  const [progress, setProgress] = useState(null);
+  const [stats, setStats] = useState({ totalQuestionsLearned: 0, streakDays: 0, thisWeekCount: 0 });
+  const [overallProgress, setOverallProgress] = useState({ completed: 0, total: 138, percentage: 0 });
   const [recentHistory, setRecentHistory] = useState([]);
   const [dailyTipIndex, setDailyTipIndex] = useState(0);
 
@@ -22,12 +25,16 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     { en: "Use 'FutureBuilder' and 'StreamBuilder' to handle asynchronous data in your UI elegantly.", ko: "'FutureBuilder'와 'StreamBuilder'를 사용하여 UI에서 비동기 데이터를 우아하게 처리하세요." },
   ], []);
 
-  // Load progress from localStorage
+  // Load progress from learningProgress service
+  const loadProgress = useCallback(() => {
+    const progressData = getProgress();
+    setProgress(progressData);
+    setStats(getStats());
+    setOverallProgress(getOverallProgress(curriculum));
+  }, []);
+
   useEffect(() => {
-    const saved = localStorage.getItem('flutter_progress');
-    if (saved) {
-      setCompletedQuestions(JSON.parse(saved));
-    }
+    loadProgress();
     const history = localStorage.getItem('flutter_recent_history');
     if (history) {
       setRecentHistory(JSON.parse(history));
@@ -35,7 +42,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     // Set daily tip based on date
     const today = new Date().getDate();
     setDailyTipIndex(today % flutterTips.length);
-  }, [flutterTips.length]);
+  }, [flutterTips.length, loadProgress]);
 
   // Localized text
   const t = {
@@ -117,38 +124,33 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   // Get random recommended questions
   const [recommendedQuestions, setRecommendedQuestions] = useState([]);
 
+  const completedQuestions = progress?.completedQuestions || [];
+
   const refreshRecommendedQuestions = useCallback(() => {
-    const uncompletedQuestions = allQuestions.filter(q => !completedQuestions.includes(q.id));
+    const completed = progress?.completedQuestions || [];
+    const uncompletedQuestions = allQuestions.filter(q => !completed.includes(q.id));
     const questionsToUse = uncompletedQuestions.length >= 4 ? uncompletedQuestions : allQuestions;
     const shuffled = [...questionsToUse].sort(() => Math.random() - 0.5);
     setRecommendedQuestions(shuffled.slice(0, 4));
-  }, [allQuestions, completedQuestions]);
+  }, [allQuestions, progress?.completedQuestions]);
 
   useEffect(() => {
     refreshRecommendedQuestions();
   }, [refreshRecommendedQuestions]);
 
-  // Calculate progress stats
-  const totalQuestions = 138;
-  const completedCount = completedQuestions.length;
-  const progressPercent = Math.round((completedCount / totalQuestions) * 100);
+  // Use real progress data from service
+  const totalQuestions = overallProgress.total;
+  const completedCount = overallProgress.completed;
+  const progressPercent = overallProgress.percentage;
 
-  // Calculate part progress
+  // Calculate part progress using service
   const getPartProgress = (part) => {
-    let total = 0;
-    let completed = 0;
-    part.chapters.forEach(chapter => {
-      chapter.questions.forEach(q => {
-        total++;
-        if (completedQuestions.includes(q.id)) completed++;
-      });
-    });
-    return { total, completed, percent: total > 0 ? Math.round((completed / total) * 100) : 0 };
+    return getPartProgressFromService(part.id, part.chapters);
   };
 
-  // Mock streak calculation (would need backend for real implementation)
-  const streakDays = Math.min(completedCount > 0 ? Math.floor(completedCount / 3) + 1 : 0, 30);
-  const thisWeekCount = Math.min(completedCount, 15);
+  // Use real stats from service
+  const streakDays = stats.streakDays;
+  const thisWeekCount = stats.thisWeekCount;
 
   const togglePart = (partId) => {
     setExpandedPart(expandedPart === partId ? null : partId);
@@ -172,59 +174,45 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   // Start chapter learning - sends all questions in the chapter
   const handleStartChapter = (chapter, part, e) => {
     e.stopPropagation();
-    const chapterQuestions = chapter.questions.map(q => ({
+    const chapterQs = chapter.questions.map(q => ({
       id: q.id,
       text: q[language] || q.en
     }));
     onStartConversation({
       week: `Part ${part.id}`,
       title: chapter.title[language] || chapter.title.en,
-      initialPrompt: chapterQuestions[0].text,
-      prompt: chapterQuestions[0].text,
-      chapterQuestions: chapterQuestions,
-      currentQuestionIndex: 0
+      initialPrompt: chapterQs[0].text,
+      prompt: chapterQs[0].text,
+      chapterQuestions: chapterQs,
+      currentQuestionIndex: 0,
+      chapterId: chapter.id,
+      partId: part.id
     });
   };
 
-  // Find next uncompleted question for "Continue Learning"
-  const getNextQuestion = useCallback(() => {
-    for (const part of curriculum.parts) {
-      for (const chapter of part.chapters) {
-        for (const question of chapter.questions) {
-          if (!completedQuestions.includes(question.id)) {
-            return { question, chapter, part };
-          }
-        }
-      }
-    }
-    // All completed, return first question
-    const firstPart = curriculum.parts[0];
-    const firstChapter = firstPart.chapters[0];
-    return { question: firstChapter.questions[0], chapter: firstChapter, part: firstPart };
-  }, [completedQuestions]);
-
   // Quick start - continue from last position or start from beginning
   const handleContinueLearning = () => {
-    const next = getNextQuestion();
-    const chapterQuestions = next.chapter.questions.map(q => ({
+    const next = findNextQuestion(curriculum);
+    const chapterQs = next.chapter.questions.map(q => ({
       id: q.id,
       text: q[language] || q.en
     }));
-    const currentIndex = next.chapter.questions.findIndex(q => q.id === next.question.id);
     onStartConversation({
       week: `Part ${next.part.id}`,
       title: next.chapter.title[language] || next.chapter.title.en,
       initialPrompt: next.question[language] || next.question.en,
       prompt: next.question[language] || next.question.en,
-      chapterQuestions: chapterQuestions,
-      currentQuestionIndex: currentIndex
+      chapterQuestions: chapterQs,
+      currentQuestionIndex: next.questionIndex,
+      chapterId: next.chapter.id,
+      partId: next.part.id
     });
   };
 
   const handleStartFromBeginning = () => {
     const firstPart = curriculum.parts[0];
     const firstChapter = firstPart.chapters[0];
-    const chapterQuestions = firstChapter.questions.map(q => ({
+    const chapterQs = firstChapter.questions.map(q => ({
       id: q.id,
       text: q[language] || q.en
     }));
@@ -233,8 +221,10 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       title: firstChapter.title[language] || firstChapter.title.en,
       initialPrompt: firstChapter.questions[0][language] || firstChapter.questions[0].en,
       prompt: firstChapter.questions[0][language] || firstChapter.questions[0].en,
-      chapterQuestions: chapterQuestions,
-      currentQuestionIndex: 0
+      chapterQuestions: chapterQs,
+      currentQuestionIndex: 0,
+      chapterId: firstChapter.id,
+      partId: firstPart.id
     });
   };
 
@@ -312,7 +302,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
           </div>
           <div className="part-progress-list">
             {curriculum.parts.slice(0, 3).map(part => {
-              const progress = getPartProgress(part);
+              const partProgress = getPartProgress(part);
               return (
                 <div key={part.id} className="part-progress-item">
                   <span className="part-progress-name" style={{ color: part.color }}>
@@ -321,10 +311,10 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
                   <div className="part-progress-bar">
                     <div
                       className="part-progress-fill"
-                      style={{ width: `${progress.percent}%`, backgroundColor: part.color }}
+                      style={{ width: `${partProgress.percentage}%`, backgroundColor: part.color }}
                     />
                   </div>
-                  <span className="part-progress-text">{progress.percent}%</span>
+                  <span className="part-progress-text">{partProgress.percentage}%</span>
                 </div>
               );
             })}
@@ -457,48 +447,59 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
 
               {expandedPart === part.id && (
                 <div className="chapters-list">
-                  {part.chapters.map((chapter) => (
-                    <div key={chapter.id} className="chapter-container">
-                      <div
-                        className={`chapter-header ${expandedChapter === chapter.id ? 'expanded' : ''}`}
-                        onClick={(e) => toggleChapter(chapter.id, e)}
-                      >
-                        <div className="chapter-info">
-                          <span className="chapter-number">Ch. {chapter.id}</span>
-                          <span className="chapter-title">{chapter.title[language] || chapter.title.en}</span>
-                        </div>
-                        <div className="chapter-meta">
-                          <span className="question-count">{chapter.questions.length} {text.questions}</span>
-                          <button
-                            className="start-chapter-btn"
-                            onClick={(e) => handleStartChapter(chapter, part, e)}
-                            style={{ backgroundColor: part.color }}
-                          >
-                            <HiPlay />
-                            {text.startChapter}
-                          </button>
-                          <span className="expand-icon">
-                            {expandedChapter === chapter.id ? <HiChevronDown /> : <HiChevronRight />}
-                          </span>
-                        </div>
-                      </div>
-
-                      {expandedChapter === chapter.id && (
-                        <div className="questions-list">
-                          {chapter.questions.map((question) => (
+                  {part.chapters.map((chapter) => {
+                    const chapterComplete = isChapterCompleted(chapter.id);
+                    return (
+                      <div key={chapter.id} className="chapter-container">
+                        <div
+                          className={`chapter-header ${expandedChapter === chapter.id ? 'expanded' : ''} ${chapterComplete ? 'completed' : ''}`}
+                          onClick={(e) => toggleChapter(chapter.id, e)}
+                        >
+                          <div className="chapter-info">
+                            <span className="chapter-number">
+                              {chapterComplete && <HiCheckCircle className="chapter-complete-icon" />}
+                              Ch. {chapter.id}
+                            </span>
+                            <span className="chapter-title">{chapter.title[language] || chapter.title.en}</span>
+                          </div>
+                          <div className="chapter-meta">
+                            <span className="question-count">{chapter.questions.length} {text.questions}</span>
                             <button
-                              key={question.id}
-                              className="question-btn"
-                              onClick={() => handleQuestionClick(question, chapter, part)}
+                              className="start-chapter-btn"
+                              onClick={(e) => handleStartChapter(chapter, part, e)}
+                              style={{ backgroundColor: part.color }}
                             >
-                              <span className="question-id">{question.id}</span>
-                              <span className="question-text">{question[language] || question.en}</span>
+                              <HiPlay />
+                              {text.startChapter}
                             </button>
-                          ))}
+                            <span className="expand-icon">
+                              {expandedChapter === chapter.id ? <HiChevronDown /> : <HiChevronRight />}
+                            </span>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+
+                        {expandedChapter === chapter.id && (
+                          <div className="questions-list">
+                            {chapter.questions.map((question) => {
+                              const questionComplete = completedQuestions.includes(question.id);
+                              return (
+                                <button
+                                  key={question.id}
+                                  className={`question-btn ${questionComplete ? 'completed' : ''}`}
+                                  onClick={() => handleQuestionClick(question, chapter, part)}
+                                >
+                                  <span className="question-id">
+                                    {questionComplete ? <HiCheckCircle className="question-complete-icon" /> : question.id}
+                                  </span>
+                                  <span className="question-text">{question[language] || question.en}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
