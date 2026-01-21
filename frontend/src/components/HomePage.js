@@ -14,15 +14,48 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   const [recentHistory, setRecentHistory] = useState([]);
   const [dailyTipIndex, setDailyTipIndex] = useState(0);
 
-  // Flutter tips data
+  // Flutter tips data - comprehensive list for daily rotation
   const flutterTips = useMemo(() => [
+    // Performance tips
     { en: "Use 'const' constructors whenever possible to improve performance by allowing Flutter to cache widgets.", ko: "가능하면 'const' 생성자를 사용하세요. Flutter가 위젯을 캐시하여 성능이 향상됩니다." },
     { en: "The 'ListView.builder' is more efficient than 'ListView' for long lists as it only builds visible items.", ko: "'ListView.builder'는 보이는 항목만 빌드하므로 긴 목록에서 'ListView'보다 효율적입니다." },
-    { en: "Use 'setState' sparingly - consider using Provider or Riverpod for complex state management.", ko: "'setState'를 아껴서 사용하세요 - 복잡한 상태 관리에는 Provider나 Riverpod를 고려하세요." },
-    { en: "Hot reload (r) preserves state, while hot restart (R) resets the entire app state.", ko: "Hot reload(r)는 상태를 유지하고, hot restart(R)는 전체 앱 상태를 초기화합니다." },
-    { en: "Use 'MediaQuery.of(context).size' to build responsive layouts that adapt to different screen sizes.", ko: "'MediaQuery.of(context).size'를 사용하여 다양한 화면 크기에 적응하는 반응형 레이아웃을 만드세요." },
     { en: "Wrap expensive widgets with 'RepaintBoundary' to isolate repaints and improve rendering performance.", ko: "비용이 큰 위젯을 'RepaintBoundary'로 감싸 리페인트를 격리하고 렌더링 성능을 향상시키세요." },
+    { en: "Use 'const' widgets inside build() methods to prevent unnecessary rebuilds and improve performance.", ko: "build() 메서드 내에서 'const' 위젯을 사용하여 불필요한 리빌드를 방지하고 성능을 향상시키세요." },
+    { en: "Avoid using Opacity widget for hiding widgets - use Visibility or conditional rendering instead for better performance.", ko: "위젯을 숨길 때 Opacity 위젯 사용을 피하세요 - 더 나은 성능을 위해 Visibility나 조건부 렌더링을 사용하세요." },
+    // State management tips
+    { en: "Use 'setState' sparingly - consider using Provider or Riverpod for complex state management.", ko: "'setState'를 아껴서 사용하세요 - 복잡한 상태 관리에는 Provider나 Riverpod를 고려하세요." },
+    { en: "Keep your StatefulWidgets small and focused - extract logic to separate classes for better testability.", ko: "StatefulWidget을 작고 집중적으로 유지하세요 - 더 나은 테스트 가능성을 위해 로직을 별도 클래스로 추출하세요." },
+    { en: "Use 'ValueNotifier' and 'ValueListenableBuilder' for simple reactive state without complex packages.", ko: "복잡한 패키지 없이 간단한 반응형 상태를 위해 'ValueNotifier'와 'ValueListenableBuilder'를 사용하세요." },
+    // Development tips
+    { en: "Hot reload (r) preserves state, while hot restart (R) resets the entire app state.", ko: "Hot reload(r)는 상태를 유지하고, hot restart(R)는 전체 앱 상태를 초기화합니다." },
+    { en: "Use Flutter DevTools to profile your app's performance and identify rendering issues.", ko: "Flutter DevTools를 사용하여 앱의 성능을 프로파일링하고 렌더링 문제를 식별하세요." },
+    { en: "Add 'debugPrint()' instead of 'print()' - it throttles output to avoid dropped messages in Android logs.", ko: "'print()' 대신 'debugPrint()'를 추가하세요 - Android 로그에서 메시지 누락을 방지하기 위해 출력을 조절합니다." },
+    // Layout tips
+    { en: "Use 'MediaQuery.of(context).size' to build responsive layouts that adapt to different screen sizes.", ko: "'MediaQuery.of(context).size'를 사용하여 다양한 화면 크기에 적응하는 반응형 레이아웃을 만드세요." },
+    { en: "Use 'LayoutBuilder' to get parent constraints and build responsive widgets based on available space.", ko: "'LayoutBuilder'를 사용하여 부모 제약 조건을 얻고 사용 가능한 공간에 따라 반응형 위젯을 빌드하세요." },
+    { en: "Prefer 'SizedBox' over 'Container' when you only need to add spacing or set dimensions.", ko: "간격 추가나 크기 설정만 필요할 때는 'Container' 대신 'SizedBox'를 사용하세요." },
+    { en: "Use 'Expanded' and 'Flexible' inside Row/Column to control how children share available space.", ko: "Row/Column 내에서 'Expanded'와 'Flexible'을 사용하여 자식 위젯이 사용 가능한 공간을 공유하는 방식을 제어하세요." },
+    // Async tips
     { en: "Use 'FutureBuilder' and 'StreamBuilder' to handle asynchronous data in your UI elegantly.", ko: "'FutureBuilder'와 'StreamBuilder'를 사용하여 UI에서 비동기 데이터를 우아하게 처리하세요." },
+    { en: "Always handle loading, error, and data states when using FutureBuilder or StreamBuilder.", ko: "FutureBuilder나 StreamBuilder를 사용할 때 항상 로딩, 에러, 데이터 상태를 처리하세요." },
+    { en: "Use 'async/await' with try-catch blocks for cleaner asynchronous code and better error handling.", ko: "더 깔끔한 비동기 코드와 더 나은 에러 처리를 위해 try-catch 블록과 함께 'async/await'를 사용하세요." },
+    // Widget tips
+    { en: "Extract repeated widget code into custom widgets - it improves readability and makes testing easier.", ko: "반복되는 위젯 코드를 커스텀 위젯으로 추출하세요 - 가독성이 향상되고 테스트가 쉬워집니다." },
+    { en: "Use 'GestureDetector' or 'InkWell' to add touch interactions - InkWell provides Material ripple effect.", ko: "터치 상호작용을 추가하려면 'GestureDetector' 또는 'InkWell'을 사용하세요 - InkWell은 Material 리플 효과를 제공합니다." },
+    { en: "Use 'SafeArea' widget to avoid system UI overlaps on devices with notches or rounded corners.", ko: "노치나 둥근 모서리가 있는 기기에서 시스템 UI 겹침을 방지하려면 'SafeArea' 위젯을 사용하세요." },
+    // Navigation tips
+    { en: "Use named routes for cleaner navigation code: Navigator.pushNamed(context, '/detail').", ko: "더 깔끔한 네비게이션 코드를 위해 명명된 라우트를 사용하세요: Navigator.pushNamed(context, '/detail')." },
+    { en: "Consider using 'go_router' or 'auto_route' packages for complex navigation requirements.", ko: "복잡한 네비게이션 요구사항에는 'go_router' 또는 'auto_route' 패키지 사용을 고려하세요." },
+    // Testing tips
+    { en: "Write widget tests using 'testWidgets()' to verify your UI behaves correctly under different conditions.", ko: "'testWidgets()'를 사용하여 위젯 테스트를 작성하고 다양한 조건에서 UI가 올바르게 동작하는지 확인하세요." },
+    { en: "Use 'flutter test --coverage' to generate code coverage reports for your test suite.", ko: "'flutter test --coverage'를 사용하여 테스트 스위트의 코드 커버리지 보고서를 생성하세요." },
+    // Animation tips
+    { en: "Use 'AnimatedContainer' for simple implicit animations - it automatically animates property changes.", ko: "간단한 암시적 애니메이션에는 'AnimatedContainer'를 사용하세요 - 속성 변경을 자동으로 애니메이션합니다." },
+    { en: "Prefer implicit animations (AnimatedFoo widgets) over explicit animations when possible for simpler code.", ko: "가능하면 더 간단한 코드를 위해 명시적 애니메이션보다 암시적 애니메이션(AnimatedFoo 위젯)을 선호하세요." },
+    // Dart tips
+    { en: "Use null safety operators: ?. for null-aware access, ?? for default values, and ! for null assertion.", ko: "null 안전 연산자를 사용하세요: null 인식 접근에는 ?., 기본값에는 ??, null 단언에는 !를 사용합니다." },
+    { en: "Use 'spread operator' (...) to combine lists easily: [...list1, ...list2, newItem].", ko: "'전개 연산자'(...)를 사용하여 리스트를 쉽게 결합하세요: [...list1, ...list2, newItem]." },
+    { en: "Use 'collection if' and 'collection for' for cleaner list building: [if (condition) widget, for (item in items) Text(item)].", ko: "더 깔끔한 리스트 빌딩을 위해 'collection if'와 'collection for'를 사용하세요." },
   ], []);
 
   // Load progress from learningProgress service
@@ -33,16 +66,21 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     setOverallProgress(getOverallProgress(curriculum));
   }, []);
 
+  // Refresh tip - select random tip
+  const refreshTip = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * flutterTips.length);
+    setDailyTipIndex(randomIndex);
+  }, [flutterTips.length]);
+
   useEffect(() => {
     loadProgress();
     const history = localStorage.getItem('flutter_recent_history');
     if (history) {
       setRecentHistory(JSON.parse(history));
     }
-    // Set daily tip based on date
-    const today = new Date().getDate();
-    setDailyTipIndex(today % flutterTips.length);
-  }, [flutterTips.length, loadProgress]);
+    // Set random tip on page load/visit
+    refreshTip();
+  }, [loadProgress, refreshTip]);
 
   // Localized text
   const t = {
@@ -395,6 +433,9 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
             <h3>{text.tipsTitle}</h3>
             <p>{flutterTips[dailyTipIndex][language] || flutterTips[dailyTipIndex].en}</p>
           </div>
+          <button className="tip-refresh-btn" onClick={refreshTip} title={text.refreshQuestions}>
+            <HiRefresh />
+          </button>
         </div>
       </div>
 

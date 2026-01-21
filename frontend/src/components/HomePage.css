@@ -711,6 +711,35 @@
   margin: 0;
 }
 
+.tip-content {
+  flex: 1;
+}
+
+.tip-refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: #aaa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.tip-refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+.tip-refresh-btn:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
 /* Recent Section */
 .recent-section {
   margin-bottom: 32px;
