@@ -21,14 +21,6 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
   const chapterQuestions = conversation?.chapterQuestions || null;
   const hasNextQuestion = chapterQuestions && currentQuestionIndex < chapterQuestions.length - 1;
 
-  // Debug log
-  console.log('ChatInterface Debug:', {
-    chapterQuestions,
-    currentQuestionIndex,
-    hasNextQuestion,
-    conversationId: conversation?.id
-  });
-
   // Localized messages
   const t = {
     en: {
@@ -99,11 +91,14 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     } else {
       setMessages([]);
     }
-    // Set initial question index
+  }, [conversation]);
+
+  // Reset question index only when conversation ID changes (new conversation)
+  useEffect(() => {
     if (conversation?.currentQuestionIndex !== undefined) {
       setCurrentQuestionIndex(conversation.currentQuestionIndex);
     }
-  }, [conversation]);
+  }, [conversation?.id]);
 
   useEffect(() => {
     // Adjust textarea height when input value changes
