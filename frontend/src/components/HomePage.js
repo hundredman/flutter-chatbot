@@ -190,9 +190,14 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     });
   };
 
+  // Get next question info for display
+  const nextQuestionInfo = useMemo(() => {
+    return findNextQuestion(curriculum);
+  }, [progress?.completedQuestions]);
+
   // Quick start - continue from last position or start from beginning
   const handleContinueLearning = () => {
-    const next = findNextQuestion(curriculum);
+    const next = nextQuestionInfo;
     const chapterQs = next.chapter.questions.map(q => ({
       id: q.id,
       text: q[language] || q.en
@@ -256,7 +261,12 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
             onClick={handleContinueLearning}
           >
             <HiPlay />
-            {text.continueLearning}
+            <span className="continue-btn-text">
+              <span className="continue-btn-main">{text.continueLearning}</span>
+              <span className="continue-btn-position">
+                Part {nextQuestionInfo.part.id} • Ch. {nextQuestionInfo.chapter.id} • Q{nextQuestionInfo.questionIndex + 1}
+              </span>
+            </span>
           </button>
           <button
             className="start-beginning-btn"
@@ -301,7 +311,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
             </div>
           </div>
           <div className="part-progress-list">
-            {curriculum.parts.slice(0, 3).map(part => {
+            {curriculum.parts.map(part => {
               const partProgress = getPartProgress(part);
               return (
                 <div key={part.id} className="part-progress-item">
