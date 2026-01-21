@@ -3,7 +3,7 @@ import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
 import { addMessageToConversation } from '../firebase/chatService';
-import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX } from 'react-icons/hi';
+import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight } from 'react-icons/hi';
 
 const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, showBackButton = true, language = 'en', onLanguageChange }) => {
   const [messages, setMessages] = useState([]);
@@ -12,9 +12,14 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
   const [linkUrl, setLinkUrl] = useState('');
   const [attachedFile, setAttachedFile] = useState(null);
   const [showAttachments, setShowAttachments] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Chapter questions for sequential learning
+  const chapterQuestions = conversation?.chapterQuestions || null;
+  const hasNextQuestion = chapterQuestions && currentQuestionIndex < chapterQuestions.length - 1;
 
   // Localized messages
   const t = {
@@ -31,6 +36,8 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       linkPlaceholder: 'Enter URL (e.g., https://example.com)',
       removeLink: 'Remove link',
       removeFile: 'Remove file',
+      nextQuestion: 'Next Question',
+      questionProgress: 'Question',
     },
     ko: {
       backButton: '홈으로 돌아가기',
@@ -45,6 +52,8 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       linkPlaceholder: 'URL 입력 (예: https://example.com)',
       removeLink: '링크 제거',
       removeFile: '파일 제거',
+      nextQuestion: '다음 질문',
+      questionProgress: '질문',
     },
   };
 
@@ -81,6 +90,10 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
       setMessages(conversation.messages);
     } else {
       setMessages([]);
+    }
+    // Set initial question index
+    if (conversation?.currentQuestionIndex !== undefined) {
+      setCurrentQuestionIndex(conversation.currentQuestionIndex);
     }
   }, [conversation]);
 
@@ -360,6 +373,16 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
     }
   };
 
+  // Handle next question in chapter learning mode
+  const handleNextQuestion = () => {
+    if (hasNextQuestion) {
+      const nextIndex = currentQuestionIndex + 1;
+      const nextQuestion = chapterQuestions[nextIndex];
+      setCurrentQuestionIndex(nextIndex);
+      handleSendMessage(nextQuestion.text, true);
+    }
+  };
+
   return (
     <div className="chat-interface">
       <header className="chat-header">
@@ -372,7 +395,12 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
         <div className="chat-title">
           <h2>{conversation?.title || 'Flutter Chat'}</h2>
           {conversation?.week && conversation?.week !== 'quick' && conversation?.week !== 'new' && (
-            <span className="week-badge">Week {conversation.week}</span>
+            <span className="week-badge">{conversation.week}</span>
+          )}
+          {chapterQuestions && (
+            <span className="question-progress">
+              {currentLang.questionProgress} {currentQuestionIndex + 1}/{chapterQuestions.length}
+            </span>
           )}
         </div>
         <LanguageToggle language={language} onLanguageChange={onLanguageChange} />
@@ -487,6 +515,17 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
         <div className="input-help">
           <span>{currentLang.inputHelp}</span>
         </div>
+
+        {/* Next Question Button for chapter learning mode */}
+        {hasNextQuestion && !isLoading && (
+          <button
+            className="next-question-btn"
+            onClick={handleNextQuestion}
+          >
+            <span>{currentLang.nextQuestion}</span>
+            <HiArrowRight />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './HomePage.css';
-import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh } from 'react-icons/hi';
+import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
 
@@ -64,6 +64,9 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       questionsLearned: 'Questions Learned',
       streakDays: 'Day Streak',
       thisWeek: 'This Week',
+      startChapter: 'Start Chapter',
+      continueLearning: 'Continue Learning',
+      startFromBeginning: 'Start from Beginning',
     },
     ko: {
       welcomeBack: '환영합니다',
@@ -90,6 +93,9 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       questionsLearned: '학습한 질문',
       streakDays: '연속 학습',
       thisWeek: '이번 주',
+      startChapter: '챕터 시작',
+      continueLearning: '이어서 학습하기',
+      startFromBeginning: '처음부터 시작',
     }
   };
 
@@ -163,6 +169,75 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     });
   };
 
+  // Start chapter learning - sends all questions in the chapter
+  const handleStartChapter = (chapter, part, e) => {
+    e.stopPropagation();
+    const chapterQuestions = chapter.questions.map(q => ({
+      id: q.id,
+      text: q[language] || q.en
+    }));
+    onStartConversation({
+      week: `Part ${part.id}`,
+      title: chapter.title[language] || chapter.title.en,
+      initialPrompt: chapterQuestions[0].text,
+      prompt: chapterQuestions[0].text,
+      chapterQuestions: chapterQuestions,
+      currentQuestionIndex: 0
+    });
+  };
+
+  // Find next uncompleted question for "Continue Learning"
+  const getNextQuestion = useCallback(() => {
+    for (const part of curriculum.parts) {
+      for (const chapter of part.chapters) {
+        for (const question of chapter.questions) {
+          if (!completedQuestions.includes(question.id)) {
+            return { question, chapter, part };
+          }
+        }
+      }
+    }
+    // All completed, return first question
+    const firstPart = curriculum.parts[0];
+    const firstChapter = firstPart.chapters[0];
+    return { question: firstChapter.questions[0], chapter: firstChapter, part: firstPart };
+  }, [completedQuestions]);
+
+  // Quick start - continue from last position or start from beginning
+  const handleContinueLearning = () => {
+    const next = getNextQuestion();
+    const chapterQuestions = next.chapter.questions.map(q => ({
+      id: q.id,
+      text: q[language] || q.en
+    }));
+    const currentIndex = next.chapter.questions.findIndex(q => q.id === next.question.id);
+    onStartConversation({
+      week: `Part ${next.part.id}`,
+      title: next.chapter.title[language] || next.chapter.title.en,
+      initialPrompt: next.question[language] || next.question.en,
+      prompt: next.question[language] || next.question.en,
+      chapterQuestions: chapterQuestions,
+      currentQuestionIndex: currentIndex
+    });
+  };
+
+  const handleStartFromBeginning = () => {
+    const firstPart = curriculum.parts[0];
+    const firstChapter = firstPart.chapters[0];
+    const chapterQuestions = firstChapter.questions.map(q => ({
+      id: q.id,
+      text: q[language] || q.en
+    }));
+    onStartConversation({
+      week: `Part ${firstPart.id}`,
+      title: firstChapter.title[language] || firstChapter.title.en,
+      initialPrompt: firstChapter.questions[0][language] || firstChapter.questions[0].en,
+      prompt: firstChapter.questions[0][language] || firstChapter.questions[0].en,
+      chapterQuestions: chapterQuestions,
+      currentQuestionIndex: 0
+    });
+  };
+
   return (
     <div className="home-page">
       <header className="home-header">
@@ -185,17 +260,33 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
         </h1>
         <p>{text.subtitle}</p>
 
-        <button
-          className="new-chat-btn"
-          onClick={() => onStartConversation({
-            week: 'new',
-            title: 'New Chat',
-            initialPrompt: null // No premade prompt - blank chat
-          })}
-        >
-          <HiSparkles />
-          {text.startNewChat}
-        </button>
+        <div className="header-buttons">
+          <button
+            className="continue-learning-btn"
+            onClick={handleContinueLearning}
+          >
+            <HiPlay />
+            {text.continueLearning}
+          </button>
+          <button
+            className="start-beginning-btn"
+            onClick={handleStartFromBeginning}
+          >
+            <HiArrowRight />
+            {text.startFromBeginning}
+          </button>
+          <button
+            className="new-chat-btn"
+            onClick={() => onStartConversation({
+              week: 'new',
+              title: 'New Chat',
+              initialPrompt: null
+            })}
+          >
+            <HiSparkles />
+            {text.startNewChat}
+          </button>
+        </div>
       </header>
 
       {/* Progress Dashboard */}
@@ -378,6 +469,14 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
                         </div>
                         <div className="chapter-meta">
                           <span className="question-count">{chapter.questions.length} {text.questions}</span>
+                          <button
+                            className="start-chapter-btn"
+                            onClick={(e) => handleStartChapter(chapter, part, e)}
+                            style={{ backgroundColor: part.color }}
+                          >
+                            <HiPlay />
+                            {text.startChapter}
+                          </button>
                           <span className="expand-icon">
                             {expandedChapter === chapter.id ? <HiChevronDown /> : <HiChevronRight />}
                           </span>
