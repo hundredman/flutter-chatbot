@@ -21,6 +21,14 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, user, sho
   const chapterQuestions = conversation?.chapterQuestions || null;
   const hasNextQuestion = chapterQuestions && currentQuestionIndex < chapterQuestions.length - 1;
 
+  // Debug log
+  console.log('ChatInterface Debug:', {
+    chapterQuestions,
+    currentQuestionIndex,
+    hasNextQuestion,
+    conversationId: conversation?.id
+  });
+
   // Localized messages
   const t = {
     en: {

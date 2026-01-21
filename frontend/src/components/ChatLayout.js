@@ -47,7 +47,9 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
       const newConversation = {
         ...result.conversation,
         week: initialData?.week,
-        initialPrompt: initialData?.initialPrompt
+        initialPrompt: initialData?.initialPrompt,
+        chapterQuestions: initialData?.chapterQuestions || null,
+        currentQuestionIndex: initialData?.currentQuestionIndex || 0
       };
 
       setConversations(prev => [newConversation, ...prev]);
@@ -65,7 +67,9 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
     const newConv = await createNewChat({
       title: weekData.title,
       week: weekData.week,
-      initialPrompt: weekData.initialPrompt
+      initialPrompt: weekData.initialPrompt,
+      chapterQuestions: weekData.chapterQuestions,
+      currentQuestionIndex: weekData.currentQuestionIndex
     });
     if (newConv) {
       setCurrentConversation(newConv);
