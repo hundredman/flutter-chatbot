@@ -193,7 +193,8 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   // Get next question info for display
   const nextQuestionInfo = useMemo(() => {
     return findNextQuestion(curriculum);
-  }, [progress?.completedQuestions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress]);
 
   // Quick start - continue from last position or start from beginning
   const handleContinueLearning = () => {
