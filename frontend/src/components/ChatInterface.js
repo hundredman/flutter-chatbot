@@ -103,6 +103,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
     scrollToBottom();
   }, [messages]);
 
+  // Track the last conversation ID to detect new conversations
+  const lastConversationIdRef = useRef(null);
+
   useEffect(() => {
     // Load messages from conversation when it changes
     if (conversation && conversation.messages) {
@@ -127,12 +130,20 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   }, [inputValue]);
 
   useEffect(() => {
-    // Send initial prompt if this is a new conversation
-    if (conversation && conversation.initialPrompt && messages.length === 0) {
+    // Send initial prompt if this is a new conversation with a different ID
+    const isNewConversation = conversation?.id && conversation.id !== lastConversationIdRef.current;
+
+    if (isNewConversation && conversation.initialPrompt) {
+      // Update the ref to track this conversation
+      lastConversationIdRef.current = conversation.id;
+      // Send the initial prompt
       handleSendMessage(conversation.initialPrompt, true);
+    } else if (conversation?.id) {
+      // Just update the ref without sending (for existing conversations)
+      lastConversationIdRef.current = conversation.id;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversation]);
+  }, [conversation?.id, conversation?.initialPrompt]);
 
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
