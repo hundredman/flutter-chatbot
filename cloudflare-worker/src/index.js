@@ -188,9 +188,9 @@ ${context}
 Instructions:
 1. Answer based ONLY on the provided context above
 2. Be CONCISE and avoid repetition - do not repeat the same information multiple times
-3. Structure your answer with clear paragraphs (use double line breaks between sections)
+3. Structure your answer with clear paragraphs (use single line breaks between paragraphs)
 4. Include code examples when relevant
-5. At the end, cite sources using [Source X] notation in a separate line
+5. DO NOT include [Source X] citations in your answer - the sources will be displayed separately
 6. If the context doesn't fully answer the question, acknowledge it
 7. Keep your answer focused and to the point - quality over quantity`;
 
