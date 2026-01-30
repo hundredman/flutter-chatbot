@@ -9,12 +9,12 @@ A RAG (Retrieval-Augmented Generation) based chatbot for Flutter documentation, 
 - **Frontend Framework**: React 19.2.0
 - **Backend (FaaS)**: Google Cloud Functions (Node.js 22)
 - **Data Collection**: GitHub API (Octokit)
-- **Data Storage & Indexing (RAG Core)**: Google Vertex AI Vector Search
+- **Vector Database (RAG Core)**: Pinecone (Serverless, AWS us-east-1)
 - **AI / Language Model**: Google Gemini 2.5 Flash Lite
 - **Embedding Model**: Google text-embedding-004 (768 dimensions)
 - **Database**: Firebase Firestore
 - **Authentication**: Firebase Auth (Google & Email)
-- **Hosting**: Firebase Hosting
+- **Hosting**: Vercel (Frontend) + Firebase Hosting (Backup)
 - **Source Control & Collaboration**: GitHub
 - **Data Source**: Flutter GitHub Repository (flutter/website)
 
@@ -74,8 +74,7 @@ This process syncs Flutter documentation from GitHub and can be triggered manual
    - Classifies content type (tutorial, api, guide, cookbook, reference)
    - Generates vector embeddings using Google text-embedding-004
 3. **💾 Firebase Firestore** → Stores document chunks and metadata
-4. **📚 Cloud Storage** → Stores vector embeddings in batch files
-5. **🔍 Vertex AI Vector Search** → Indexes embeddings for similarity search
+4. **🔍 Pinecone Vector Database** → Stores and indexes 768-dimensional embeddings for similarity search
 
 **Key Features:**
 - GitHub API-based synchronization (no web scraping)
@@ -98,10 +97,10 @@ This happens instantly when a user asks a question in the chat interface.
 1. **👨‍💻 User** → Asks a question in the React app
 2. **🌐 React App** → Sends the question to the backend
 3. **🔍 RAG Function** ([rag.js](functions/rag.js))
-   - Converts the question into a vector embedding using text-embedding-004
-   - Searches Firestore for relevant document chunks
-   - Applies keyword-based boosting for better relevance
-   - Returns top matching documentation sections
+   - Converts the question into a vector embedding using Google text-embedding-004
+   - Searches Pinecone vector database for semantically similar documents (cosine similarity)
+   - Fallback to Firestore keyword search if Pinecone is unavailable
+   - Returns top 5 matching documentation sections with similarity scores
 4. **🧠 Answer Generation** ([generateAnswer.js](functions/generateAnswer.js))
    - Receives user question + relevant context documents
    - Sends to Google Gemini 2.5 Flash Lite for answer generation
@@ -111,7 +110,8 @@ This happens instantly when a user asks a question in the chat interface.
 6. **⬅️ Response** → Displayed to the user in the chat interface
 
 **Key Features:**
-- Hybrid search (vector + keyword matching)
+- Vector semantic search via Pinecone (primary)
+- Keyword-based fallback search in Firestore (backup)
 - Context-aware answer generation with source citations
 - Conversation history persistence
 - Multi-language support (English, Korean)
