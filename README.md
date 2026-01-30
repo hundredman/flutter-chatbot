@@ -12,7 +12,7 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 ## ⭐ 주요 특징
 
 - 🤖 **AI 챗봇**: Flutter 공식 문서 기반 실시간 질의응답
-- 📚 **RAG 시스템**: 32개 공식 문서로 학습된 지능형 검색
+- 📚 **RAG 시스템**: 370+ 공식 문서로 학습된 지능형 검색
 - 🌍 **다국어 지원**: 한국어/영어 자동 전환
 - 💡 **30개 Flutter 팁**: 랜덤 학습 팁 제공
 - 🔐 **Firebase 인증**: Google 로그인 지원
@@ -39,7 +39,7 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 │  └─────────────────────────────────────────────────┘   │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │  🔍 Vectorize (Vector Database)                │   │
-│  │     - 32 Flutter 공식 문서                      │   │
+│  │     - 370+ Flutter 공식 문서                    │   │
 │  │     - 768-dim embeddings                        │   │
 │  └─────────────────────────────────────────────────┘   │
 │  ┌─────────────────────────────────────────────────┐   │
@@ -151,18 +151,30 @@ npm run deploy
 ### 2. Flutter 문서 동기화
 
 ```bash
-# 32개 공식 문서를 Vectorize에 삽입
+# GitHub Token 설정 (선택사항 - rate limit 증가용)
+export GITHUB_TOKEN=your_github_token_here
+
+# 370+ 공식 문서를 Vectorize에 삽입
 cd cloudflare-worker
-node scripts/sync-flutter-docs.js
+node scripts/sync-github-tree.js
 ```
 
 성공하면 다음과 같이 출력됩니다:
 ```
-✅ Fetched 32 documents successfully!
-📤 Syncing 32 documents to Vectorize...
-✅ Batch 1: Synced 5 documents
+🌲 Fetching complete file tree from flutter/website...
+📌 Latest commit: abc123...
+✅ Retrieved 676 total items
+📝 Found 676 markdown files in src/content/
+
+🚀 Downloading content from 676 markdown files...
+✅ Download completed!
+   Success: 621 documents
+   Skipped: 55 (empty or too short)
+
+📤 Syncing 621 documents to Vectorize...
+✅ Batch 1/63: 10 docs
 ...
-✅ Sync completed!
+✅ Sync completed! (~370 documents successfully inserted)
 ```
 
 ### 3. Frontend 설정
@@ -216,16 +228,28 @@ vercel --prod
 
 프로젝트는 GitHub Actions를 통해 **매주 일요일 자동으로 Flutter 문서를 업데이트**합니다.
 
+**GitHub Secret 설정 (필수):**
+1. GitHub 저장소 → Settings → Secrets and variables → Actions
+2. "New repository secret" 클릭
+3. Name: `FLUTTER_DOCS_TOKEN`
+4. Value: GitHub Personal Access Token 입력
+   - [토큰 생성](https://github.com/settings/tokens/new?scopes=public_repo&description=Flutter%20Docs%20Sync)
+   - Scopes: `public_repo` (공개 저장소 읽기 권한)
+   - 5000 req/hour rate limit (인증 없이는 60 req/hour)
+5. "Add secret" 클릭
+
 **자동 동기화:**
 - **주기**: 매주 일요일 오전 3시 (UTC)
 - **방법**: GitHub Actions (`.github/workflows/sync-flutter-docs.yml`)
 - **무료**: Public 저장소는 GitHub Actions 무료
+- **인증**: FLUTTER_DOCS_TOKEN secret 사용
 
 **수동 동기화:**
 ```bash
 # 로컬에서 수동 실행
 cd cloudflare-worker
-node scripts/sync-flutter-docs.js
+export GITHUB_TOKEN=your_github_token_here
+node scripts/sync-github-tree.js
 
 # GitHub Actions 수동 트리거
 # GitHub 저장소 → Actions → Sync Flutter Documentation → Run workflow
@@ -308,10 +332,10 @@ User Response (한국어/영어)
 ```
 
 ### 2. Document Sync
-- 32개 Flutter 공식 문서 자동 크롤링
-- HTML → Markdown → 8000자 청크로 분할
+- 370+ Flutter 공식 문서 자동 크롤링 (GitHub Tree API)
+- Markdown → 텍스트 정리 → 8000자 청크로 분할
 - 임베딩 생성 및 Vectorize 저장
-- 메타데이터: title, content, url, type, fetchedAt
+- 메타데이터: title, content, url, path, fetchedAt
 - **자동 업데이트**: 매주 일요일 자동 동기화 (GitHub Actions)
 
 ### 3. Chat History
