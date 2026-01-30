@@ -1,22 +1,38 @@
-# Flutter_Chatbot
+# Flutter AI 학습 챗봇 (100% 무료)
 
-A RAG (Retrieval-Augmented Generation) based chatbot for Flutter documentation, powered by Google Vertex AI and Firebase.
+Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니다. RAG (Retrieval-Augmented Generation) 기술로 Flutter 공식 문서를 학습하고 질문에 답변합니다.
 
-## Tech Stack and Structure
+**💰 월 비용**: $0 (완전 무료, 영구 지속 가능)
 
-### Frameworks and Services
+## ⭐ 주요 특징
 
-- **Frontend Framework**: React 19.2.0
-- **Backend (FaaS)**: Google Cloud Functions (Node.js 22)
-- **Data Collection**: GitHub API (Octokit)
-- **Vector Database (RAG Core)**: Pinecone (Serverless, AWS us-east-1)
-- **AI / Language Model**: Google Gemini 2.5 Flash Lite
-- **Embedding Model**: Google text-embedding-004 (768 dimensions)
-- **Database**: Firebase Firestore
-- **Authentication**: Firebase Auth (Google & Email)
-- **Hosting**: Vercel (Frontend) + Firebase Hosting (Backup)
-- **Source Control & Collaboration**: GitHub
-- **Data Source**: Flutter GitHub Repository (flutter/website)
+- 🤖 **AI 챗봇**: 실시간 Flutter 질의응답
+- 📚 **구조화된 커리큘럼**: 6개 파트, 30개 챕터, 138개 질문
+- 🌍 **다국어 지원**: 한국어/영어 전환
+- 📊 **학습 진도 추적**: 완료한 챕터 및 질문 표시
+- 💡 **30개 Flutter 팁**: 랜덤 팁 제공
+- 🔄 **자동 업데이트**: 매주 Flutter 공식 문서 동기화
+
+## 🚀 Tech Stack (100% 무료 통합)
+
+### 단일 플랫폼 아키텍처
+
+- **Frontend**: React 19.2.0 (Vercel 호스팅, 무료)
+- **Backend**: Cloudflare Workers (통합 백엔드, 무료)
+  - **LLM**: Workers AI - Llama 3.1 8B (내장, 무료)
+  - **임베딩**: Workers AI - BGE Base (내장, 무료)
+  - **벡터 검색**: Cloudflare Vectorize (내장, 무료)
+  - **Database**: D1 Database (내장, 무료)
+- **자동 동기화**: GitHub Actions (Public 저장소, 무료)
+- **데이터 소스**: Flutter GitHub (flutter/website)
+
+### 왜 Cloudflare인가?
+
+1. ✅ **완전 통합**: 모든 기능이 단일 플랫폼
+2. ✅ **0개 API 키**: 외부 의존성 없음
+3. ✅ **초고속**: 전 세계 300+ 엣지 배포
+4. ✅ **유지보수 쉬움**: 하나의 대시보드만 관리
+5. ✅ **100% 무료**: $0/월, 과금 위험 0%
 
 ### Project Structure
 

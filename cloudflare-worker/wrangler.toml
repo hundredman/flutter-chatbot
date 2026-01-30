@@ -1,0 +1,22 @@
+name = "flutter-chatbot-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Workers AI 바인딩 (무료)
+[ai]
+binding = "AI"
+
+# Vectorize 바인딩 (무료 벡터 DB)
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "flutter-docs"
+
+# D1 Database 바인딩 (무료 SQL, 대화 기록용)
+[[d1_databases]]
+binding = "DB"
+database_name = "flutter-chatbot-db"
+database_id = "placeholder" # wrangler d1 create로 생성 후 업데이트
+
+# 환경 변수 (필요시)
+[vars]
+ENVIRONMENT = "production"
