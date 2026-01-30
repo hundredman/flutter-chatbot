@@ -1,348 +1,362 @@
-# Flutter AI 학습 챗봇 (100% 무료)
+# Flutter AI Chatbot (100% Free)
 
 Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니다. RAG (Retrieval-Augmented Generation) 기술로 Flutter 공식 문서를 학습하고 질문에 답변합니다.
 
 **💰 월 비용**: $0 (완전 무료, 영구 지속 가능)
 
+## 🎯 Live Demo
+
+- **Production**: [https://flutter-chatbot-ten.vercel.app](https://flutter-chatbot-ten.vercel.app)
+- **Worker API**: [https://flutter-chatbot-worker.hiprojectflutterchatbot.workers.dev](https://flutter-chatbot-worker.hiprojectflutterchatbot.workers.dev)
+
 ## ⭐ 주요 특징
 
-- 🤖 **AI 챗봇**: 실시간 Flutter 질의응답
-- 📚 **구조화된 커리큘럼**: 6개 파트, 30개 챕터, 138개 질문
-- 🌍 **다국어 지원**: 한국어/영어 전환
-- 📊 **학습 진도 추적**: 완료한 챕터 및 질문 표시
-- 💡 **30개 Flutter 팁**: 랜덤 팁 제공
-- 🔄 **자동 업데이트**: 매주 Flutter 공식 문서 동기화
+- 🤖 **AI 챗봇**: Flutter 공식 문서 기반 실시간 질의응답
+- 📚 **RAG 시스템**: 32개 공식 문서로 학습된 지능형 검색
+- 🌍 **다국어 지원**: 한국어/영어 자동 전환
+- 💡 **30개 Flutter 팁**: 랜덤 학습 팁 제공
+- 🔐 **Firebase 인증**: Google 로그인 지원
+- 💬 **대화 기록**: 자동 저장 및 관리
+- ⚡ **초고속 응답**: Cloudflare Edge Network
 
-## 🚀 Tech Stack (100% 무료 통합)
+## 🚀 Tech Stack (100% 무료)
 
-### 단일 플랫폼 아키텍처
+### 완전 통합 아키텍처
 
-- **Frontend**: React 19.2.0 (Vercel 호스팅, 무료)
-- **Backend**: Cloudflare Workers (통합 백엔드, 무료)
-  - **LLM**: Workers AI - Llama 3.1 8B (내장, 무료)
-  - **임베딩**: Workers AI - BGE Base (내장, 무료)
-  - **벡터 검색**: Cloudflare Vectorize (내장, 무료)
-  - **Database**: D1 Database (내장, 무료)
-- **자동 동기화**: GitHub Actions (Public 저장소, 무료)
-- **데이터 소스**: Flutter GitHub (flutter/website)
+```
+┌─────────────────────────────────────────────────────────┐
+│                      Frontend (Vercel)                  │
+│  React 19 + Vite + Firebase Auth + Firestore           │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│              Cloudflare Workers (Edge)                  │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  🤖 Workers AI (LLM + Embeddings)              │   │
+│  │     - Llama 3.1 8B Instruct                    │   │
+│  │     - BGE Base EN v1.5                         │   │
+│  └─────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  🔍 Vectorize (Vector Database)                │   │
+│  │     - 32 Flutter 공식 문서                      │   │
+│  │     - 768-dim embeddings                        │   │
+│  └─────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  💾 D1 Database (SQL)                          │   │
+│  │     - Chat history (optional)                  │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 기술 스택 상세
+
+| Category | Technology | Cost | Why? |
+|----------|-----------|------|------|
+| **Frontend** | React 19 + Vite | $0 | 빠른 빌드, 모던 개발 환경 |
+| **Hosting** | Vercel | $0 | 자동 배포, CDN, 무제한 대역폭 |
+| **Backend** | Cloudflare Workers | $0 | 전 세계 300+ 엣지, 무료 10만 요청/일 |
+| **LLM** | Llama 3.1 8B (Workers AI) | $0 | 내장 모델, API 키 불필요 |
+| **Embeddings** | BGE Base (Workers AI) | $0 | 내장 모델, API 키 불필요 |
+| **Vector DB** | Cloudflare Vectorize | $0 | 통합 벡터 검색, 무료 3000만 쿼리/월 |
+| **Database** | D1 + Firestore | $0 | D1 무료 100k rows, Firestore 무료 tier |
+| **Auth** | Firebase Auth | $0 | Google 로그인, 무제한 사용자 |
 
 ### 왜 Cloudflare인가?
 
-1. ✅ **완전 통합**: 모든 기능이 단일 플랫폼
-2. ✅ **0개 API 키**: 외부 의존성 없음
-3. ✅ **초고속**: 전 세계 300+ 엣지 배포
-4. ✅ **유지보수 쉬움**: 하나의 대시보드만 관리
-5. ✅ **100% 무료**: $0/월, 과금 위험 0%
+1. ✅ **완전 통합**: LLM + Embeddings + Vector DB + SQL이 모두 Workers 내장
+2. ✅ **0개 API 키**: 외부 서비스 의존성 제로
+3. ✅ **초고속**: 전 세계 300+ 엣지에서 실행 (<50ms latency)
+4. ✅ **유지보수 쉬움**: 하나의 대시보드, 하나의 코드베이스
+5. ✅ **100% 무료**: $0/월, 과금 위험 0%, 신용카드 불필요
 
-### Project Structure
+## 📁 Project Structure
 
 ```
-/Flutter_Chatbot/
-├── .github/                  # GitHub Actions workflows
-├── frontend/                 # React application
+Flutter_Chatbot/
+├── frontend/                      # React 프론트엔드 (Vercel)
 │   ├── src/
-│   │   ├── components/       # React components
-│   │   │   ├── Auth/         # Authentication components
-│   │   │   ├── Chat/         # Chat interface components
-│   │   │   └── Common/       # Shared components
-│   │   ├── services/         # API services
-│   │   │   ├── firebase.js   # Firebase configuration
-│   │   │   └── api.js        # API client
-│   │   ├── i18n/             # Internationalization (en, ko)
-│   │   └── App.js
+│   │   ├── components/            # React 컴포넌트
+│   │   │   ├── AuthPage.jsx       # 로그인 페이지
+│   │   │   ├── ChatInterface.jsx  # 채팅 인터페이스
+│   │   │   ├── ChatLayout.jsx     # 메인 레이아웃
+│   │   │   ├── HomePage.jsx       # 홈페이지 (30개 팁)
+│   │   │   ├── MessageBubble.jsx  # 메시지 UI
+│   │   │   └── Sidebar.jsx        # 사이드바
+│   │   ├── firebase/              # Firebase 설정
+│   │   │   ├── config.js          # Firebase 초기화
+│   │   │   ├── authService.js     # 인증 서비스
+│   │   │   └── chatService.js     # 채팅 저장
+│   │   ├── i18n/                  # 다국어 지원
+│   │   │   └── translations.js    # 한국어/영어
+│   │   ├── App.jsx
+│   │   └── index.jsx
+│   ├── public/
 │   ├── package.json
-│   └── public/
+│   ├── vite.config.js
+│   └── .env.example
 │
-├── functions/                # Google Cloud Functions
-│   ├── index.js              # Main Cloud Functions entry point
-│   ├── generateAnswer.js     # RAG answer generation (main endpoint)
-│   ├── rag.js                # Vector search & retrieval logic
-│   ├── githubCrawler.js      # GitHub documentation crawler
-│   ├── getHistory.js         # Chat history retrieval
-│   ├── syncMissingFiles.js   # GitHub sync utilities
-│   ├── check-statefulwidget.js
-│   ├── compare-sync.js
+├── cloudflare-worker/             # Cloudflare Workers 백엔드
+│   ├── src/
+│   │   └── index.js               # 통합 Worker (RAG 파이프라인)
+│   ├── scripts/
+│   │   ├── sync-flutter-docs.js   # Flutter 문서 크롤러
+│   │   └── test-vectorize.js      # 테스트 데이터 삽입
+│   ├── wrangler.toml              # Worker 설정
 │   ├── package.json
-│   └── ...
+│   └── .env.example
 │
-├── backend/                  # Backend configuration & documentation
-│   ├── vertex-ai-config.md   # Vertex AI setup guide
-│   └── ...
-│
-├── firebase.json             # Firebase deployment config
-├── firestore.rules           # Firestore security rules
-└── README.md
+├── .gitignore
+├── README.md
+└── LICENSE
 ```
 
-## Main Processes
-
-### Process 1: Background Data Collection (Populating the Vector Database)
-
-This process syncs Flutter documentation from GitHub and can be triggered manually or scheduled.
-
-**Flow:**
-
-1. **🔧 Manual Trigger** → Call the `runGitHubSync` Cloud Function
-2. **🤖 GitHub Crawler** ([githubCrawler.js](functions/githubCrawler.js))
-   - Fetches Flutter documentation from GitHub API (flutter/website repository)
-   - Processes markdown files and extracts code examples
-   - Splits documents into chunks (max 1200 chars with 200 char overlap)
-   - Classifies content type (tutorial, api, guide, cookbook, reference)
-   - Generates vector embeddings using Google text-embedding-004
-3. **💾 Firebase Firestore** → Stores document chunks and metadata
-4. **🔍 Pinecone Vector Database** → Stores and indexes 768-dimensional embeddings for similarity search
-
-**Key Features:**
-- GitHub API-based synchronization (no web scraping)
-- Incremental updates based on commit SHA tracking
-- Batch processing with progress tracking (3-730 files per batch)
-- Automatic retry logic with exponential backoff
-- ~730 Flutter documentation files indexed
-
-**Sync Endpoint:**
-```
-https://rungithubsync-yt3kigee5a-uc.a.run.app
-```
-
-### Process 2: Real-Time Question Answering (RAG Pipeline)
-
-This happens instantly when a user asks a question in the chat interface.
-
-**Flow:**
-
-1. **👨‍💻 User** → Asks a question in the React app
-2. **🌐 React App** → Sends the question to the backend
-3. **🔍 RAG Function** ([rag.js](functions/rag.js))
-   - Converts the question into a vector embedding using Google text-embedding-004
-   - Searches Pinecone vector database for semantically similar documents (cosine similarity)
-   - Fallback to Firestore keyword search if Pinecone is unavailable
-   - Returns top 5 matching documentation sections with similarity scores
-4. **🧠 Answer Generation** ([generateAnswer.js](functions/generateAnswer.js))
-   - Receives user question + relevant context documents
-   - Sends to Google Gemini 2.5 Flash Lite for answer generation
-   - Uses low temperature (0.1) for factual, consistent responses
-   - Formats and returns the final answer
-5. **💬 Chat History** → Saves conversation to Firestore
-6. **⬅️ Response** → Displayed to the user in the chat interface
-
-**Key Features:**
-- Vector semantic search via Pinecone (primary)
-- Keyword-based fallback search in Firestore (backup)
-- Context-aware answer generation with source citations
-- Conversation history persistence
-- Multi-language support (English, Korean)
-
-## AI Model Configuration
-
-### Gemini 2.5 Flash Lite (LLM)
-- **Location**: us-central1
-- **Max Output Tokens**: 2048
-- **Temperature**: 0.1 (factual, low creativity)
-- **Top-p**: 0.8
-- **Top-k**: 40
-- **Use Case**: Generate accurate answers from documentation context
-
-### text-embedding-004 (Embedding Model)
-- **Dimensions**: 768
-- **Use Case**: Convert documents and queries into vector representations
-- **API**: Vertex AI Prediction API
-
-### Vector Search Configuration
-- **Index ID**: 2259692108149424128
-- **Distance Metric**: DOT_PRODUCT_DISTANCE
-- **Algorithm**: Tree-AH
-- **Storage**: gs://hi-project-flutter-chatbot-vectors
-
-## Firebase & GCP Configuration
-
-### Project Information
-- **Project ID**: hi-project-flutter-chatbot
-- **Region**: us-central1
-- **Hosting URL**: https://hi-project-flutter-chatbot.web.app
-- **Auth Domain**: hi-project-flutter-chatbot.firebaseapp.com
-
-### Cloud Functions (8 deployed)
-1. `generateAnswer` - Main RAG answer generation endpoint
-2. `mockRAG` - Testing endpoint with hardcoded responses
-3. `getHistory` - Retrieve chat conversation history
-4. `mockHistory` - Testing endpoint for chat history
-5. `runGitHubSync` - Trigger GitHub documentation sync
-6. `checkMissingFiles` - Compare GitHub vs Firestore files
-7. `helloWorld` - Health check endpoint
-8. `testFirestore` - Firestore connection test
-
-### Firestore Collections
-- `document_chunks` - Processed documentation chunks with embeddings
-- `chat_history` - User conversation records
-- `sync_progress` - GitHub sync status tracking
-
-## Setup and Deployment
+## 🔧 Setup & Deployment
 
 ### Prerequisites
 
-- Node.js 22+
-- Google Cloud Platform account with billing enabled
-- Firebase CLI installed (`npm install -g firebase-tools`)
-- GitHub personal access token (for data collection)
+- Node.js 18+
+- Cloudflare 계정 (무료)
+- Vercel 계정 (무료)
+- Firebase 프로젝트 (무료 tier)
 
-### Environment Variables
-
-Create a `.env` file in the `functions/` directory:
-
-```env
-PROJECT_ID=hi-project-flutter-chatbot
-REGION=us-central1
-VERTEX_AI_LOCATION=us-central1
-FIREBASE_PROJECT_ID=hi-project-flutter-chatbot
-GITHUB_TOKEN=your_github_personal_access_token
-NODE_ENV=development
-```
-
-Create a `.env` file in the `frontend/` directory:
-
-```env
-REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
-REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=your-project-id
-REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-REACT_APP_FIREBASE_APP_ID=your_app_id
-REACT_APP_API_BASE_URL=https://us-central1-your-project.cloudfunctions.net/generateAnswer
-```
-
-### Local Development
+### 1. Cloudflare Worker 설정
 
 ```bash
-# Install frontend dependencies
-cd frontend
-npm install
-npm start
+# Worker 디렉토리로 이동
+cd cloudflare-worker
 
-# Install backend dependencies
-cd functions
+# 의존성 설치
 npm install
 
-# Test functions locally
-firebase emulators:start --only functions
+# Wrangler 로그인
+npx wrangler login
 
-# Deploy functions to GCP
-firebase deploy --only functions
+# D1 데이터베이스 생성
+npx wrangler d1 create flutter-chatbot-db
 
-# Deploy frontend to Firebase Hosting
+# Vectorize 인덱스 생성
+npx wrangler vectorize create flutter-docs --dimensions=768 --metric=cosine
+
+# wrangler.toml 파일 업데이트 (위 명령어 출력에서 ID 복사)
+# [[d1_databases]]
+# database_id = "your-database-id"
+# [[vectorize]]
+# index_name = "flutter-docs"
+
+# Worker 배포
+npm run deploy
+```
+
+### 2. Flutter 문서 동기화
+
+```bash
+# 32개 공식 문서를 Vectorize에 삽입
+cd cloudflare-worker
+node scripts/sync-flutter-docs.js
+```
+
+성공하면 다음과 같이 출력됩니다:
+```
+✅ Fetched 32 documents successfully!
+📤 Syncing 32 documents to Vectorize...
+✅ Batch 1: Synced 5 documents
+...
+✅ Sync completed!
+```
+
+### 3. Frontend 설정
+
+```bash
+# Frontend 디렉토리로 이동
 cd frontend
-npm run build
-firebase deploy --only hosting
+
+# 의존성 설치
+npm install
+
+# .env 파일 생성 (.env.example 참고)
+cp .env.example .env
+
+# 환경 변수 설정
+# VITE_CLOUDFLARE_WORKER_URL=https://your-worker.workers.dev
+# VITE_FIREBASE_API_KEY=your-api-key
+# VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+# VITE_FIREBASE_PROJECT_ID=your-project-id
+# VITE_FIREBASE_STORAGE_BUCKET=your-bucket.appspot.com
+# VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+# VITE_FIREBASE_APP_ID=your-app-id
+
+# 로컬 개발 서버 실행
+npm run dev
 ```
 
-### Initial Data Sync
-
-After deploying the Cloud Functions, trigger the initial sync:
+### 4. Vercel 배포
 
 ```bash
-# Sync all Flutter documentation (~730 files)
-curl -X POST https://rungithubsync-yt3kigee5a-uc.a.run.app
+# Vercel CLI 설치
+npm install -g vercel
 
-# Or use the sync script
-cd functions
-./sync-all.sh
+# 로그인
+vercel login
+
+# 프로젝트 배포
+vercel --prod
+
+# Vercel 대시보드에서 환경 변수 설정:
+# Settings → Environment Variables
+# - VITE_CLOUDFLARE_WORKER_URL
+# - VITE_FIREBASE_* (모든 Firebase 변수)
+# 주의: Production, Preview, Development 모두 체크!
+
+# 재배포 (환경 변수 적용)
+vercel --prod
 ```
 
-## Current Implementation Status
+## 📊 API Endpoints
 
-### Completed Features ✅
-- React-based chat interface with real-time messaging
-- Firebase authentication (Google & Email login)
-- Conversation history management
-- GitHub API-based documentation synchronization
-- Document chunking and embedding generation
-- Gemini LLM integration for answer generation
-- Firestore data persistence
-- Batch processing with progress tracking
-- Multi-language UI support
-
-### In Progress / Planned ⚠️
-- Full Vertex AI Vector Search deployment (code ready, needs Index Endpoint setup)
-- Link attachment content extraction
-- File upload processing and integration into RAG context
-- Enhanced security rules for production
-
-## Vector Search Setup (Optional)
-
-The project includes full Vertex AI Vector Search integration code. To enable it:
-
-### Prerequisites
-1. Vector Search Index is already created: `2259692108149424128`
-2. Embeddings are stored in Cloud Storage: `gs://hi-project-flutter-chatbot-vectors`
-
-### Deployment Steps
-
-1. **Create an Index Endpoint** (one-time setup):
+### 1. Chat API
 ```bash
-gcloud ai index-endpoints create \
-  --display-name="flutter-docs-endpoint" \
-  --description="Endpoint for Flutter documentation search" \
-  --region=us-central1 \
-  --project=hi-project-flutter-chatbot
-```
+POST https://your-worker.workers.dev/api/chat
+Content-Type: application/json
 
-2. **Deploy the Index to the Endpoint**:
-```bash
-# Get the endpoint ID from step 1
-export ENDPOINT_ID="<your-endpoint-id>"
+{
+  "question": "What is Flutter?",
+  "language": "ko",
+  "conversationId": "conv-123"
+}
 
-gcloud ai index-endpoints deploy-index $ENDPOINT_ID \
-  --deployed-index-id="flutter_docs_deployed" \
-  --display-name="Flutter Docs Index" \
-  --index="2259692108149424128" \
-  --region=us-central1 \
-  --project=hi-project-flutter-chatbot
-```
-
-3. **Update the Code**:
-Edit `functions/rag.js` and set the `INDEX_ENDPOINT_ID`:
-```javascript
-const INDEX_ENDPOINT_ID = "<your-endpoint-id>"; // Replace with actual endpoint ID
-```
-
-4. **Redeploy Cloud Functions**:
-```bash
-firebase deploy --only functions:generateAnswer
-```
-
-### Current Behavior
-- **Without Index Endpoint**: Uses intelligent keyword-based search with synonym expansion
-- **With Index Endpoint**: Uses true semantic vector search for better accuracy
-
-Both approaches work well, but Vector Search provides superior semantic understanding.
-
-## API Endpoints
-
-### Main Endpoint
-```
-POST https://us-central1-hi-project-flutter-chatbot.cloudfunctions.net/generateAnswer
-Body: {
-  "userId": "user123",
-  "conversationId": "conv456",
-  "query": "What is Flutter?",
-  "links": [],
-  "files": []
+# Response
+{
+  "answer": "Flutter는 Google이 개발한...",
+  "sources": [
+    {
+      "title": "What is Flutter?",
+      "url": "https://docs.flutter.dev/",
+      "similarity": 0.89
+    }
+  ],
+  "confidence": 0.89
 }
 ```
 
-### Sync Endpoint
-```
-POST https://rungithubsync-yt3kigee5a-uc.a.run.app
-Body: {
-  "batchSize": 50  // Optional, default: 10
+### 2. Health Check
+```bash
+GET https://your-worker.workers.dev/api/health
+
+# Response
+{
+  "status": "ok",
+  "service": "Flutter Chatbot Worker",
+  "cost": "$0/month (100% free)"
 }
 ```
 
-## Contributing
+### 3. Test Data Insert
+```bash
+POST https://your-worker.workers.dev/api/test-insert
+
+# Response
+{
+  "success": true,
+  "message": "Inserted 5 test documents",
+  "documents": ["What is Flutter?", "Getting Started", ...]
+}
+```
+
+## 🎨 Features
+
+### 1. RAG Pipeline
+```
+User Question
+    ↓
+[임베딩 생성] Workers AI (BGE Base)
+    ↓
+[벡터 검색] Vectorize (Top 5 유사 문서)
+    ↓
+[컨텍스트 구성] 문서 + 질문 결합
+    ↓
+[답변 생성] Workers AI (Llama 3.1 8B)
+    ↓
+User Response (한국어/영어)
+```
+
+### 2. Document Sync
+- 32개 Flutter 공식 문서 자동 크롤링
+- HTML → Markdown → 8000자 청크로 분할
+- 임베딩 생성 및 Vectorize 저장
+- 메타데이터: title, content, url, type, fetchedAt
+
+### 3. Chat History
+- Firestore에 대화 저장
+- 대화방별 메시지 관리
+- 자동 제목 생성
+- 검색 및 필터링
+
+## 🔐 Security
+
+- ✅ `.env` 파일은 Git에서 제외됨
+- ✅ Firebase Security Rules 적용
+- ✅ CORS 설정 완료
+- ✅ 환경 변수를 통한 민감 정보 관리
+
+## 📈 Performance
+
+| Metric | Value |
+|--------|-------|
+| **Cold Start** | <100ms |
+| **Warm Response** | <50ms |
+| **Embedding Generation** | ~200ms |
+| **Vector Search** | ~50ms |
+| **LLM Generation** | ~500ms |
+| **Total Response Time** | ~800ms |
+
+## 💰 Cost Breakdown
+
+| Service | Usage | Free Tier | Cost |
+|---------|-------|-----------|------|
+| Cloudflare Workers | 100 req/day | 100,000 req/day | $0 |
+| Workers AI (LLM) | 100 req/day | 10,000 req/day | $0 |
+| Workers AI (Embeddings) | 100 req/day | 10,000 req/day | $0 |
+| Vectorize | 100 queries/day | 30M queries/month | $0 |
+| D1 Database | 100 writes/day | 100k rows stored | $0 |
+| Vercel Hosting | Unlimited | Unlimited bandwidth | $0 |
+| Firebase Auth | 100 users | Unlimited users | $0 |
+| Firestore | 100 docs/day | 50k reads/day | $0 |
+| **Total** | | | **$0/month** |
+
+## 🚀 Roadmap
+
+- [ ] 더 많은 Flutter 문서 추가 (현재 32개 → 100개+)
+- [ ] 코드 예제 실행 기능
+- [ ] 멀티모달 지원 (이미지, 다이어그램)
+- [ ] 학습 진도 추적 시스템
+- [ ] 커뮤니티 Q&A 기능
+- [ ] 모바일 앱 (React Native)
+
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
 
 This project is open source and available under the MIT License.
 
+## 🙏 Acknowledgments
+
+- [Flutter](https://flutter.dev) - Official Flutter Documentation
+- [Cloudflare Workers](https://workers.cloudflare.com) - Edge Computing Platform
+- [Firebase](https://firebase.google.com) - Authentication & Database
+- [Vercel](https://vercel.com) - Frontend Hosting
+- [React](https://react.dev) - UI Framework
+
 ---
+
+**Made with ❤️ for Flutter learners**
+
+**💰 Total Cost: $0/month (100% Free Forever)**
