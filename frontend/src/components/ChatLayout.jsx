@@ -10,7 +10,6 @@ import {
   deleteConversation,
   generateConversationTitle
 } from '../firebase/chatService';
-import { createTestConversations, testConversationRetrieval } from '../firebase/testConversations';
 
 const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
   const [conversations, setConversations] = useState([]);
@@ -156,24 +155,6 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
   const handleGoHome = () => {
     setCurrentView('home');
     setCurrentConversation(null);
-  };
-
-  // Debug function to test conversation functionality
-  const handleTestConversations = async () => {
-    console.log('Testing conversations...');
-    await createTestConversations(user.id);
-
-    // Reload conversations after creating test data
-    const result = await getUserConversations(user.id);
-    if (result.success) {
-      setConversations(result.conversations);
-    }
-  };
-
-  const handleTestRetrieval = async () => {
-    console.log('Testing conversation retrieval...');
-    const result = await testConversationRetrieval(user.id);
-    console.log('Test retrieval result:', result);
   };
 
   // Delete all conversations

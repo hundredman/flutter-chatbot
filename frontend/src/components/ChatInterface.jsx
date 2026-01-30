@@ -224,13 +224,6 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       const workerUrl = import.meta.env.VITE_CLOUDFLARE_WORKER_URL;
       const apiUrl = workerUrl ? `${workerUrl}/api/chat` : '/api/chat';
 
-      console.log('Environment variable:', workerUrl);
-      console.log('API URL:', apiUrl);
-
-      if (!workerUrl) {
-        console.error('VITE_CLOUDFLARE_WORKER_URL is not set!');
-      }
-
       const requestBody = {
         question: messageText,
         conversationId: conversation.id,
