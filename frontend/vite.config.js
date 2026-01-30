@@ -13,7 +13,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'build',
-    sourcemap: false
+    sourcemap: false,
+    chunkSizeWarningLimit: 1500
   },
   define: {
     'process.env': {}
