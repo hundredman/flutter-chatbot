@@ -226,7 +226,7 @@ vercel --prod
 
 ### 5. 자동 문서 동기화 설정
 
-프로젝트는 GitHub Actions를 통해 **매주 일요일 자동으로 Flutter 문서를 업데이트**합니다.
+프로젝트는 GitHub Actions를 통해 **매일 자동으로 Flutter 문서를 업데이트**합니다.
 
 **GitHub Secret 설정 (필수):**
 1. GitHub 저장소 → Settings → Secrets and variables → Actions
@@ -239,10 +239,11 @@ vercel --prod
 5. "Add secret" 클릭
 
 **자동 동기화:**
-- **주기**: 매주 일요일 오전 3시 (UTC)
+- **주기**: 매일 오전 3시 (UTC) - 한국시간 정오 12시
 - **방법**: GitHub Actions (`.github/workflows/sync-flutter-docs.yml`)
 - **무료**: Public 저장소는 GitHub Actions 무료
 - **인증**: FLUTTER_DOCS_TOKEN secret 사용
+- **목적**: Worker CPU 제한으로 실패한 문서들을 매일 재시도하여 점진적으로 모든 문서 업로드
 
 **수동 동기화:**
 ```bash
@@ -336,7 +337,7 @@ User Response (한국어/영어)
 - Markdown → 텍스트 정리 → 8000자 청크로 분할
 - 임베딩 생성 및 Vectorize 저장
 - 메타데이터: title, content, url, path, fetchedAt
-- **자동 업데이트**: 매주 일요일 자동 동기화 (GitHub Actions)
+- **자동 업데이트**: 매일 자동 동기화 (GitHub Actions) - 실패한 문서 재시도로 점진적 개선
 
 ### 3. Chat History
 - Firestore에 대화 저장
