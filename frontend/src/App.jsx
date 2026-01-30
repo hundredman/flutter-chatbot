@@ -7,6 +7,14 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { signOutUser } from './firebase/authService';
 
 function App() {
+  // Debug: Check environment variable at app startup
+  console.log('[App] Environment check:', {
+    VITE_CLOUDFLARE_WORKER_URL: import.meta.env.VITE_CLOUDFLARE_WORKER_URL,
+    MODE: import.meta.env.MODE,
+    DEV: import.meta.env.DEV,
+    PROD: import.meta.env.PROD
+  });
+
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState(() => {
