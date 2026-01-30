@@ -1,0 +1,53 @@
+name: Sync Flutter Documentation
+
+on:
+  # 매주 일요일 오전 3시 (UTC) 자동 실행
+  schedule:
+    - cron: '0 3 * * 0'
+
+  # 수동 트리거 가능
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force full sync (ignore cache)'
+        required: false
+        default: 'false'
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: cloudflare-worker/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd cloudflare-worker
+          npm ci
+
+      - name: Run Flutter documentation sync
+        run: |
+          cd cloudflare-worker
+          node scripts/sync-flutter-docs.js
+        env:
+          NODE_ENV: production
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Flutter documentation sync completed successfully!"
+          echo "📊 Check the logs above for details"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Flutter documentation sync failed!"
+          echo "🔍 Check the logs above for error details"

@@ -212,6 +212,33 @@ vercel --prod
 vercel --prod
 ```
 
+### 5. 자동 문서 동기화 설정
+
+프로젝트는 GitHub Actions를 통해 **매주 일요일 자동으로 Flutter 문서를 업데이트**합니다.
+
+**자동 동기화:**
+- **주기**: 매주 일요일 오전 3시 (UTC)
+- **방법**: GitHub Actions (`.github/workflows/sync-flutter-docs.yml`)
+- **무료**: Public 저장소는 GitHub Actions 무료
+
+**수동 동기화:**
+```bash
+# 로컬에서 수동 실행
+cd cloudflare-worker
+node scripts/sync-flutter-docs.js
+
+# GitHub Actions 수동 트리거
+# GitHub 저장소 → Actions → Sync Flutter Documentation → Run workflow
+```
+
+**동기화 확인:**
+```bash
+# 데이터가 제대로 들어갔는지 확인
+curl -X POST https://flutter-chatbot-worker.hiprojectflutterchatbot.workers.dev/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What is Flutter?","language":"ko"}'
+```
+
 ## 📊 API Endpoints
 
 ### 1. Chat API
@@ -285,6 +312,7 @@ User Response (한국어/영어)
 - HTML → Markdown → 8000자 청크로 분할
 - 임베딩 생성 및 Vectorize 저장
 - 메타데이터: title, content, url, type, fetchedAt
+- **자동 업데이트**: 매주 일요일 자동 동기화 (GitHub Actions)
 
 ### 3. Chat History
 - Firestore에 대화 저장
