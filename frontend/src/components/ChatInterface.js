@@ -220,8 +220,8 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
         fileName = attachedFile.name;
       }
 
-      // Call generateAnswer API (real AI)
-      const apiUrl = process.env.REACT_APP_API_BASE_URL;
+      // Call chat API (Vercel Serverless Function - 무료)
+      const apiUrl = '/api/chat';
 
       if (!apiUrl) {
         throw new Error(currentLang.apiConfigError);
@@ -288,7 +288,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
     } catch (error) {
       console.error('Error sending message:', error);
       console.error('Error details:', error.message);
-      console.error('API URL:', process.env.REACT_APP_API_BASE_URL);
+      console.error('API URL:', '/api/chat');
 
       const errorMessage = {
         id: Date.now() + 1,

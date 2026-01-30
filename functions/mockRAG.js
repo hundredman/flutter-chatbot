@@ -1,12 +1,27 @@
-const {onRequest} = require("firebase-functions/https");
+const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 
 /**
  * Mock RAG API for frontend testing
  * Returns realistic responses without requiring vector search
  */
-exports.mockRAG = onRequest({cors: true}, async (req, res) => {
+exports.mockRAG = onRequest({
+  cors: ["https://flutter-chatbot.vercel.app", "http://localhost:3000"],
+  timeoutSeconds: 60,
+}, async (req, res) => {
   try {
+    // Set CORS headers explicitly
+    res.set('Access-Control-Allow-Origin', req.headers.origin || 'https://flutter-chatbot.vercel.app');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+
+    // Handle preflight request
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== "POST") {
       return res.status(405).json({
         success: false,
@@ -80,8 +95,23 @@ exports.mockRAG = onRequest({cors: true}, async (req, res) => {
 /**
  * Get mock chat history
  */
-exports.mockHistory = onRequest({cors: true}, async (req, res) => {
+exports.mockHistory = onRequest({
+  cors: ["https://flutter-chatbot.vercel.app", "http://localhost:3000"],
+  timeoutSeconds: 60,
+}, async (req, res) => {
   try {
+    // Set CORS headers explicitly
+    res.set('Access-Control-Allow-Origin', req.headers.origin || 'https://flutter-chatbot.vercel.app');
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+
+    // Handle preflight request
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== "GET") {
       return res.status(405).json({
         success: false,

@@ -1,4 +1,4 @@
-const {onRequest} = require("firebase-functions/https");
+const {onRequest} = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const {findSimilarDocuments} = require("./rag");
 const {generateAnswerFromContext} = require("./llm");
@@ -8,8 +8,24 @@ const {crawlUrl} = require("./urlCrawler");
  * Generate AI-powered answers using RAG
  * HTTP endpoint for the React frontend
  */
-exports.generateAnswer = onRequest({cors: true, memory: "512MiB"}, async (req, res) => {
+exports.generateAnswer = onRequest({
+  cors: ["https://flutter-chatbot.vercel.app", "http://localhost:3000"],
+  memory: "512MiB",
+  timeoutSeconds: 300,
+}, async (req, res) => {
   try {
+    // Set CORS headers explicitly
+    res.set('Access-Control-Allow-Origin', req.headers.origin || 'https://flutter-chatbot.vercel.app');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+
+    // Handle preflight request
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     // Validate request method
     if (req.method !== "POST") {
       return res.status(405).json({
@@ -187,8 +203,23 @@ exports.generateAnswer = onRequest({cors: true, memory: "512MiB"}, async (req, r
 /**
  * Get chat history for a conversation
  */
-exports.getHistory = onRequest({cors: true}, async (req, res) => {
+exports.getHistory = onRequest({
+  cors: ["https://flutter-chatbot.vercel.app", "http://localhost:3000"],
+  timeoutSeconds: 60,
+}, async (req, res) => {
   try {
+    // Set CORS headers explicitly
+    res.set('Access-Control-Allow-Origin', req.headers.origin || 'https://flutter-chatbot.vercel.app');
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+
+    // Handle preflight request
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     if (req.method !== "GET") {
       return res.status(405).json({
         success: false,

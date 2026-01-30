@@ -1,9 +1,14 @@
 {
+  "name": "flutter-chatbot",
+  "version": "2.0.0",
+  "description": "Flutter AI Learning Platform - 100% Free Edition",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "test": "cd frontend && npm test"
+  },
   "dependencies": {
-    "@google-cloud/vertexai": "^1.10.0",
-    "axios": "^1.12.2",
-    "cheerio": "^1.1.2",
-    "firebase-admin": "^13.5.0",
-    "puppeteer": "^24.26.1"
+    "@pinecone-database/pinecone": "^6.1.4"
   }
 }
