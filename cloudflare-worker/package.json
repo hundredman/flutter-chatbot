@@ -1,6 +1,7 @@
 {
   "name": "flutter-chatbot-worker",
   "version": "1.0.0",
+  "type": "module",
   "description": "Cloudflare Worker for Flutter AI Chatbot - 100% Free",
   "main": "src/index.js",
   "scripts": {
@@ -9,10 +10,21 @@
     "tail": "wrangler tail",
     "test": "vitest"
   },
-  "keywords": ["cloudflare", "workers", "ai", "flutter", "chatbot"],
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "ai",
+    "flutter",
+    "chatbot"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "wrangler": "^3.78.0"
+  },
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "axios": "^1.13.4",
+    "gray-matter": "^4.0.3"
   }
 }

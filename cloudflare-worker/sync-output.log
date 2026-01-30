@@ -1,0 +1,48 @@
+🚀 Starting Flutter docs sync to Cloudflare Vectorize...
+📚 Fetching file tree from flutter/website...
+📄 Found 100 markdown files to process
+Processing: src/content/add-to-app/android/_initial-route-cached-engine.md
+❌ Error processing src/content/add-to-app/android/_initial-route-cached-engine.md: Invalid array length
+Processing: src/content/add-to-app/android/add-flutter-fragment.md
+❌ Error processing src/content/add-to-app/android/add-flutter-fragment.md: Invalid array length
+Processing: src/content/add-to-app/android/add-flutter-screen.md
+❌ Error processing src/content/add-to-app/android/add-flutter-screen.md: Invalid array length
+Processing: src/content/add-to-app/android/add-flutter-view.md
+❌ Error processing src/content/add-to-app/android/add-flutter-view.md: Invalid array length
+Processing: src/content/add-to-app/android/index.md
+  └─ Created 0 chunks
+✅ Completed: src/content/add-to-app/android/index.md (1/100)
+Processing: src/content/add-to-app/android/plugin-setup.md
+❌ Error processing src/content/add-to-app/android/plugin-setup.md: Invalid array length
+Processing: src/content/add-to-app/android/project-setup.md
+❌ Error processing src/content/add-to-app/android/project-setup.md: Invalid array length
+Processing: src/content/add-to-app/debugging.md
+❌ Error processing src/content/add-to-app/debugging.md: Invalid array length
+Processing: src/content/add-to-app/index.md
+❌ Error processing src/content/add-to-app/index.md: Invalid array length
+Processing: src/content/add-to-app/ios/add-flutter-screen.md
+❌ Error processing src/content/add-to-app/ios/add-flutter-screen.md: Invalid array length
+Processing: src/content/add-to-app/ios/index.md
+  └─ Created 0 chunks
+✅ Completed: src/content/add-to-app/ios/index.md (2/100)
+Processing: src/content/add-to-app/ios/project-setup.md
+❌ Error processing src/content/add-to-app/ios/project-setup.md: Invalid array length
+Processing: src/content/add-to-app/multiple-flutters.md
+❌ Error processing src/content/add-to-app/multiple-flutters.md: Invalid array length
+Processing: src/content/add-to-app/performance.md
+❌ Error processing src/content/add-to-app/performance.md: Invalid array length
+Processing: src/content/ai/ai-rules.md
+❌ Error processing src/content/ai/ai-rules.md: Invalid array length
+Processing: src/content/ai/ai-toolkit/chat-client-sample.md
+❌ Error processing src/content/ai/ai-toolkit/chat-client-sample.md: Invalid array length
+Processing: src/content/ai/ai-toolkit/custom-llm-providers.md
+❌ Error processing src/content/ai/ai-toolkit/custom-llm-providers.md: Invalid array length
+Processing: src/content/ai/ai-toolkit/feature-integration.md
+❌ Error processing src/content/ai/ai-toolkit/feature-integration.md: Invalid array length
+Processing: src/content/ai/ai-toolkit/index.md
+❌ Error processing src/content/ai/ai-toolkit/index.md: Invalid array length
+Processing: src/content/ai/ai-toolkit/user-experience.md
+❌ Error processing src/content/ai/ai-toolkit/user-experience.md: Invalid array length
+Processing: src/content/ai/best-practices/developer-experience.md
+❌ Error processing src/content/ai/best-practices/developer-experience.md: Invalid array length
+Processing: src/content/ai/best-practices/index.md

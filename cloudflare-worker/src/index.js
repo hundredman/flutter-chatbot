@@ -43,12 +43,86 @@ export default {
       }, { headers: corsHeaders });
     }
 
+    if (url.pathname === '/api/test-insert' && request.method === 'POST') {
+      return handleTestInsert(request, env, corsHeaders);
+    }
+
     return Response.json(
       { error: 'Not found' },
       { status: 404, headers: corsHeaders }
     );
   },
 };
+
+/**
+ * 테스트 데이터 삽입
+ */
+async function handleTestInsert(request, env, corsHeaders) {
+  try {
+    const testDocs = [
+      {
+        title: "What is Flutter?",
+        content: "Flutter is an open-source UI software development kit created by Google. It is used to develop cross-platform applications for Android, iOS, Linux, macOS, Windows, and the web from a single codebase. Flutter uses the Dart programming language and provides a rich set of pre-built widgets.",
+      },
+      {
+        title: "Getting Started with Flutter",
+        content: "To get started with Flutter, you need to install the Flutter SDK and set up your development environment. You can use Android Studio, VS Code, or IntelliJ IDEA as your IDE. Flutter supports hot reload, which allows you to see changes instantly without restarting your app.",
+      },
+      {
+        title: "Flutter Widgets",
+        content: "Flutter widgets are the building blocks of a Flutter app's user interface. Everything in Flutter is a widget, from a simple button to a complex layout. There are two types of widgets: StatelessWidget for static content and StatefulWidget for dynamic content that can change over time.",
+      },
+      {
+        title: "State Management in Flutter",
+        content: "State management is crucial in Flutter applications. Common approaches include setState for simple cases, Provider for medium complexity, Bloc for enterprise apps, and Riverpod as a modern alternative. Choose based on your app's complexity and team preference.",
+      },
+      {
+        title: "Flutter Navigation",
+        content: "Flutter provides powerful navigation features through the Navigator widget. You can push and pop routes, pass data between screens, and create named routes. For complex navigation, consider using packages like go_router or auto_route.",
+      }
+    ];
+
+    console.log('Inserting test documents into Vectorize...');
+
+    const vectors = [];
+    for (let i = 0; i < testDocs.length; i++) {
+      const doc = testDocs[i];
+
+      // 임베딩 생성
+      const embeddings = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
+        text: doc.content,
+      });
+
+      vectors.push({
+        id: `test_doc_${i}`,
+        values: embeddings.data[0],
+        metadata: {
+          title: doc.title,
+          content: doc.content,
+          type: 'test',
+        },
+      });
+    }
+
+    // Vectorize에 벡터 삽입
+    await env.VECTORIZE.insert(vectors);
+
+    console.log(`Successfully inserted ${vectors.length} test documents`);
+
+    return Response.json({
+      success: true,
+      message: `Inserted ${vectors.length} test documents`,
+      documents: testDocs.map(d => d.title),
+    }, { headers: corsHeaders });
+
+  } catch (error) {
+    console.error('Test insert error:', error);
+    return Response.json({
+      success: false,
+      error: error.message,
+    }, { status: 500, headers: corsHeaders });
+  }
+}
 
 /**
  * 채팅 처리 (통합 RAG 파이프라인)

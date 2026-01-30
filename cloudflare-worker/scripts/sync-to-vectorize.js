@@ -139,21 +139,48 @@ async function downloadFile(path) {
  * Cloudflare Workers AI로 임베딩 생성 (무료)
  */
 async function generateEmbedding(text) {
-  const response = await axios.post(
-    `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/baai/bge-base-en-v1.5`,
-    {
-      text: text.substring(0, 512), // 모델 최대 길이
-    },
-    {
-      headers: {
-        'Authorization': `Bearer ${CF_API_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      timeout: 30000,
-    }
-  );
+  try {
+    const truncatedText = text.substring(0, 512).trim();
 
-  return response.data.result.data[0];
+    if (!truncatedText) {
+      throw new Error('Empty text after truncation');
+    }
+
+    const response = await axios.post(
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/baai/bge-base-en-v1.5`,
+      {
+        text: truncatedText,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${CF_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+
+    // 응답 구조 검증
+    if (!response.data || !response.data.result) {
+      throw new Error(`Invalid API response structure`);
+    }
+
+    // Workers AI 응답 구조: { result: { data: [[embedding_array]] } }
+    const embedding = response.data.result.data[0];
+
+    // 임베딩이 배열인지 확인
+    if (!Array.isArray(embedding)) {
+      throw new Error(`Invalid embedding format: ${typeof embedding}`);
+    }
+
+    if (embedding.length !== 768) {
+      throw new Error(`Invalid embedding dimension: ${embedding.length}, expected 768`);
+    }
+
+    return embedding;
+  } catch (error) {
+    throw new Error(`Embedding generation failed: ${error.message}`);
+  }
 }
 
 /**

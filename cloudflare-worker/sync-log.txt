@@ -1,0 +1,119 @@
+2026-01-30T11:22:38.125Z - 🚀 Starting Flutter docs sync to Cloudflare Vectorize...
+2026-01-30T11:22:38.127Z - 📚 Fetching file tree from flutter/website...
+2026-01-30T11:22:38.636Z - 📄 Found 100 markdown files to process
+2026-01-30T11:22:38.636Z - Processing: src/content/add-to-app/android/_initial-route-cached-engine.md
+2026-01-30T11:22:44.754Z - ❌ Error processing src/content/add-to-app/android/_initial-route-cached-engine.md: Invalid array length
+2026-01-30T11:22:44.754Z - Processing: src/content/add-to-app/android/add-flutter-fragment.md
+2026-01-30T11:22:49.161Z - ❌ Error processing src/content/add-to-app/android/add-flutter-fragment.md: Invalid array length
+2026-01-30T11:22:49.161Z - Processing: src/content/add-to-app/android/add-flutter-screen.md
+2026-01-30T11:22:54.231Z - ❌ Error processing src/content/add-to-app/android/add-flutter-screen.md: Invalid array length
+2026-01-30T11:22:54.231Z - Processing: src/content/add-to-app/android/add-flutter-view.md
+2026-01-30T11:22:58.480Z - ❌ Error processing src/content/add-to-app/android/add-flutter-view.md: Invalid array length
+2026-01-30T11:22:58.480Z - Processing: src/content/add-to-app/android/index.md
+2026-01-30T11:22:58.726Z -   └─ Created 0 chunks
+2026-01-30T11:22:58.727Z - ✅ Completed: src/content/add-to-app/android/index.md (1/100)
+2026-01-30T11:22:58.727Z - Processing: src/content/add-to-app/android/plugin-setup.md
+2026-01-30T11:23:03.468Z - ❌ Error processing src/content/add-to-app/android/plugin-setup.md: Invalid array length
+2026-01-30T11:23:03.469Z - Processing: src/content/add-to-app/android/project-setup.md
+2026-01-30T11:23:46.188Z - 🚀 Starting Flutter docs sync to Cloudflare Vectorize...
+2026-01-30T11:23:46.189Z - 📚 Fetching file tree from flutter/website...
+2026-01-30T11:23:46.718Z - 📄 Found 100 markdown files to process
+2026-01-30T11:23:46.718Z - Processing: src/content/add-to-app/android/_initial-route-cached-engine.md
+2026-01-30T11:23:50.909Z - ❌ Error processing src/content/add-to-app/android/_initial-route-cached-engine.md: Invalid array length
+2026-01-30T11:23:50.909Z - Processing: src/content/add-to-app/android/add-flutter-fragment.md
+2026-01-30T11:23:54.560Z - ❌ Error processing src/content/add-to-app/android/add-flutter-fragment.md: Invalid array length
+2026-01-30T11:23:54.561Z - Processing: src/content/add-to-app/android/add-flutter-screen.md
+2026-01-30T11:23:58.090Z - ❌ Error processing src/content/add-to-app/android/add-flutter-screen.md: Invalid array length
+2026-01-30T11:23:58.091Z - Processing: src/content/add-to-app/android/add-flutter-view.md
+2026-01-30T11:24:01.597Z - ❌ Error processing src/content/add-to-app/android/add-flutter-view.md: Invalid array length
+2026-01-30T11:24:01.598Z - Processing: src/content/add-to-app/android/index.md
+2026-01-30T11:24:01.612Z -   └─ Created 0 chunks
+2026-01-30T11:24:01.613Z - ✅ Completed: src/content/add-to-app/android/index.md (1/100)
+2026-01-30T11:24:01.613Z - Processing: src/content/add-to-app/android/plugin-setup.md
+2026-01-30T11:24:06.343Z - ❌ Error processing src/content/add-to-app/android/plugin-setup.md: Invalid array length
+2026-01-30T11:24:06.343Z - Processing: src/content/add-to-app/android/project-setup.md
+2026-01-30T11:24:10.534Z - ❌ Error processing src/content/add-to-app/android/project-setup.md: Invalid array length
+2026-01-30T11:24:10.535Z - Processing: src/content/add-to-app/debugging.md
+2026-01-30T11:24:15.621Z - ❌ Error processing src/content/add-to-app/debugging.md: Invalid array length
+2026-01-30T11:24:15.622Z - Processing: src/content/add-to-app/index.md
+2026-01-30T11:24:20.818Z - ❌ Error processing src/content/add-to-app/index.md: Invalid array length
+2026-01-30T11:24:20.818Z - Processing: src/content/add-to-app/ios/add-flutter-screen.md
+2026-01-30T11:24:25.671Z - ❌ Error processing src/content/add-to-app/ios/add-flutter-screen.md: Invalid array length
+2026-01-30T11:24:25.671Z - Processing: src/content/add-to-app/ios/index.md
+2026-01-30T11:24:25.915Z -   └─ Created 0 chunks
+2026-01-30T11:24:25.915Z - ✅ Completed: src/content/add-to-app/ios/index.md (2/100)
+2026-01-30T11:24:25.916Z - Processing: src/content/add-to-app/ios/project-setup.md
+2026-01-30T11:24:31.381Z - ❌ Error processing src/content/add-to-app/ios/project-setup.md: Invalid array length
+2026-01-30T11:24:31.381Z - Processing: src/content/add-to-app/multiple-flutters.md
+2026-01-30T11:24:35.735Z - ❌ Error processing src/content/add-to-app/multiple-flutters.md: Invalid array length
+2026-01-30T11:24:35.735Z - Processing: src/content/add-to-app/performance.md
+2026-01-30T11:24:40.200Z - ❌ Error processing src/content/add-to-app/performance.md: Invalid array length
+2026-01-30T11:24:40.200Z - Processing: src/content/ai/ai-rules.md
+2026-01-30T11:24:46.281Z - ❌ Error processing src/content/ai/ai-rules.md: Invalid array length
+2026-01-30T11:24:46.282Z - Processing: src/content/ai/ai-toolkit/chat-client-sample.md
+2026-01-30T11:24:50.205Z - ❌ Error processing src/content/ai/ai-toolkit/chat-client-sample.md: Invalid array length
+2026-01-30T11:24:50.205Z - Processing: src/content/ai/ai-toolkit/custom-llm-providers.md
+2026-01-30T11:24:54.425Z - ❌ Error processing src/content/ai/ai-toolkit/custom-llm-providers.md: Invalid array length
+2026-01-30T11:24:54.426Z - Processing: src/content/ai/ai-toolkit/feature-integration.md
+2026-01-30T11:24:58.228Z - ❌ Error processing src/content/ai/ai-toolkit/feature-integration.md: Invalid array length
+2026-01-30T11:24:58.229Z - Processing: src/content/ai/ai-toolkit/index.md
+2026-01-30T11:25:02.475Z - ❌ Error processing src/content/ai/ai-toolkit/index.md: Invalid array length
+2026-01-30T11:25:02.476Z - Processing: src/content/ai/ai-toolkit/user-experience.md
+2026-01-30T11:25:06.631Z - ❌ Error processing src/content/ai/ai-toolkit/user-experience.md: Invalid array length
+2026-01-30T11:25:06.631Z - Processing: src/content/ai/best-practices/developer-experience.md
+2026-01-30T11:25:10.743Z - ❌ Error processing src/content/ai/best-practices/developer-experience.md: Invalid array length
+2026-01-30T11:25:10.743Z - Processing: src/content/ai/best-practices/index.md
+2026-01-30T11:25:48.929Z - 🚀 Starting Flutter docs sync to Cloudflare Vectorize...
+2026-01-30T11:25:48.930Z - 📚 Fetching file tree from flutter/website...
+2026-01-30T11:25:49.538Z - 📄 Found 100 markdown files to process
+2026-01-30T11:25:49.538Z - Processing: src/content/add-to-app/android/_initial-route-cached-engine.md
+2026-01-30T11:25:53.311Z - ❌ Error processing src/content/add-to-app/android/_initial-route-cached-engine.md: Invalid array length
+2026-01-30T11:25:53.312Z - Processing: src/content/add-to-app/android/add-flutter-fragment.md
+2026-01-30T11:25:57.933Z - ❌ Error processing src/content/add-to-app/android/add-flutter-fragment.md: Invalid array length
+2026-01-30T11:25:57.933Z - Processing: src/content/add-to-app/android/add-flutter-screen.md
+2026-01-30T11:26:01.279Z - ❌ Error processing src/content/add-to-app/android/add-flutter-screen.md: Invalid array length
+2026-01-30T11:26:01.280Z - Processing: src/content/add-to-app/android/add-flutter-view.md
+2026-01-30T11:26:04.685Z - ❌ Error processing src/content/add-to-app/android/add-flutter-view.md: Invalid array length
+2026-01-30T11:26:04.686Z - Processing: src/content/add-to-app/android/index.md
+2026-01-30T11:26:04.699Z -   └─ Created 0 chunks
+2026-01-30T11:26:04.699Z - ✅ Completed: src/content/add-to-app/android/index.md (1/100)
+2026-01-30T11:26:04.699Z - Processing: src/content/add-to-app/android/plugin-setup.md
+2026-01-30T11:26:09.210Z - ❌ Error processing src/content/add-to-app/android/plugin-setup.md: Invalid array length
+2026-01-30T11:26:09.211Z - Processing: src/content/add-to-app/android/project-setup.md
+2026-01-30T11:26:12.679Z - ❌ Error processing src/content/add-to-app/android/project-setup.md: Invalid array length
+2026-01-30T11:26:12.679Z - Processing: src/content/add-to-app/debugging.md
+2026-01-30T11:26:16.217Z - ❌ Error processing src/content/add-to-app/debugging.md: Invalid array length
+2026-01-30T11:26:16.218Z - Processing: src/content/add-to-app/index.md
+2026-01-30T11:26:19.851Z - ❌ Error processing src/content/add-to-app/index.md: Invalid array length
+2026-01-30T11:26:19.851Z - Processing: src/content/add-to-app/ios/add-flutter-screen.md
+2026-01-30T11:26:24.276Z - ❌ Error processing src/content/add-to-app/ios/add-flutter-screen.md: Invalid array length
+2026-01-30T11:26:24.276Z - Processing: src/content/add-to-app/ios/index.md
+2026-01-30T11:26:24.289Z -   └─ Created 0 chunks
+2026-01-30T11:26:24.289Z - ✅ Completed: src/content/add-to-app/ios/index.md (2/100)
+2026-01-30T11:26:24.289Z - Processing: src/content/add-to-app/ios/project-setup.md
+2026-01-30T11:26:28.302Z - ❌ Error processing src/content/add-to-app/ios/project-setup.md: Invalid array length
+2026-01-30T11:26:28.302Z - Processing: src/content/add-to-app/multiple-flutters.md
+2026-01-30T11:26:33.520Z - ❌ Error processing src/content/add-to-app/multiple-flutters.md: Invalid array length
+2026-01-30T11:26:33.521Z - Processing: src/content/add-to-app/performance.md
+2026-01-30T11:26:36.994Z - ❌ Error processing src/content/add-to-app/performance.md: Invalid array length
+2026-01-30T11:26:36.994Z - Processing: src/content/ai/ai-rules.md
+2026-01-30T11:26:40.183Z - ❌ Error processing src/content/ai/ai-rules.md: Invalid array length
+2026-01-30T11:26:40.183Z - Processing: src/content/ai/ai-toolkit/chat-client-sample.md
+2026-01-30T11:26:43.566Z - ❌ Error processing src/content/ai/ai-toolkit/chat-client-sample.md: Invalid array length
+2026-01-30T11:26:43.566Z - Processing: src/content/ai/ai-toolkit/custom-llm-providers.md
+2026-01-30T11:26:49.027Z - ❌ Error processing src/content/ai/ai-toolkit/custom-llm-providers.md: Invalid array length
+2026-01-30T11:26:49.028Z - Processing: src/content/ai/ai-toolkit/feature-integration.md
+2026-01-30T11:26:52.487Z - ❌ Error processing src/content/ai/ai-toolkit/feature-integration.md: Invalid array length
+2026-01-30T11:26:52.487Z - Processing: src/content/ai/ai-toolkit/index.md
+2026-01-30T11:26:56.884Z - ❌ Error processing src/content/ai/ai-toolkit/index.md: Invalid array length
+2026-01-30T11:26:56.885Z - Processing: src/content/ai/ai-toolkit/user-experience.md
+2026-01-30T11:27:00.625Z - ❌ Error processing src/content/ai/ai-toolkit/user-experience.md: Invalid array length
+2026-01-30T11:27:00.625Z - Processing: src/content/ai/best-practices/developer-experience.md
+2026-01-30T11:27:05.885Z - ❌ Error processing src/content/ai/best-practices/developer-experience.md: Invalid array length
+2026-01-30T11:27:05.886Z - Processing: src/content/ai/best-practices/index.md
+2026-01-30T11:27:09.133Z - ❌ Error processing src/content/ai/best-practices/index.md: Invalid array length
+2026-01-30T11:27:09.133Z - Processing: src/content/ai/best-practices/mode-of-interaction.md
+2026-01-30T11:27:14.204Z - ❌ Error processing src/content/ai/best-practices/mode-of-interaction.md: Invalid array length
+2026-01-30T11:27:14.205Z - Processing: src/content/ai/best-practices/prompting.md
+2026-01-30T11:27:18.077Z - ❌ Error processing src/content/ai/best-practices/prompting.md: Invalid array length
+2026-01-30T11:27:18.078Z - Processing: src/content/ai/best-practices/structure-output.md
