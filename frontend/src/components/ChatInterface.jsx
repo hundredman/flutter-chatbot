@@ -221,7 +221,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       }
 
       // Call chat API (Cloudflare Worker - 100% 무료 통합)
-      const apiUrl = process.env.REACT_APP_CLOUDFLARE_WORKER_URL || '/api/chat';
+      const apiUrl = import.meta.env.VITE_CLOUDFLARE_WORKER_URL || '/api/chat';
 
       if (!apiUrl) {
         throw new Error(currentLang.apiConfigError);

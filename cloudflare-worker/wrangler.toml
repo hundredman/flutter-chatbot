@@ -1,6 +1,7 @@
 name = "flutter-chatbot-worker"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
+account_id = "6fd9c3e9185527e14ee25c7d310c7798"
 
 # Workers AI 바인딩 (무료)
 [ai]
@@ -15,7 +16,7 @@ index_name = "flutter-docs"
 [[d1_databases]]
 binding = "DB"
 database_name = "flutter-chatbot-db"
-database_id = "placeholder" # wrangler d1 create로 생성 후 업데이트
+database_id = "9b14e184-3c33-403a-8621-5bf649b200f8"
 
 # 환경 변수 (필요시)
 [vars]
