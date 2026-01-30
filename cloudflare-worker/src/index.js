@@ -314,12 +314,27 @@ Instructions:
     );
   } catch (error) {
     console.error('Chat error:', error);
+
+    // 리밋 초과 에러 감지
+    const errorMessage = error.message || '';
+    let userMessage = 'Internal server error';
+    let statusCode = 500;
+
+    if (errorMessage.includes('rate limit') || errorMessage.includes('limit exceeded')) {
+      userMessage = '일일 사용량을 초과했습니다. 내일 자정(한국시간 오전 9시)에 다시 이용 가능합니다.';
+      statusCode = 429; // Too Many Requests
+    } else if (errorMessage.includes('neuron')) {
+      userMessage = 'AI 처리 한도를 초과했습니다. 잠시 후 다시 시도해주세요.';
+      statusCode = 429;
+    }
+
     return Response.json(
       {
         success: false,
-        error: error.message || 'Internal server error',
+        error: userMessage,
+        technicalError: error.message, // 디버깅용
       },
-      { status: 500, headers: corsHeaders }
+      { status: statusCode, headers: corsHeaders }
     );
   }
 }

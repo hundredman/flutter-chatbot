@@ -247,11 +247,16 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
+      const data = await response.json();
+
+      // Handle rate limit errors (429)
+      if (response.status === 429) {
+        throw new Error(data.error || '일일 사용량을 초과했습니다. 내일 자정(한국시간 오전 9시)에 다시 이용 가능합니다.');
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get response');
+      }
 
       const botMessage = {
         id: Date.now() + 1,
