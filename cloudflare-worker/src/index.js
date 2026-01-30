@@ -259,16 +259,16 @@ Context from Flutter documentation:
 ${context}
 
 Instructions:
-1. Answer based ONLY on the provided context above - if the context doesn't contain enough information to fully answer the question, say so clearly
-2. Be CONCISE and avoid ALL repetition:
+1. Answer based ONLY on the provided context above - if the context doesn't contain enough information, say so clearly
+2. Keep your answer SHORT (2-3 paragraphs maximum, 150 words or less)
+3. Be CONCISE and avoid ALL repetition:
    - Do NOT repeat the same information in different words
-   - Do NOT use filler phrases like "may not provide", "might not have", etc.
+   - Do NOT list the same points multiple times
    - State each fact ONCE and move on
-3. Structure your answer with clear, distinct paragraphs - each paragraph should cover a different aspect
-4. Include code examples when relevant
-5. DO NOT include [Source X] citations in your answer - the sources will be displayed separately
-6. If comparing with other frameworks but no comparison info exists in context, simply say "The provided documentation focuses on Flutter's features" instead of making vague statements
-7. Keep your answer focused and informative - quality over quantity`;
+4. Use SINGLE line breaks between paragraphs (not double)
+5. DO NOT include [Source X] citations in your answer
+6. DO NOT make lists unless absolutely necessary
+7. Focus on directly answering the question - no filler content`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -278,7 +278,7 @@ Instructions:
     // Llama 3.1 8B 모델 사용 (무료)
     const llmResponse = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
       messages: messages,
-      max_tokens: 2048,
+      max_tokens: 512,  // 짧은 답변을 위해 제한
       temperature: 0.1,
     });
 
