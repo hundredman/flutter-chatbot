@@ -21,3 +21,13 @@ database_id = "9b14e184-3c33-403a-8621-5bf649b200f8"
 # 환경 변수 (필요시)
 [vars]
 ENVIRONMENT = "production"
+
+# 외부 AI API 키 (선택사항 - fallback용)
+# 설정 방법:
+# 1. Groq: https://console.groq.com/keys 에서 무료 API 키 생성
+# 2. Gemini: https://aistudio.google.com/apikey 에서 무료 API 키 생성
+# 3. 아래 명령어로 secret 설정:
+#    npx wrangler secret put GROQ_API_KEY
+#    npx wrangler secret put GEMINI_API_KEY
+#
+# 주의: API 키는 wrangler secret으로 설정해야 하며, 이 파일에 직접 작성하지 마세요!

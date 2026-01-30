@@ -198,6 +198,137 @@ async function handleSyncDocs(request, env, corsHeaders) {
 }
 
 /**
+ * AI Provider: Cloudflare Workers AI
+ */
+async function callCloudflareAI(messages, env) {
+  const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+    messages,
+    max_tokens: 512,
+    temperature: 0.1,
+  });
+  return response.response || 'No response generated';
+}
+
+/**
+ * AI Provider: Groq (무료 14,400 요청/일)
+ */
+async function callGroqAI(messages, env) {
+  if (!env.GROQ_API_KEY) {
+    throw new Error('Groq API key not configured');
+  }
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.GROQ_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages,
+      max_tokens: 512,
+      temperature: 0.1,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Groq API error: ${response.status} - ${error}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+/**
+ * AI Provider: Google Gemini (무료 60 요청/분)
+ */
+async function callGeminiAI(messages, env) {
+  if (!env.GEMINI_API_KEY) {
+    throw new Error('Gemini API key not configured');
+  }
+
+  // Convert messages to Gemini format
+  const systemMessage = messages.find(m => m.role === 'system');
+  const userMessages = messages.filter(m => m.role !== 'system');
+
+  const contents = userMessages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+
+  // Add system message as first user message if exists
+  if (systemMessage) {
+    contents.unshift({
+      role: 'user',
+      parts: [{ text: systemMessage.content }]
+    });
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Gemini API error: ${response.status} - ${error}`);
+  }
+
+  const data = await response.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+/**
+ * Multi-Provider AI with Fallback Chain
+ * Priority: Cloudflare → Groq → Gemini
+ */
+async function callAIWithFallback(messages, env) {
+  const providers = [
+    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
+    { name: 'Groq', call: callGroqAI },
+    { name: 'Gemini', call: callGeminiAI },
+  ];
+
+  let lastError = null;
+
+  for (const provider of providers) {
+    try {
+      console.log(`🤖 Trying ${provider.name}...`);
+      const answer = await provider.call(messages, env);
+      console.log(`✅ ${provider.name} succeeded`);
+      return { answer, provider: provider.name };
+    } catch (error) {
+      console.log(`❌ ${provider.name} failed: ${error.message}`);
+      lastError = error;
+
+      // Rate limit이나 quota 초과면 다음 provider 시도
+      if (error.message.includes('rate limit') ||
+          error.message.includes('429') ||
+          error.message.includes('quota') ||
+          error.message.includes('limit exceeded')) {
+        continue;
+      }
+
+      // API 키가 없으면 다음 provider 시도
+      if (error.message.includes('not configured')) {
+        continue;
+      }
+
+      // 그 외 에러는 재시도하지 않고 실패
+      throw error;
+    }
+  }
+
+  // 모든 provider 실패
+  throw new Error(`모든 AI 제공자가 사용 불가합니다. ${lastError?.message || ''}`);
+}
+
+/**
  * 채팅 처리 (통합 RAG 파이프라인)
  */
 async function handleChat(request, env, corsHeaders) {
@@ -275,14 +406,9 @@ Instructions:
       { role: 'user', content: question },
     ];
 
-    // Llama 3.1 8B 모델 사용 (무료)
-    const llmResponse = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-      messages: messages,
-      max_tokens: 512,  // 짧은 답변을 위해 제한
-      temperature: 0.1,
-    });
-
-    const answer = llmResponse.response || 'No response generated';
+    // Multi-Provider AI with automatic fallback
+    const { answer, provider } = await callAIWithFallback(messages, env);
+    console.log(`📊 Used provider: ${provider}`);
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
     if (conversationId && env.DB) {

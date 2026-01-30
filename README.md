@@ -146,6 +146,25 @@ npx wrangler vectorize create flutter-docs --dimensions=768 --metric=cosine
 
 # Worker 배포
 npm run deploy
+
+# (선택사항) 외부 AI API 키 설정 - 용량 확장용
+# 설정하지 않아도 Cloudflare Workers AI만으로 작동합니다
+
+# Groq API 키 (무료 14,400 요청/일)
+# 1. https://console.groq.com/keys 방문
+# 2. 무료 계정 생성 (신용카드 불필요)
+# 3. API 키 생성
+# 4. 아래 명령어로 설정:
+npx wrangler secret put GROQ_API_KEY
+
+# Google Gemini API 키 (무료 60 요청/분)
+# 1. https://aistudio.google.com/apikey 방문
+# 2. 무료 계정 생성 (신용카드 불필요)
+# 3. API 키 생성
+# 4. 아래 명령어로 설정:
+npx wrangler secret put GEMINI_API_KEY
+
+# 효과: 일일 용량 2,000 → 18,200 질문으로 증가!
 ```
 
 ### 2. Flutter 문서 동기화
@@ -363,6 +382,39 @@ User Response (한국어/영어)
 | **LLM Generation** | ~500ms |
 | **Total Response Time** | ~800ms |
 
+## 🚀 Multi-Provider AI System
+
+### Automatic Fallback Chain
+프로젝트는 **3개의 무료 AI 제공자**를 자동으로 전환하여 안정성과 용량을 극대화합니다.
+
+```
+우선순위 1: Cloudflare Workers AI (10,000 Neurons/일)
+    ↓ 리밋 도달 시
+우선순위 2: Groq AI (14,400 요청/일)
+    ↓ 리밋 도달 시
+우선순위 3: Google Gemini (60 요청/분)
+```
+
+### 일일 총 용량
+- **Cloudflare**: ~2,000 질문/일
+- **Groq**: 14,400 질문/일
+- **Gemini**: ~1,800 질문/일
+- **총합**: **18,200 질문/일**
+- **학생 100명**: 학생당 **182개 질문/일** ✅
+
+### 외부 API 키 설정 (선택사항)
+```bash
+# Groq API 키 설정 (무료)
+# https://console.groq.com/keys 에서 생성
+npx wrangler secret put GROQ_API_KEY
+
+# Gemini API 키 설정 (무료)
+# https://aistudio.google.com/apikey 에서 생성
+npx wrangler secret put GEMINI_API_KEY
+```
+
+**참고**: API 키 없이도 Cloudflare Workers AI만으로 작동합니다 (학생당 13개/일).
+
 ## 💰 Cost Breakdown
 
 | Service | Usage | Free Tier | Cost |
@@ -370,12 +422,16 @@ User Response (한국어/영어)
 | Cloudflare Workers | 100 req/day | 100,000 req/day | $0 |
 | Workers AI (LLM) | 100 req/day | 10,000 req/day | $0 |
 | Workers AI (Embeddings) | 100 req/day | 10,000 req/day | $0 |
+| Groq AI (Fallback) | 0-14,400 req/day | 14,400 req/day | $0 |
+| Gemini (Fallback) | 0-1,800 req/day | 60 req/min | $0 |
 | Vectorize | 100 queries/day | 30M queries/month | $0 |
 | D1 Database | 100 writes/day | 100k rows stored | $0 |
 | Vercel Hosting | Unlimited | Unlimited bandwidth | $0 |
 | Firebase Auth | 100 users | Unlimited users | $0 |
 | Firestore | 100 docs/day | 50k reads/day | $0 |
 | **Total** | | | **$0/month** |
+
+**Total Capacity**: 18,200 질문/일 (학생 100명 = 182개/일/학생)
 
 ## 🚀 Roadmap
 
