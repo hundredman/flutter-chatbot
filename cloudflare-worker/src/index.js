@@ -186,11 +186,13 @@ Context from Flutter documentation:
 ${context}
 
 Instructions:
-1. Answer based ONLY on the provided context
-2. Include code examples when relevant
-3. Cite sources using [Source X] notation
-4. Be concise but thorough
-5. If the context doesn't fully answer the question, acknowledge it`;
+1. Answer based ONLY on the provided context above
+2. Be CONCISE and avoid repetition - do not repeat the same information multiple times
+3. Structure your answer with clear paragraphs (use double line breaks between sections)
+4. Include code examples when relevant
+5. At the end, cite sources using [Source X] notation in a separate line
+6. If the context doesn't fully answer the question, acknowledge it
+7. Keep your answer focused and to the point - quality over quantity`;
 
     const messages = [
       { role: 'system', content: systemPrompt },

@@ -57,8 +57,9 @@
 .message-text {
   padding: var(--spacing-lg) var(--spacing-xl);
   border-radius: var(--radius-2xl);
-  line-height: var(--line-height-relaxed);
+  line-height: 1.8;
   word-wrap: break-word;
+  white-space: pre-line;
   transition: all var(--transition-base);
 }
 
@@ -140,10 +141,22 @@
 }
 
 /* Markdown styles */
+.message-text p {
+  margin: 1em 0;
+}
+
+.message-text p:first-child {
+  margin-top: 0;
+}
+
+.message-text p:last-child {
+  margin-bottom: 0;
+}
+
 .message-text h1,
 .message-text h2,
 .message-text h3 {
-  margin: 12px 0 8px 0;
+  margin: 1.5em 0 0.8em 0;
   font-weight: 600;
 }
 
