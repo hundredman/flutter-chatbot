@@ -47,6 +47,10 @@ export default {
       return handleTestInsert(request, env, corsHeaders);
     }
 
+    if (url.pathname === '/api/sync-docs' && request.method === 'POST') {
+      return handleSyncDocs(request, env, corsHeaders);
+    }
+
     return Response.json(
       { error: 'Not found' },
       { status: 404, headers: corsHeaders }
@@ -125,6 +129,75 @@ async function handleTestInsert(request, env, corsHeaders) {
 }
 
 /**
+ * Flutter 문서 동기화 (크롤링된 문서를 Vectorize에 삽입)
+ */
+async function handleSyncDocs(request, env, corsHeaders) {
+  try {
+    const { documents } = await request.json();
+
+    if (!documents || !Array.isArray(documents)) {
+      return Response.json(
+        { error: 'documents array is required' },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    console.log(`Syncing ${documents.length} documents to Vectorize...`);
+
+    const vectors = [];
+    for (let i = 0; i < documents.length; i++) {
+      const doc = documents[i];
+
+      if (!doc.content || !doc.title) {
+        console.log(`Skipping document ${i}: missing content or title`);
+        continue;
+      }
+
+      // 임베딩 생성
+      const embeddings = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
+        text: doc.content.substring(0, 4000), // 임베딩 모델 입력 제한
+      });
+
+      // URL에서 ID 생성 (고유 식별자)
+      const docId = doc.url
+        ? doc.url.replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_')
+        : `doc_${Date.now()}_${i}`;
+
+      vectors.push({
+        id: docId,
+        values: embeddings.data[0],
+        metadata: {
+          title: doc.title,
+          content: doc.content,
+          url: doc.url || '',
+          type: 'official-docs',
+          fetchedAt: doc.fetchedAt || new Date().toISOString(),
+        },
+      });
+    }
+
+    // Vectorize에 벡터 삽입
+    if (vectors.length > 0) {
+      await env.VECTORIZE.insert(vectors);
+      console.log(`Successfully inserted ${vectors.length} documents`);
+    }
+
+    return Response.json({
+      success: true,
+      message: `Inserted ${vectors.length} documents`,
+      documents: vectors.map(v => v.metadata.title),
+    }, { headers: corsHeaders });
+
+  } catch (error) {
+    console.error('Sync docs error:', error);
+    return Response.json({
+      success: false,
+      error: error.message,
+    }, { status: 500, headers: corsHeaders });
+  }
+}
+
+/**
  * 채팅 처리 (통합 RAG 파이프라인)
  */
 async function handleChat(request, env, corsHeaders) {
@@ -186,13 +259,16 @@ Context from Flutter documentation:
 ${context}
 
 Instructions:
-1. Answer based ONLY on the provided context above
-2. Be CONCISE and avoid repetition - do not repeat the same information multiple times
-3. Structure your answer with clear paragraphs (use single line breaks between paragraphs)
+1. Answer based ONLY on the provided context above - if the context doesn't contain enough information to fully answer the question, say so clearly
+2. Be CONCISE and avoid ALL repetition:
+   - Do NOT repeat the same information in different words
+   - Do NOT use filler phrases like "may not provide", "might not have", etc.
+   - State each fact ONCE and move on
+3. Structure your answer with clear, distinct paragraphs - each paragraph should cover a different aspect
 4. Include code examples when relevant
 5. DO NOT include [Source X] citations in your answer - the sources will be displayed separately
-6. If the context doesn't fully answer the question, acknowledge it
-7. Keep your answer focused and to the point - quality over quantity`;
+6. If comparing with other frameworks but no comparison info exists in context, simply say "The provided documentation focuses on Flutter's features" instead of making vague statements
+7. Keep your answer focused and informative - quality over quantity`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
