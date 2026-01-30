@@ -221,10 +221,14 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       }
 
       // Call chat API (Cloudflare Worker - 100% 무료 통합)
-      const apiUrl = import.meta.env.VITE_CLOUDFLARE_WORKER_URL || '/api/chat';
+      const workerUrl = import.meta.env.VITE_CLOUDFLARE_WORKER_URL;
+      const apiUrl = workerUrl ? `${workerUrl}/api/chat` : '/api/chat';
 
-      if (!apiUrl) {
-        throw new Error(currentLang.apiConfigError);
+      console.log('Environment variable:', workerUrl);
+      console.log('API URL:', apiUrl);
+
+      if (!workerUrl) {
+        console.error('VITE_CLOUDFLARE_WORKER_URL is not set!');
       }
 
       const requestBody = {
