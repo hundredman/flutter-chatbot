@@ -407,8 +407,11 @@ Instructions:
     ];
 
     // Multi-Provider AI with automatic fallback
-    const { answer, provider } = await callAIWithFallback(messages, env);
+    const { answer: rawAnswer, provider } = await callAIWithFallback(messages, env);
     console.log(`📊 Used provider: ${provider}`);
+
+    // Clean up double line breaks (reduce spacing)
+    const answer = rawAnswer.replace(/\n\n+/g, '\n');
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
     if (conversationId && env.DB) {
