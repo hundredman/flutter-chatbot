@@ -323,6 +323,11 @@ async function callAIWithFallback(messages, env) {
         continue;
       }
 
+      // 403 Forbidden 에러도 다음 provider 시도 (API 키 문제 가능성)
+      if (error.message.includes('403') || error.message.includes('Forbidden')) {
+        continue;
+      }
+
       // 그 외 에러는 재시도하지 않고 실패
       throw error;
     }
