@@ -10,6 +10,7 @@
 const ALLOWED_ORIGINS = [
   'https://flutter-chatbot-worker.hiprojectflutterchatbot.workers.dev',
   'https://hiprojectflutterchatbot.web.app',
+  'https://flutter-chatbot.vercel.app',  // Vercel 배포
   'http://localhost:5173',  // 로컬 개발
   'http://localhost:3000',  // 로컬 개발
 ];
