@@ -4,7 +4,6 @@
   max-width: 75%;
   margin-bottom: var(--spacing-lg);
   animation: slideIn var(--transition-slow);
-  overflow-x: hidden;
 }
 
 @keyframes slideIn {
@@ -62,8 +61,7 @@
   word-wrap: break-word;
   white-space: pre-line;
   transition: all var(--transition-base);
-  overflow-x: visible;
-  max-width: 100%;
+  overflow: visible;
 }
 
 .user-message .message-text {
