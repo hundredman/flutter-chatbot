@@ -643,20 +643,58 @@ NO greetings or casual language. Technical content only.`;
       .replace(/<Text\(/g, 'Text(')
       .replace(/\/>(?=\s*[,\)])/g, ')');
 
-    // 4. 이상한 패턴 감지
+    // 4. 긴 단어/gibberish 제거 (화면 가로 스크롤 방지)
+    // 공백 없이 50자 이상 연속되는 문자열 제거 (URL, 패키지명 등 제외)
+    answer = answer.replace(/(?<![`\/:])([a-zA-Z0-9가-힣_]{50,})(?![`])/g, (match) => {
+      // 유효한 패키지명이나 URL은 유지
+      if (match.includes('flutter') || match.includes('dart') || match.includes('http')) {
+        return match.substring(0, 50) + '...';
+      }
+      return '[내용 생략]';
+    });
+
+    // 코드 블록 외부의 긴 연속 문자 제거
+    const lines = answer.split('\n');
+    const cleanedLines = lines.map(line => {
+      // 코드 블록 내부가 아닌 경우만 처리
+      if (!line.trim().startsWith('```') && !line.includes('import ')) {
+        // 50자 이상 공백 없는 단어 잘라내기
+        return line.replace(/\S{50,}/g, (match) => {
+          if (match.startsWith('http') || match.includes('://')) {
+            return match; // URL은 유지
+          }
+          return match.substring(0, 40) + '...';
+        });
+      }
+      return line;
+    });
+    answer = cleanedLines.join('\n');
+
+    // 이상한 패턴 감지
     const gibberishPatterns = [
-      /\w{40,}/g,  // 40자 이상 연속 문자
+      /[a-zA-Z]{60,}/g,  // 60자 이상 영문 연속
+      /[가-힣]{40,}/g,   // 40자 이상 한글 연속
+      /[a-zA-Z0-9_]{80,}/g, // 80자 이상 알파벳+숫자 연속
+      /undefined{2,}/gi,
       /안녕~~~?/g,
       /\^\^/g,
-      /~{2,}/g,
+      /~{3,}/g,
     ];
     const hasGibberish = gibberishPatterns.some(pattern => pattern.test(answer));
 
-    // 5. gibberish 감지시 첫 번째 코드 블록까지만
+    // 5. gibberish 감지시 해당 부분 제거 또는 첫 번째 코드 블록까지만
     if (hasGibberish) {
-      const firstCodeEnd = answer.indexOf('```', answer.indexOf('```') + 3);
-      if (firstCodeEnd > 0) {
-        answer = answer.substring(0, firstCodeEnd + 3);
+      // 먼저 gibberish 패턴 직접 제거
+      gibberishPatterns.forEach(pattern => {
+        answer = answer.replace(pattern, '[...]');
+      });
+
+      // 여전히 이상하면 첫 번째 코드 블록까지만
+      if (/[a-zA-Z0-9]{60,}/.test(answer)) {
+        const firstCodeEnd = answer.indexOf('```', answer.indexOf('```') + 3);
+        if (firstCodeEnd > 0) {
+          answer = answer.substring(0, firstCodeEnd + 3);
+        }
       }
     }
 
