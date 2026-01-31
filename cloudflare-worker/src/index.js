@@ -373,27 +373,91 @@ async function handleChat(request, env, corsHeaders) {
 
     console.log(`Found ${results.matches.length} similar documents`);
 
-    // 3.5 앱 만들기 요청인지 먼저 확인
-    const isAppCreationRequest = /앱\s*(만들|구현|개발|만드|코드)|앱을?\s*(만들|구현|개발)|만들기|만들어줘|구현해줘|개발해줘/i.test(question);
-
     // 질문 유형 감지 (설명/개념 질문인지)
     const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|what\s*is|explain/i.test(question);
 
-    // 3. 컨텍스트 구성 (앱 만들기 요청이 아니면 템플릿 코드 제외)
+    // 키워드 기반 앱 템플릿 매칭 (직접 반환용)
+    // 키: 매칭 패턴, 값: [템플릿 제목 키워드, 앱 이름]
+    const appTemplateMap = {
+      'todo|투두|할일|할 일': ['ToDo', 'ToDo 앱'],
+      '계산기|calculator': ['계산기', '계산기'],
+      '로그인|login': ['로그인', '로그인 화면'],
+      '채팅|chat': ['채팅', '채팅 앱'],
+      '날씨|weather': ['날씨', '날씨 앱'],
+      '메모장|메모\s*앱|notes?\s*app': ['메모장', '메모장 앱'],
+      '쇼핑\s*앱|shopping\s*app|장바구니\s*앱': ['쇼핑', '쇼핑 앱'],
+      '프로필\s*앱|profile\s*app': ['프로필', '프로필 화면'],
+      '설정\s*앱|settings?\s*app': ['설정', '설정 화면'],
+      '갤러리\s*앱|gallery\s*app|사진\s*앱': ['갤러리', '갤러리 앱'],
+      '타이머\s*앱|timer\s*app|스톱워치': ['타이머', '타이머 앱'],
+      '바텀\s*네비게이션|bottom\s*nav|탭\s*바\s*앱': ['네비게이션', '바텀 네비게이션'],
+      '스플래시\s*스크린|splash\s*screen': ['스플래시', '스플래시 화면'],
+      '카운터\s*앱|counter\s*app': ['카운터', '카운터 앱'],
+      '좋아요\s*버튼|like\s*button|하트\s*버튼': ['좋아요', '좋아요 버튼'],
+    };
+
+    // 질문에서 앱 템플릿 키워드 매칭 (더 엄격하게)
+    let matchedTemplate = null;
+    let templateDisplayName = null;
+    for (const [pattern, [templateKey, displayName]] of Object.entries(appTemplateMap)) {
+      if (new RegExp(pattern, 'i').test(question)) {
+        // 벡터 검색 결과에서 해당 템플릿 찾기
+        const template = results.matches.find(m =>
+          (m.metadata?.title || '').includes(templateKey) &&
+          (m.metadata?.content || '').includes('void main()')
+        );
+        if (template) {
+          matchedTemplate = template;
+          templateDisplayName = displayName;
+          console.log(`🎯 Direct template match: "${pattern}" -> ${template.metadata?.title}`);
+        }
+        break;
+      }
+    }
+
+    // 직접 템플릿 반환 (키워드가 정확히 매칭되고 설명 질문이 아닐 때만)
+    if (matchedTemplate && !isExplanationQuestion) {
+      const templateContent = matchedTemplate.metadata?.content || '';
+      const codeMatch = templateContent.match(/```dart[\s\S]*?```/);
+      if (codeMatch) {
+        console.log('📦 Returning template directly without AI');
+        // 을/를 구분 (받침 있으면 을, 없으면 를)
+        const lastChar = templateDisplayName.charCodeAt(templateDisplayName.length - 1);
+        const hasJongseong = lastChar >= 0xAC00 && lastChar <= 0xD7A3 && (lastChar - 0xAC00) % 28 !== 0;
+        const particle = hasJongseong ? '을' : '를';
+        const directAnswer = `${templateDisplayName}${particle} 구현하는 방법입니다.\n\n${codeMatch[0]}\n\n위 코드를 복사하여 사용하세요.`;
+
+        return Response.json(
+          {
+            success: true,
+            answer: directAnswer,
+            sources: results.matches.slice(0, 3).map((match) => ({
+              title: match.metadata?.title || 'Flutter Documentation',
+              url: match.metadata?.url || '',
+              similarity: match.score || 0,
+            })),
+            confidence: matchedTemplate.score || 0.8,
+            provider: 'template',
+          },
+          { headers: corsHeaders }
+        );
+      }
+    }
+
+    // 3. 컨텍스트 구성 (템플릿 전체 코드는 제외, 문서 내용만)
     const context = results.matches
       .map((match, i) => {
         const metadata = match.metadata || {};
         let content = (metadata.content || '').substring(0, 1000);
 
-        // 설명 질문일 경우 템플릿의 코드 블록 제외하고 설명만 추출
-        if (isExplanationQuestion && content.includes('```dart') && content.includes('void main()')) {
+        // 전체 앱 템플릿 코드는 컨텍스트에서 제외 (AI가 그대로 복사하는 것 방지)
+        if (content.includes('```dart') && content.includes('void main()') && content.includes('runApp(')) {
           // 코드 블록 전 설명 부분만 추출
           const beforeCode = content.split('```dart')[0].trim();
           if (beforeCode.length > 50) {
             content = beforeCode;
           } else {
-            // 템플릿이면 건너뛰기
-            return null;
+            return null; // 설명 없는 순수 템플릿은 건너뛰기
           }
         }
 
@@ -405,84 +469,8 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       .filter(Boolean)
       .join('\n\n');
 
-    // 키워드 기반 템플릿 매칭 (앱 만들기 요청일 때만)
-    const appKeywordMap = {
-      'todo|투두|할일|할 일': 'ToDo',
-      '계산기|calculator': '계산기',
-      '로그인|login': '로그인',
-      '채팅|chat': '채팅',
-      '날씨|weather': '날씨',
-      '메모|note': '메모장',
-      '쇼핑|shopping|카트|cart': '쇼핑',
-      '프로필|profile': '프로필',
-      '설정|setting': '설정',
-      '갤러리|gallery|이미지': '갤러리',
-      '타이머|timer|스톱워치': '타이머',
-      '검색|search': '검색',
-      '바텀\s*네비게이션|bottom\s*nav|탭\s*바': '네비게이션',
-      '스플래시|splash': '스플래시',
-      '카운터|counter': '카운터',
-      '좋아요|like|하트': '좋아요',
-    };
-
-    // 질문에서 앱 유형 감지 (앱 만들기 요청일 때만)
-    let detectedAppType = null;
-    if (isAppCreationRequest) {
-      for (const [pattern, appType] of Object.entries(appKeywordMap)) {
-        if (new RegExp(pattern, 'i').test(question)) {
-          detectedAppType = appType;
-          break;
-        }
-      }
-    }
-
-    // 감지된 앱 유형으로 템플릿 찾기
-    let bestMatch = results.matches[0];
-    if (detectedAppType) {
-      const matchingTemplate = results.matches.find(m =>
-        (m.metadata?.title || '').includes(detectedAppType)
-      );
-      if (matchingTemplate) {
-        bestMatch = matchingTemplate;
-        console.log(`🎯 Keyword match: "${detectedAppType}" -> ${matchingTemplate.metadata?.title}`);
-      }
-    }
-
-    const topContent = bestMatch?.metadata?.content || '';
-    const topScore = bestMatch?.score || 0;
-
-    // 템플릿에 dart 코드 블록이 있고, 앱 만들기 요청이면서 설명 질문이 아닐 때만 직접 반환
-    if (isAppCreationRequest && !isExplanationQuestion && topContent.includes('```dart') && topContent.includes('void main()')) {
-      console.log('📦 Direct template match found, returning without AI');
-
-      // 코드 블록 추출
-      const codeMatch = topContent.match(/```dart[\s\S]*?```/);
-      if (codeMatch) {
-        // 제목에서 첫 번째 의미 있는 부분만 추출 (예: "ToDo 앱" from "ToDo 앱 투두앱 할일앱...")
-        const rawTitle = bestMatch.metadata?.title || 'Flutter App';
-        const cleanTitle = rawTitle.split(/\s+/).slice(0, 2).join(' ').replace(/만들기|구현|Flutter/gi, '').trim() || 'Flutter 앱';
-        // 을/를 구분 (받침 있으면 을, 없으면 를)
-        const lastChar = cleanTitle.charCodeAt(cleanTitle.length - 1);
-        const hasJongseong = lastChar >= 0xAC00 && lastChar <= 0xD7A3 && (lastChar - 0xAC00) % 28 !== 0;
-        const particle = hasJongseong ? '을' : '를';
-        const directAnswer = `${cleanTitle}${particle} 구현하는 방법입니다.\n\n${codeMatch[0]}\n\n위 코드를 복사하여 사용하세요.`;
-
-        return Response.json(
-          {
-            success: true,
-            answer: directAnswer,
-            sources: results.matches.map((match) => ({
-              title: match.metadata?.title || 'Flutter Documentation',
-              url: match.metadata?.url || '',
-              similarity: match.score || 0,
-            })),
-            confidence: topScore,
-            provider: 'template',
-          },
-          { headers: corsHeaders }
-        );
-      }
-    }
+    // 벡터 검색 결과 정보
+    const topScore = results.matches[0]?.score || 0;
 
     // 4. LLM 답변 생성 (Workers AI - 무료)
     console.log('Generating answer with LLM...');
