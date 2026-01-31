@@ -210,12 +210,12 @@ async function handleSyncDocs(request, env, corsHeaders) {
 }
 
 /**
- * AI Provider: Cloudflare Workers AI (Primary)
+ * AI Provider: Cloudflare Workers AI (Fallback)
  */
 async function callCloudflareAI(messages, env) {
   const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
     messages,
-    max_tokens: 600,  // 더 충분한 응답
+    max_tokens: 600,
     temperature: 0.3,
     repetition_penalty: 1.3,
     frequency_penalty: 0.5,
@@ -261,9 +261,9 @@ async function callGeminiAI(messages, env) {
         body: JSON.stringify({
           contents,
           generationConfig: {
-            temperature: 0.2,  // 더 보수적으로
-            topP: 0.8,
-            maxOutputTokens: 350,  // 출력 제한
+            temperature: 0.3,
+            topP: 0.9,
+            maxOutputTokens: 600,  // 충분한 응답
           },
         }),
         signal: controller.signal,
@@ -284,13 +284,13 @@ async function callGeminiAI(messages, env) {
 
 /**
  * Multi-Provider AI with Fallback Chain
- * Priority: Cloudflare Workers AI → Gemini
- * (Cloudflare AI가 더 안정적인 응답 생성)
+ * Priority: Gemini → Cloudflare Workers AI
+ * (Gemini가 코드 품질이 더 좋음)
  */
 async function callAIWithFallback(messages, env) {
   const providers = [
-    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
     { name: 'Gemini', call: callGeminiAI },
+    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
   ];
 
   let lastError = null;
@@ -393,19 +393,23 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       en: 'Respond in English.',
     };
 
-    const systemPrompt = `You are a Flutter documentation assistant.
+    const systemPrompt = `You are a Flutter/Dart expert. Give accurate, complete technical answers.
 
 ${languageInstructions[language] || languageInstructions.en}
 
-Context:
+Reference:
 ${context}
 
-RULES:
-1. Provide COMPLETE answers - if there are multiple steps, explain ALL steps
-2. Include ONE working code example (15-25 lines) with proper Dart syntax
-3. NO greetings, thanks, or casual chat - technical content only
-4. Explain the concept briefly, then show the code
-5. If the question asks "how to", provide step-by-step instructions`;
+FORMAT REQUIREMENTS:
+1. Start with a clear 2-3 sentence explanation of the concept
+2. If there are steps, number them clearly (1., 2., 3.) and explain EACH step
+3. Include ONE complete, runnable code example with proper formatting:
+   - Correct import statements
+   - Proper indentation (2 spaces)
+   - No syntax errors
+4. End with a brief note about common use cases or tips
+5. NO greetings, thanks, emojis, or casual language
+6. Use proper punctuation (periods at end of sentences)`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -452,10 +456,17 @@ RULES:
       .replace(/StatelessWidet/g, 'StatelessWidget')
       .replace(/Buildectx/g, 'BuildContext ctx')
       .replace(/MyAppextendsStatelessWidet/g, 'MyApp extends StatelessWidget')
+      .replace(/MyAppextends StatelessWidget/g, 'MyApp extends StatelessWidget')
       .replace(/@overridewidgetcreate/gi, '@override\n  Widget build')
       .replace(/returnMaterialApplcation/g, 'return MaterialApp')
       .replace(/homepage\(\)/g, 'HomePage()')
-      .replace(/import'package/g, "import 'package");
+      .replace(/import'package/g, "import 'package")
+      .replace(/notifyListners/g, 'notifyListeners')  // 오타 수정
+      .replace(/appBar:title:/g, 'appBar: AppBar(title: Text(')
+      .replace(/appBar\s*:\s*title\s*:\s*"([^"]+)"/g, 'appBar: AppBar(title: Text("$1"))')
+      .replace(/\.\.+/g, '.')  // 중복 마침표
+      .replace(/違い점/g, '차이점')  // 일본어 제거
+      .replace(/\s+\./g, '.');  // 마침표 앞 공백 제거
 
     // 4. 이상한 패턴 감지
     const gibberishPatterns = [
