@@ -215,8 +215,8 @@ async function handleSyncDocs(request, env, corsHeaders) {
 async function callCloudflareAI(messages, env) {
   const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
     messages,
-    max_tokens: 600,
-    temperature: 0.3,
+    max_tokens: 1024,  // 앱 만들기 등 긴 응답 허용
+    temperature: 0.2,  // 더 정확한 코드를 위해 낮춤
     repetition_penalty: 1.3,
     frequency_penalty: 0.5,
   });
@@ -261,9 +261,9 @@ async function callGeminiAI(messages, env) {
         body: JSON.stringify({
           contents,
           generationConfig: {
-            temperature: 0.3,
-            topP: 0.9,
-            maxOutputTokens: 600,  // 충분한 응답
+            temperature: 0.2,  // 더 정확한 코드를 위해 낮춤
+            topP: 0.85,
+            maxOutputTokens: 1024,  // 앱 만들기 등 긴 응답 허용
           },
         }),
         signal: controller.signal,
@@ -393,23 +393,66 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       en: 'Respond in English.',
     };
 
-    const systemPrompt = `You are a Flutter/Dart expert. Give accurate, complete technical answers.
+    // 복잡한 앱 요청 감지
+    const isComplexAppRequest = /앱\s*(만들기|구현|개발)|calculator|todo\s*list|login|계산기|투두|로그인|채팅|날씨|메모|쇼핑|프로필|설정|갤러리|타이머|검색|네비게이션|스플래시/i.test(question);
+
+    // 템플릿이 있는지 확인 (Reference에 완전한 코드가 포함되어 있는지)
+    const hasTemplate = context.includes('완전한 코드:') || context.includes('Complete code:');
+
+    const systemPrompt = `You are a senior Flutter/Dart developer. Write CORRECT, COMPILABLE code only.
 
 ${languageInstructions[language] || languageInstructions.en}
 
 Reference:
 ${context}
 
-FORMAT REQUIREMENTS:
-1. Start with a clear 2-3 sentence explanation of the concept
-2. If there are steps, number them clearly (1., 2., 3.) and explain EACH step
-3. Include ONE complete, runnable code example with proper formatting:
-   - Correct import statements
-   - Proper indentation (2 spaces)
-   - No syntax errors
-4. End with a brief note about common use cases or tips
-5. NO greetings, thanks, emojis, or casual language
-6. Use proper punctuation (periods at end of sentences)`;
+${isComplexAppRequest ? (hasTemplate ?
+`APP TEMPLATE FOUND - Use the code from Reference section as your answer.
+Copy the complete code example exactly as provided in the Reference.
+` :
+`COMPLEX APP REQUEST (No template available):
+1. Provide ONLY the basic app structure with Scaffold
+2. Keep it simple - just show the main UI skeleton
+3. At the end, ALWAYS suggest these follow-up questions:
+   - "더 자세한 기능 구현이 필요하시면 질문해주세요"
+   - "데이터 저장 방법이 궁금하시면 질문해주세요"
+   - "상태 관리 추가 방법이 궁금하시면 질문해주세요"
+`) : ''}
+CRITICAL CODE RULES:
+1. ALWAYS add spaces between keywords: "void main()" "extends StatelessWidget"
+2. ALWAYS use exact class names: StatelessWidget, StatefulWidget, BuildContext
+3. ALWAYS use @override (lowercase), Widget build() method
+4. ALWAYS match opening and closing brackets { }
+5. ONLY use real Flutter widgets and methods
+6. StatefulWidget State class format: class _WidgetNameState extends State<WidgetName>
+
+RESPONSE FORMAT:
+1. Brief explanation (2-3 sentences)
+2. Complete, runnable code example:
+\`\`\`dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Title')),
+        body: const Center(child: Text('Content')),
+      ),
+    );
+  }
+}
+\`\`\`
+3. Brief usage tip
+
+NO greetings or casual language. Technical content only.`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -446,27 +489,64 @@ FORMAT REQUIREMENTS:
     answer = answer.replace(/```\s*\n+```dart\n/g, '\n');
     answer = answer.replace(/```dart\n+```dart\n/g, '```dart\n');
 
-    // 3. 잘못된 Dart 문법 수정
+    // 3. 잘못된 Dart 문법 수정 (공백 누락, 오타, 잘못된 메서드명)
     answer = answer
+      // 공백 누락 수정
       .replace(/voidmain\(\)/g, 'void main()')
+      .replace(/void main\(\)\{/g, 'void main() {')
       .replace(/runApp\(MyApp\(\)\);}/g, 'runApp(MyApp());\n}')
       .replace(/BuildContextcontext/g, 'BuildContext context')
-      .replace(/Widget create\(/g, 'Widget build(')
-      .replace(/backgroundColorColors\./g, 'backgroundColor: Colors.')
+      .replace(/BuildContext context\)/g, 'BuildContext context)')
+      .replace(/extends StatelessWidget\{/g, 'extends StatelessWidget {')
+      .replace(/extends StatefulWidget\{/g, 'extends StatefulWidget {')
+      .replace(/extends State<(\w+)>\{/g, 'extends State<$1> {')
+      .replace(/body:(\w)/g, 'body: $1')
+      .replace(/appBar:(\w)/g, 'appBar: $1')
+      .replace(/home:(\w)/g, 'home: $1')
+      .replace(/child:(\w)/g, 'child: $1')
+      .replace(/title:(\w)/g, 'title: $1')
+      .replace(/context=context/g, 'context: context')
+      .replace(/itemcount:/gi, 'itemCount: ')
+      .replace(/itembuilder:/gi, 'itemBuilder: ')
+
+      // 클래스명/메서드명 오타 수정
       .replace(/StatelessWidet/g, 'StatelessWidget')
-      .replace(/Buildectx/g, 'BuildContext ctx')
-      .replace(/MyAppextendsStatelessWidet/g, 'MyApp extends StatelessWidget')
-      .replace(/MyAppextends StatelessWidget/g, 'MyApp extends StatelessWidget')
+      .replace(/StatefulWidet/g, 'StatefulWidget')
+      .replace(/STATEfulWidget/gi, 'StatefulWidget')
+      .replace(/Widgetbuild/g, 'Widget build')
+      .replace(/Widget create\(/g, 'Widget build(')
+      .replace(/@Override/g, '@override')
       .replace(/@overridewidgetcreate/gi, '@override\n  Widget build')
-      .replace(/returnMaterialApplcation/g, 'return MaterialApp')
-      .replace(/homepage\(\)/g, 'HomePage()')
+      .replace(/Buildectx/g, 'BuildContext ctx')
+      .replace(/notifyListners/g, 'notifyListeners')
+      .replace(/MaterialApplcation/g, 'MaterialApp')
+      .replace(/Elevatedbutton/gi, 'ElevatedButton')
+      .replace(/listview\.builder/gi, 'ListView.builder')
+      .replace(/sizedbox/gi, 'SizedBox')
+      .replace(/center\(/gi, 'Center(')
+
+      // 잘못된 extends 패턴
+      .replace(/(\w+)extends(\w+)/g, '$1 extends $2')
+      .replace(/(\w+) extends (\w+)/g, '$1 extends $2')
+
+      // 잘못된 import
       .replace(/import'package/g, "import 'package")
-      .replace(/notifyListners/g, 'notifyListeners')  // 오타 수정
-      .replace(/appBar:title:/g, 'appBar: AppBar(title: Text(')
+
+      // 가상의 메서드 제거/수정
+      .replace(/titleOnly\([^)]*\)/g, 'AppBar(title: Text("Title"))')
+      .replace(/centerChild\(\)/g, 'Center(child: Text("Content"))')
+
+      // 일반 정리
+      .replace(/\.\.+/g, '.')
+      .replace(/違い점/g, '차이점')
+      .replace(/\s+\./g, '.')
       .replace(/appBar\s*:\s*title\s*:\s*"([^"]+)"/g, 'appBar: AppBar(title: Text("$1"))')
-      .replace(/\.\.+/g, '.')  // 중복 마침표
-      .replace(/違い점/g, '차이점')  // 일본어 제거
-      .replace(/\s+\./g, '.');  // 마침표 앞 공백 제거
+      .replace(/homepage\(\)/gi, 'HomePage()')
+      .replace(/backgroundColorColors\./g, 'backgroundColor: Colors.')
+
+      // 괄호 오류 (기본적인 것만)
+      .replace(/<Text\(/g, 'Text(')
+      .replace(/\/>(?=\s*[,\)])/g, ')');
 
     // 4. 이상한 패턴 감지
     const gibberishPatterns = [
@@ -485,13 +565,14 @@ FORMAT REQUIREMENTS:
       }
     }
 
-    // 6. 길이 제한 (더 충분한 응답 허용)
-    if (answer.length > 1500) {
-      const lastCodeEnd = answer.lastIndexOf('```', 1500);
-      if (lastCodeEnd > 400) {
+    // 6. 길이 제한 (앱 만들기 등 긴 응답 허용)
+    if (answer.length > 2500) {
+      // 코드 블록이 잘리지 않도록 마지막 완전한 코드 블록까지만
+      const lastCodeEnd = answer.lastIndexOf('```', 2500);
+      if (lastCodeEnd > 500) {
         answer = answer.substring(0, lastCodeEnd + 3);
       } else {
-        answer = answer.substring(0, 1500);
+        answer = answer.substring(0, 2500);
       }
     }
 
