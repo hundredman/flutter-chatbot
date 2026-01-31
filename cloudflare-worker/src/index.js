@@ -210,15 +210,15 @@ async function handleSyncDocs(request, env, corsHeaders) {
 }
 
 /**
- * AI Provider: Cloudflare Workers AI
+ * AI Provider: Cloudflare Workers AI (Primary)
  */
 async function callCloudflareAI(messages, env) {
   const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
     messages,
-    max_tokens: 512,
-    temperature: 0.4,
-    repetition_penalty: 1.3,
-    frequency_penalty: 0.7,
+    max_tokens: 400,
+    temperature: 0.3,  // 더 일관된 응답
+    repetition_penalty: 1.5,  // 반복 강하게 억제
+    frequency_penalty: 0.8,
   });
   return response.response || 'No response generated';
 }
@@ -284,12 +284,13 @@ async function callGeminiAI(messages, env) {
 
 /**
  * Multi-Provider AI with Fallback Chain
- * Priority: Gemini → Cloudflare Workers AI
+ * Priority: Cloudflare Workers AI → Gemini
+ * (Cloudflare AI가 더 안정적인 응답 생성)
  */
 async function callAIWithFallback(messages, env) {
   const providers = [
-    { name: 'Gemini', call: callGeminiAI },
     { name: 'Cloudflare Workers AI', call: callCloudflareAI },
+    { name: 'Gemini', call: callGeminiAI },
   ];
 
   let lastError = null;
@@ -442,41 +443,47 @@ CRITICAL Instructions - Follow these strictly:
       .replace(/State<MyHome>\{/g, 'State<MyHome> {')
       .replace(/@overrideWidgetbuild/g, '@override\n  Widget build')
       .replace(/@Override Void Build/gi, '@override\n  Widget build')
+      .replace(/Widget create\(/g, 'Widget build(')  // create → build
       .replace(/\)\{/g, ') {')
       .replace(/appBar:title:/g, 'appBar: AppBar(title: Text(')
-      .replace(/Scaffoldelevatedbutton/g, 'Scaffold(\n  body: ElevatedButton');
+      .replace(/Scaffoldelevatedbutton/g, 'Scaffold(\n  body: ElevatedButton')
+      .replace(/appBar\s*:\s*AppBar\s*\(\s*title\s*:\s*'([^']+)'\s*\)/g, "appBar: AppBar(title: Text('$1'))");
 
-    // 3. 이상한 패턴 감지 (gibberish 코드)
+    // 3. 연속된 코드 블록 합치기 (```dart 가 여러 번 나오는 경우)
+    // ```dart ... ``` ```dart ... ``` → ```dart ... ... ```
+    answer = answer.replace(/```\s*\n*```dart\n/g, '\n');
+
+    // 4. 이상한 패턴 감지 (gibberish 코드)
     const gibberishPatterns = [
       /\w{35,}/g,  // 35자 이상 연속 문자
       /@end override/gi,
       /pref\.remove \('/g,  // 잘못된 따옴표
       /_deletestoredunamemethod/gi,
+      /Day-by-day|Day-to-Day/gi,  // 이상한 표현
     ];
 
     const hasGibberish = gibberishPatterns.some(pattern => pattern.test(answer));
 
-    // 4. gibberish 감지시 첫 번째 완전한 코드 블록까지만 사용
+    // 5. gibberish 감지시 첫 번째 완전한 코드 블록까지만 사용
     if (hasGibberish) {
       const firstCodeStart = answer.indexOf('```');
       const firstCodeEnd = answer.indexOf('```', firstCodeStart + 3);
       if (firstCodeStart >= 0 && firstCodeEnd > firstCodeStart) {
-        // 코드 블록 앞의 설명 + 첫 번째 코드 블록만 유지
         answer = answer.substring(0, firstCodeEnd + 3);
       }
     }
 
-    // 5. 너무 긴 응답 자르기
-    if (answer.length > 1500) {
-      const lastCodeEnd = answer.lastIndexOf('```', 1500);
-      if (lastCodeEnd > 500) {
+    // 6. 너무 긴 응답 자르기
+    if (answer.length > 1200) {
+      const lastCodeEnd = answer.lastIndexOf('```', 1200);
+      if (lastCodeEnd > 400) {
         answer = answer.substring(0, lastCodeEnd + 3);
       } else {
-        answer = answer.substring(0, 1500) + '...';
+        answer = answer.substring(0, 1200) + '...';
       }
     }
 
-    // 6. 줄바꿈 정리
+    // 7. 줄바꿈 정리
     answer = answer.replace(/\n{3,}/g, '\n\n').trim();
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
