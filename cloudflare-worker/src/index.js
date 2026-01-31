@@ -376,29 +376,44 @@ async function handleChat(request, env, corsHeaders) {
     // 질문 유형 감지 (설명/개념 질문인지)
     const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|explain|how\s*to\s*use/i.test(question);
 
-    // 주요 토픽별 공식 문서 링크
+    // 주요 토픽별 공식 문서 링크 (구체적인 패턴이 먼저 와야 함!)
     const docLinks = {
-      'firebase|파이어베이스': 'https://firebase.flutter.dev/docs/overview',
-      'firebaseauth|firebase\s*auth|인증': 'https://firebase.flutter.dev/docs/auth/overview',
-      'firestore|파이어스토어': 'https://firebase.flutter.dev/docs/firestore/overview',
+      // Firebase 관련 - 구체적인 것 먼저
+      'firebaseauth|firebase\\s*auth|파이어베이스\\s*인증': 'https://firebase.flutter.dev/docs/auth/overview',
+      'firestore|파이어스토어|파이어\\s*스토어': 'https://firebase.flutter.dev/docs/firestore/overview',
+      'firebase\\s*storage|파이어베이스\\s*스토리지': 'https://firebase.flutter.dev/docs/storage/overview',
+      'firebase\\s*messaging|fcm|푸시\\s*알림': 'https://firebase.flutter.dev/docs/messaging/overview',
+      'firebase|파이어베이스': 'https://firebase.flutter.dev/docs/overview',  // 일반 firebase는 마지막
+
+      // 상태 관리
+      'riverpod|리버팟|리버\\s*팟': 'https://riverpod.dev/docs/introduction/getting_started',
       'provider|프로바이더': 'https://pub.dev/packages/provider',
-      'riverpod|리버팟': 'https://riverpod.dev/docs/introduction/getting_started',
-      'bloc|블록': 'https://bloclibrary.dev/#/gettingstarted',
-      'getx|겟엑스': 'https://pub.dev/packages/get',
-      'navigation|네비게이션|라우팅': 'https://docs.flutter.dev/ui/navigation',
+      'bloc|블록|블락': 'https://bloclibrary.dev/#/gettingstarted',
+      'getx|겟엑스|get\\s*x': 'https://pub.dev/packages/get',
+      'state\\s*management|상태\\s*관리': 'https://docs.flutter.dev/data-and-backend/state-mgmt',
+
+      // UI/네비게이션
+      'hero\\s*animation|히어로\\s*애니메이션': 'https://docs.flutter.dev/ui/animations/hero-animations',
       'animation|애니메이션': 'https://docs.flutter.dev/ui/animations',
-      'state\s*management|상태\s*관리': 'https://docs.flutter.dev/data-and-backend/state-mgmt',
-      'http|api\s*call|api\s*호출': 'https://docs.flutter.dev/cookbook/networking/fetch-data',
-      'sqlite|sqflite|로컬\s*db': 'https://docs.flutter.dev/cookbook/persistence/sqlite',
-      'shared\s*pref|sharedpreferences': 'https://pub.dev/packages/shared_preferences',
-      'camera|카메라': 'https://pub.dev/packages/camera',
-      'image\s*picker|이미지\s*선택': 'https://pub.dev/packages/image_picker',
-      'permission|권한': 'https://pub.dev/packages/permission_handler',
-      'notification|알림|푸시': 'https://firebase.flutter.dev/docs/messaging/overview',
-      'hero': 'https://docs.flutter.dev/ui/animations/hero-animations',
-      'form|폼|입력': 'https://docs.flutter.dev/cookbook/forms',
-      'listview|리스트뷰': 'https://docs.flutter.dev/cookbook/lists',
-      'gridview|그리드뷰': 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
+      'named\\s*route|네임드\\s*라우트': 'https://docs.flutter.dev/cookbook/navigation/named-routes',
+      'navigation|네비게이션|라우팅|라우트': 'https://docs.flutter.dev/ui/navigation',
+      'listview|리스트뷰|리스트\\s*뷰': 'https://docs.flutter.dev/cookbook/lists',
+      'gridview|그리드뷰|그리드\\s*뷰': 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
+      'form|폼|입력\\s*폼': 'https://docs.flutter.dev/cookbook/forms',
+
+      // 네트워킹/데이터
+      'http\\s*요청|api\\s*call|api\\s*호출|fetch\\s*data': 'https://docs.flutter.dev/cookbook/networking/fetch-data',
+      'sqlite|sqflite|로컬\\s*db|로컬\\s*데이터베이스': 'https://docs.flutter.dev/cookbook/persistence/sqlite',
+      'shared\\s*pref|sharedpreferences|로컬\\s*저장': 'https://pub.dev/packages/shared_preferences',
+
+      // 기기 기능
+      'camera|카메라|사진\\s*찍': 'https://pub.dev/packages/camera',
+      'image\\s*picker|이미지\\s*선택|갤러리\\s*선택': 'https://pub.dev/packages/image_picker',
+      'permission|권한|퍼미션': 'https://pub.dev/packages/permission_handler',
+      'notification|알림': 'https://firebase.flutter.dev/docs/messaging/overview',
+
+      // 인증 (Firebase 외)
+      '인증|로그인\\s*구현|auth': 'https://firebase.flutter.dev/docs/auth/overview',
     };
 
     // 질문에서 관련 문서 링크 찾기
