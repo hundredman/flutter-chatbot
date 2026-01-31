@@ -407,10 +407,15 @@ CRITICAL Instructions - Follow these strictly:
    - Do NOT generate gibberish, broken text, or random characters
    - Do NOT repeat the same phrase or sentence multiple times
    - If you find yourself repeating, STOP immediately
-4. Use markdown for code examples when appropriate
+4. For code examples:
+   - Only show ONE simple, complete, working example
+   - Keep code under 20 lines
+   - Use proper Dart/Flutter syntax with correct formatting
+   - Do NOT generate fake, broken, or incomplete code
 5. DO NOT include [Source X] citations in your answer
 6. DO NOT make long lists - prefer concise prose
-7. Quality over quantity - a short, clear answer is better than a long, repetitive one`;
+7. Quality over quantity - a short, clear answer is better than a long, repetitive one
+8. STOP generating when you've made your point - do not continue with more examples`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -421,8 +426,32 @@ CRITICAL Instructions - Follow these strictly:
     const { answer: rawAnswer, provider } = await callAIWithFallback(messages, env);
     console.log(`📊 Used provider: ${provider}`);
 
-    // Clean up double line breaks (reduce spacing)
-    const answer = rawAnswer ? rawAnswer.replace(/\n\n+/g, '\n') : rawAnswer;
+    // 응답 품질 검증 및 정리
+    let answer = rawAnswer || '';
+
+    // 1. 이상한 패턴 감지 (gibberish 코드)
+    const gibberishPatterns = [
+      /\w{30,}/g,  // 30자 이상 연속 문자 (공백 없음)
+      /[a-z]{2,}[A-Z][a-z]+[A-Z]/g,  // 잘못된 camelCase 반복
+      /@override\s*Widget\s*build\s*\([^)]*\)\s*=>/gi,  // 잘못된 Dart 문법
+    ];
+
+    const hasGibberish = gibberishPatterns.some(pattern => {
+      const matches = answer.match(pattern);
+      return matches && matches.length > 3;
+    });
+
+    // 2. 너무 긴 응답이나 gibberish 감지시 첫 번째 코드 블록까지만 사용
+    if (hasGibberish || answer.length > 2000) {
+      const codeBlockEnd = answer.indexOf('```', answer.indexOf('```') + 3);
+      if (codeBlockEnd > 0) {
+        answer = answer.substring(0, codeBlockEnd + 3);
+        answer += '\n\n(응답이 잘려서 표시됩니다)';
+      }
+    }
+
+    // 3. 줄바꿈 정리
+    answer = answer.replace(/\n\n+/g, '\n\n').trim();
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
     if (conversationId && env.DB) {
