@@ -365,20 +365,21 @@ async function handleChat(request, env, corsHeaders) {
     // 2. 벡터 검색 (Vectorize - 무료)
     console.log('Searching vector database...');
     const results = await env.VECTORIZE.query(queryVector, {
-      topK: 5,
+      topK: 3,  // 토큰 한도 방지를 위해 3개로 제한
       returnValues: false,
       returnMetadata: 'all',
     });
 
     console.log(`Found ${results.matches.length} similar documents`);
 
-    // 3. 컨텍스트 구성
+    // 3. 컨텍스트 구성 (각 문서 최대 1000자로 제한)
     const context = results.matches
       .map((match, i) => {
         const metadata = match.metadata || {};
+        const content = (metadata.content || '').substring(0, 1000);
         return `[Source ${i + 1}] ${metadata.title || 'Flutter Documentation'}
 URL: ${metadata.url || ''}
-Content: ${metadata.content || ''}
+Content: ${content}${content.length >= 1000 ? '...' : ''}
 ---`;
       })
       .join('\n\n');
