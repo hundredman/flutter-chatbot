@@ -174,7 +174,7 @@ async function fetchAllDocuments(files) {
  * Vectorize에 동기화
  */
 async function syncToVectorize(documents) {
-  const batchSize = 5; // Reduced from 10 to 5 for stability
+  const batchSize = 2; // Reduced from 5 to 2 for Worker CPU timeout
 
   console.log(`📤 Syncing ${documents.length} documents to Vectorize...\n`);
 
@@ -192,17 +192,17 @@ async function syncToVectorize(documents) {
       const response = await axios.post(`${WORKER_URL}/api/sync-docs`, {
         documents: batch,
       }, {
-        timeout: 90000, // Increased from 60s to 90s
+        timeout: 120000, // Increased from 90s to 120s
       });
 
       console.log(`   ✅ ${response.data.message}`);
       successCount += batch.length;
 
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Increased from 2s to 3s
+      await new Promise(resolve => setTimeout(resolve, 3000)); // 3s between successful batches
     } catch (error) {
       console.error(`   ❌ Batch ${batchNum} failed: ${error.message}`);
       failCount += batch.length;
-      await new Promise(resolve => setTimeout(resolve, 8000)); // Increased from 5s to 8s
+      await new Promise(resolve => setTimeout(resolve, 10000)); // Increased from 8s to 10s after failures
     }
   }
 
