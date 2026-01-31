@@ -306,11 +306,13 @@ async function callAIWithFallback(messages, env) {
       console.log(`❌ ${provider.name} failed: ${error.message}`);
       lastError = error;
 
-      // Rate limit이나 quota 초과면 다음 provider 시도
+      // Rate limit, quota 초과, context window 초과면 다음 provider 시도
       if (error.message.includes('rate limit') ||
           error.message.includes('429') ||
           error.message.includes('quota') ||
-          error.message.includes('limit exceeded')) {
+          error.message.includes('limit exceeded') ||
+          error.message.includes('context window') ||
+          error.message.includes('tokens') && error.message.includes('exceeded')) {
         continue;
       }
 
