@@ -229,9 +229,10 @@ async function callGroqAI(messages, env) {
       model: 'llama-3.3-70b-versatile',
       messages,
       max_tokens: 512,
-      temperature: 0.4,
-      frequency_penalty: 0.5,
-      presence_penalty: 0.3,
+      temperature: 0.5,
+      top_p: 0.9,
+      frequency_penalty: 0.6,
+      presence_penalty: 0.4,
     }),
   });
 
@@ -295,12 +296,13 @@ async function callGeminiAI(messages, env) {
 
 /**
  * Multi-Provider AI with Fallback Chain
- * Priority: Cloudflare → Groq → Gemini
+ * Priority: Groq → Cloudflare → Gemini
+ * (Groq has more powerful 70B model vs Cloudflare's 8B)
  */
 async function callAIWithFallback(messages, env) {
   const providers = [
-    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
     { name: 'Groq', call: callGroqAI },
+    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
     { name: 'Gemini', call: callGeminiAI },
   ];
 
@@ -331,8 +333,12 @@ async function callAIWithFallback(messages, env) {
         continue;
       }
 
-      // 403 Forbidden 에러도 다음 provider 시도 (API 키 문제 가능성)
-      if (error.message.includes('403') || error.message.includes('Forbidden')) {
+      // 403 Forbidden, 400 Invalid API Key 에러도 다음 provider 시도
+      if (error.message.includes('403') ||
+          error.message.includes('Forbidden') ||
+          error.message.includes('400') ||
+          error.message.includes('API key not valid') ||
+          error.message.includes('INVALID_ARGUMENT')) {
         continue;
       }
 
