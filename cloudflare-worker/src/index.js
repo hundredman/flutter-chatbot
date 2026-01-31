@@ -6,11 +6,22 @@
  * - D1 Database (대화 기록)
  */
 
+// 허용된 Origin 목록
+const ALLOWED_ORIGINS = [
+  'https://flutter-chatbot-worker.hiprojectflutterchatbot.workers.dev',
+  'https://hiprojectflutterchatbot.web.app',
+  'http://localhost:5173',  // 로컬 개발
+  'http://localhost:3000',  // 로컬 개발
+];
+
 export default {
-  async fetch(request, env, ctx) {
-    // CORS 헤더
+  async fetch(request, env) {
+    const origin = request.headers.get('Origin') || '';
+    const isAllowedOrigin = ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.workers.dev');
+
+    // CORS 헤더 (허용된 origin만)
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': isAllowedOrigin ? origin : ALLOWED_ORIGINS[0],
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Max-Age': '86400',
@@ -212,40 +223,6 @@ async function callCloudflareAI(messages, env) {
 }
 
 /**
- * AI Provider: Groq (무료 14,400 요청/일)
- */
-async function callGroqAI(messages, env) {
-  if (!env.GROQ_API_KEY) {
-    throw new Error('Groq API key not configured');
-  }
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${env.GROQ_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages,
-      max_tokens: 512,
-      temperature: 0.5,
-      top_p: 0.9,
-      frequency_penalty: 0.6,
-      presence_penalty: 0.4,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Groq API error: ${response.status} - ${error}`);
-  }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
-}
-
-/**
  * AI Provider: Google Gemini (무료 60 요청/분)
  */
 async function callGeminiAI(messages, env) {
@@ -270,40 +247,48 @@ async function callGeminiAI(messages, env) {
     });
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents,
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 512,
-        },
-      }),
+  // 10초 타임아웃 설정
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: 0.4,
+            topP: 0.95,
+            maxOutputTokens: 512,
+          },
+        }),
+        signal: controller.signal,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Gemini API error: ${response.status} - ${error}`);
     }
-  );
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Gemini API error: ${response.status} - ${error}`);
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  const data = await response.json();
-  return data.candidates[0].content.parts[0].text;
 }
 
 /**
  * Multi-Provider AI with Fallback Chain
- * Priority: Groq → Cloudflare → Gemini
- * (Groq has more powerful 70B model vs Cloudflare's 8B)
+ * Priority: Gemini → Cloudflare Workers AI
  */
 async function callAIWithFallback(messages, env) {
   const providers = [
-    { name: 'Groq', call: callGroqAI },
-    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
     { name: 'Gemini', call: callGeminiAI },
+    { name: 'Cloudflare Workers AI', call: callCloudflareAI },
   ];
 
   let lastError = null;

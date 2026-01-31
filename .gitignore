@@ -4,6 +4,9 @@ tech_stack.md
 firebase_config.md
 firebase-admin-key.json
 
+# Test files with sensitive data
+test-*.js
+
 # Environment files
 .env
 functions/.env
