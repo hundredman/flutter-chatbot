@@ -377,7 +377,7 @@ async function handleChat(request, env, corsHeaders) {
     const isAppCreationRequest = /앱\s*(만들|구현|개발|만드|코드)|앱을?\s*(만들|구현|개발)|만들기|만들어줘|구현해줘|개발해줘/i.test(question);
 
     // 질문 유형 감지 (설명/개념 질문인지)
-    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|설명|어떻게\s*작동|차이점|차이가|비교/i.test(question);
+    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|what\s*is|explain/i.test(question);
 
     // 3. 컨텍스트 구성 (앱 만들기 요청이 아니면 템플릿 코드 제외)
     const context = results.matches
@@ -451,8 +451,8 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
     const topContent = bestMatch?.metadata?.content || '';
     const topScore = bestMatch?.score || 0;
 
-    // 템플릿에 dart 코드 블록이 있고, 앱 만들기 요청일 때만 직접 반환
-    if (isAppCreationRequest && topContent.includes('```dart') && topContent.includes('void main()')) {
+    // 템플릿에 dart 코드 블록이 있고, 앱 만들기 요청이면서 설명 질문이 아닐 때만 직접 반환
+    if (isAppCreationRequest && !isExplanationQuestion && topContent.includes('```dart') && topContent.includes('void main()')) {
       console.log('📦 Direct template match found, returning without AI');
 
       // 코드 블록 추출
@@ -505,7 +505,14 @@ ${languageInstructions[language] || languageInstructions.en}
 Reference:
 ${context}
 
-${isComplexAppRequest ? (hasTemplate ?
+${isExplanationQuestion ?
+`EXPLANATION QUESTION DETECTED - User wants to understand a concept.
+1. Explain the concept clearly in 3-5 sentences
+2. Describe when and why to use it
+3. Provide a SHORT code snippet (10-20 lines max) showing basic usage
+4. Do NOT provide full app code with void main()
+` :
+(isComplexAppRequest ? (hasTemplate ?
 `CRITICAL: TEMPLATE CODE FOUND IN REFERENCE SECTION!
 You MUST copy the code block from Reference EXACTLY as written.
 DO NOT modify, summarize, or rewrite the code.
@@ -517,7 +524,7 @@ Just extract the \`\`\`dart code block from Reference and present it.
 2. Suggest follow-up questions:
    - "더 자세한 기능이 필요하시면 질문해주세요"
    - "데이터 저장 방법이 궁금하시면 질문해주세요"
-`) : ''}
+`) : '')}
 CRITICAL CODE RULES:
 1. ALWAYS add spaces between keywords: "void main()" "extends StatelessWidget"
 2. ALWAYS use exact class names: StatelessWidget, StatefulWidget, BuildContext
