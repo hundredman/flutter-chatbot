@@ -374,7 +374,41 @@ async function handleChat(request, env, corsHeaders) {
     console.log(`Found ${results.matches.length} similar documents`);
 
     // 질문 유형 감지 (설명/개념 질문인지)
-    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|what\s*is|explain/i.test(question);
+    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|explain|how\s*to\s*use/i.test(question);
+
+    // 주요 토픽별 공식 문서 링크
+    const docLinks = {
+      'firebase|파이어베이스': 'https://firebase.flutter.dev/docs/overview',
+      'firebaseauth|firebase\s*auth|인증': 'https://firebase.flutter.dev/docs/auth/overview',
+      'firestore|파이어스토어': 'https://firebase.flutter.dev/docs/firestore/overview',
+      'provider|프로바이더': 'https://pub.dev/packages/provider',
+      'riverpod|리버팟': 'https://riverpod.dev/docs/introduction/getting_started',
+      'bloc|블록': 'https://bloclibrary.dev/#/gettingstarted',
+      'getx|겟엑스': 'https://pub.dev/packages/get',
+      'navigation|네비게이션|라우팅': 'https://docs.flutter.dev/ui/navigation',
+      'animation|애니메이션': 'https://docs.flutter.dev/ui/animations',
+      'state\s*management|상태\s*관리': 'https://docs.flutter.dev/data-and-backend/state-mgmt',
+      'http|api\s*call|api\s*호출': 'https://docs.flutter.dev/cookbook/networking/fetch-data',
+      'sqlite|sqflite|로컬\s*db': 'https://docs.flutter.dev/cookbook/persistence/sqlite',
+      'shared\s*pref|sharedpreferences': 'https://pub.dev/packages/shared_preferences',
+      'camera|카메라': 'https://pub.dev/packages/camera',
+      'image\s*picker|이미지\s*선택': 'https://pub.dev/packages/image_picker',
+      'permission|권한': 'https://pub.dev/packages/permission_handler',
+      'notification|알림|푸시': 'https://firebase.flutter.dev/docs/messaging/overview',
+      'hero': 'https://docs.flutter.dev/ui/animations/hero-animations',
+      'form|폼|입력': 'https://docs.flutter.dev/cookbook/forms',
+      'listview|리스트뷰': 'https://docs.flutter.dev/cookbook/lists',
+      'gridview|그리드뷰': 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
+    };
+
+    // 질문에서 관련 문서 링크 찾기
+    let relevantDocLink = null;
+    for (const [pattern, url] of Object.entries(docLinks)) {
+      if (new RegExp(pattern, 'i').test(question)) {
+        relevantDocLink = url;
+        break;
+      }
+    }
 
     // 키워드 기반 앱 템플릿 매칭 (직접 반환용)
     // 키: 매칭 패턴, 값: [템플릿 제목 키워드, 앱 이름]
@@ -495,10 +529,14 @@ ${context}
 
 ${isExplanationQuestion ?
 `EXPLANATION QUESTION DETECTED - User wants to understand a concept.
+DO NOT generate code. Instead:
 1. Explain the concept clearly in 3-5 sentences
 2. Describe when and why to use it
-3. Provide a SHORT code snippet (10-20 lines max) showing basic usage
-4. Do NOT provide full app code with void main()
+3. List key classes/methods involved (e.g., "FirebaseAuth.instance, signInWithEmailAndPassword()")
+4. End with: "공식 문서: ${relevantDocLink || 'https://docs.flutter.dev'}"
+
+IMPORTANT: Do NOT write any \`\`\`dart code blocks. Just explain and provide the documentation link.
+The user can ask for code examples separately if needed.
 ` :
 (isComplexAppRequest ? (hasTemplate ?
 `CRITICAL: TEMPLATE CODE FOUND IN REFERENCE SECTION!
