@@ -485,13 +485,16 @@ async function handleChat(request, env, corsHeaders) {
       const topicMatch = question.match(/(\w+|[가-힣]+)\s*(사용법|사용방법|뭔가요|무엇|설명)/i);
       const topicName = topicMatch ? topicMatch[1] : 'Flutter';
 
-      const directAnswer = `## ${topicName} 개요
-
-${explanation || `${topicName}에 대한 Flutter 공식 문서를 참고해주세요.`}
+      const directAnswer = `## ${topicName}
 
 **공식 문서:** ${relevantDocLink}
 
-코드 예제가 필요하시면 "${topicName} 코드 예제"라고 질문해주세요.`;
+공식 문서에서 다음 내용을 확인하세요:
+- 설치 및 설정 방법
+- 기본 사용법 및 코드 예제
+- 고급 기능 및 옵션
+
+직접 복사해서 사용할 수 있는 코드 예제가 포함되어 있습니다.`;
 
       return Response.json(
         {
