@@ -373,20 +373,37 @@ async function handleChat(request, env, corsHeaders) {
 
     console.log(`Found ${results.matches.length} similar documents`);
 
-    // 3. 컨텍스트 구성 (각 문서 최대 1000자로 제한)
+    // 3.5 앱 만들기 요청인지 먼저 확인
+    const isAppCreationRequest = /앱\s*(만들|구현|개발|만드|코드)|앱을?\s*(만들|구현|개발)|만들기|만들어줘|구현해줘|개발해줘/i.test(question);
+
+    // 질문 유형 감지 (설명/개념 질문인지)
+    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|설명|어떻게\s*작동|차이점|차이가|비교/i.test(question);
+
+    // 3. 컨텍스트 구성 (앱 만들기 요청이 아니면 템플릿 코드 제외)
     const context = results.matches
       .map((match, i) => {
         const metadata = match.metadata || {};
-        const content = (metadata.content || '').substring(0, 1000);
+        let content = (metadata.content || '').substring(0, 1000);
+
+        // 설명 질문일 경우 템플릿의 코드 블록 제외하고 설명만 추출
+        if (isExplanationQuestion && content.includes('```dart') && content.includes('void main()')) {
+          // 코드 블록 전 설명 부분만 추출
+          const beforeCode = content.split('```dart')[0].trim();
+          if (beforeCode.length > 50) {
+            content = beforeCode;
+          } else {
+            // 템플릿이면 건너뛰기
+            return null;
+          }
+        }
+
         return `[Source ${i + 1}] ${metadata.title || 'Flutter Documentation'}
 URL: ${metadata.url || ''}
 Content: ${content}${content.length >= 1000 ? '...' : ''}
 ---`;
       })
+      .filter(Boolean)
       .join('\n\n');
-
-    // 3.5 앱 만들기 요청인지 먼저 확인
-    const isAppCreationRequest = /앱\s*(만들|구현|개발|만드|코드)|앱을?\s*(만들|구현|개발)|만들기|만들어|구현해|개발해/i.test(question);
 
     // 키워드 기반 템플릿 매칭 (앱 만들기 요청일 때만)
     const appKeywordMap = {
