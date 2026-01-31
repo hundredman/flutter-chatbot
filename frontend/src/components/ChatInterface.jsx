@@ -5,7 +5,7 @@ import LanguageToggle from './LanguageToggle';
 import { addMessageToConversation } from '../firebase/chatService';
 import { markQuestionCompleted, markChapterCompleted, findNextChapter } from '../services/learningProgress';
 import { curriculum } from '../data/curriculum';
-import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle } from 'react-icons/hi';
+import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft } from 'react-icons/hi';
 
 const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, user, showBackButton = true, language = 'en', onLanguageChange }) => {
   const [messages, setMessages] = useState([]);
@@ -25,6 +25,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   const chapterId = conversation?.chapterId || null;
   const partId = conversation?.partId || null;
   const hasNextQuestion = chapterQuestions && currentQuestionIndex < chapterQuestions.length - 1;
+  const hasPreviousQuestion = chapterQuestions && currentQuestionIndex > 0;
   const isLastQuestion = chapterQuestions && currentQuestionIndex === chapterQuestions.length - 1;
 
   // Find next chapter
@@ -46,6 +47,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       removeLink: 'Remove link',
       removeFile: 'Remove file',
       nextQuestion: 'Next Question',
+      previousQuestion: 'Previous Question',
       questionProgress: 'Question',
       chapterComplete: 'Chapter Complete!',
       chapterCompleteDesc: 'Great job! You have completed all questions in this chapter.',
@@ -67,6 +69,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       removeLink: '링크 제거',
       removeFile: '파일 제거',
       nextQuestion: '다음 질문',
+      previousQuestion: '이전 질문',
       questionProgress: '질문',
       chapterComplete: '챕터 완료!',
       chapterCompleteDesc: '훌륭합니다! 이 챕터의 모든 질문을 완료했습니다.',
@@ -420,6 +423,16 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
     }
   };
 
+  // Handle previous question in chapter learning mode
+  const handlePreviousQuestion = () => {
+    if (hasPreviousQuestion) {
+      const prevIndex = currentQuestionIndex - 1;
+      const prevQuestion = chapterQuestions[prevIndex];
+      setCurrentQuestionIndex(prevIndex);
+      handleSendMessage(prevQuestion.text, true);
+    }
+  };
+
   // Handle next question in chapter learning mode
   const handleNextQuestion = () => {
     // Mark current question as completed
@@ -598,15 +611,28 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
           <span>{currentLang.inputHelp}</span>
         </div>
 
-        {/* Next Question Button for chapter learning mode */}
-        {hasNextQuestion && !isLoading && (
-          <button
-            className="next-question-btn"
-            onClick={handleNextQuestion}
-          >
-            <span>{currentLang.nextQuestion}</span>
-            <HiArrowRight />
-          </button>
+        {/* Previous/Next Question Buttons for chapter learning mode */}
+        {chapterQuestions && !chapterCompleted && !isLoading && (
+          <div className="question-navigation">
+            {hasPreviousQuestion && (
+              <button
+                className="previous-question-btn"
+                onClick={handlePreviousQuestion}
+              >
+                <HiArrowLeft />
+                <span>{currentLang.previousQuestion}</span>
+              </button>
+            )}
+            {hasNextQuestion && (
+              <button
+                className="next-question-btn"
+                onClick={handleNextQuestion}
+              >
+                <span>{currentLang.nextQuestion}</span>
+                <HiArrowRight />
+              </button>
+            )}
+          </div>
         )}
 
         {/* Complete Chapter Button - shown on last question */}

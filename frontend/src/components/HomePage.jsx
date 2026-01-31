@@ -222,11 +222,24 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   };
 
   const handleQuestionClick = (question, chapter, part) => {
+    // Find the index of the clicked question in the chapter
+    const questionIndex = chapter.questions.findIndex(q => q.id === question.id);
+
+    // Prepare all chapter questions for sequential navigation
+    const chapterQs = chapter.questions.map(q => ({
+      id: q.id,
+      text: q[language] || q.en
+    }));
+
     onStartConversation({
       week: `Part ${part.id}`,
       title: chapter.title[language] || chapter.title.en,
       initialPrompt: question[language] || question.en,
-      prompt: question[language] || question.en
+      prompt: question[language] || question.en,
+      chapterQuestions: chapterQs,
+      currentQuestionIndex: questionIndex !== -1 ? questionIndex : 0,
+      chapterId: chapter.id,
+      partId: part.id
     });
   };
 
