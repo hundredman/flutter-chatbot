@@ -626,6 +626,8 @@ NO greetings or casual language. Technical content only.`;
 
       // 잘못된 import
       .replace(/import'package/g, "import 'package")
+      .replace(/import\s*'package\//g, "import 'package:")  // package/ -> package:
+      .replace(/FirebaseAuthentication\(\)/g, 'FirebaseAuth.instance')
 
       // 가상의 메서드 제거/수정
       .replace(/titleOnly\([^)]*\)/g, 'AppBar(title: Text("Title"))')
@@ -698,19 +700,49 @@ NO greetings or casual language. Technical content only.`;
       }
     }
 
-    // 6. 길이 제한 (앱 만들기 등 긴 응답 허용)
-    if (answer.length > 2500) {
+    // 6. 길이 제한 (설명 질문은 더 길게 허용)
+    const maxLength = isExplanationQuestion ? 3500 : 2500;
+    if (answer.length > maxLength) {
       // 코드 블록이 잘리지 않도록 마지막 완전한 코드 블록까지만
-      const lastCodeEnd = answer.lastIndexOf('```', 2500);
+      const lastCodeEnd = answer.lastIndexOf('```', maxLength);
       if (lastCodeEnd > 500) {
         answer = answer.substring(0, lastCodeEnd + 3);
       } else {
-        answer = answer.substring(0, 2500);
+        // 문장 단위로 자르기
+        const lastSentence = answer.lastIndexOf('.', maxLength);
+        if (lastSentence > maxLength - 500) {
+          answer = answer.substring(0, lastSentence + 1);
+        } else {
+          answer = answer.substring(0, maxLength);
+        }
       }
     }
 
     // 7. 정리
     answer = answer.replace(/\n{3,}/g, '\n\n').trim();
+
+    // 8. 잘린 응답 감지 및 안내 추가
+    const incompletePatterns = [
+      /Example\s*Code:\s*$/i,
+      /코드\s*예[시제]?:\s*$/,
+      /다음과\s*같[이습]니다[.:]*\s*$/,
+      /아래[와를]?\s*참[고조]하세요[.:]*\s*$/,
+      /```dart\s*$/,
+      /```\s*$/,
+    ];
+    const isIncomplete = incompletePatterns.some(p => p.test(answer));
+    if (isIncomplete) {
+      // 불완전한 마지막 부분 제거
+      answer = answer.replace(/Example\s*Code:\s*$/i, '');
+      answer = answer.replace(/코드\s*예[시제]?:\s*$/, '');
+      answer = answer.replace(/다음과\s*같[이습]니다[.:]*\s*$/, '');
+      answer = answer.replace(/```dart\s*$/, '');
+      answer = answer.replace(/```\s*$/, '');
+      answer = answer.trim();
+      if (!answer.endsWith('.') && !answer.endsWith('```')) {
+        answer += '\n\n더 자세한 코드 예제가 필요하시면 질문해주세요.';
+      }
+    }
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
     if (conversationId && env.DB) {
