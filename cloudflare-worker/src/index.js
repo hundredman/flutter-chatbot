@@ -204,9 +204,9 @@ async function callCloudflareAI(messages, env) {
   const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
     messages,
     max_tokens: 512,
-    temperature: 0.3,
-    repetition_penalty: 1.2,
-    frequency_penalty: 0.5,
+    temperature: 0.4,
+    repetition_penalty: 1.3,
+    frequency_penalty: 0.7,
   });
   return response.response || 'No response generated';
 }
@@ -229,7 +229,9 @@ async function callGroqAI(messages, env) {
       model: 'llama-3.3-70b-versatile',
       messages,
       max_tokens: 512,
-      temperature: 0.1,
+      temperature: 0.4,
+      frequency_penalty: 0.5,
+      presence_penalty: 0.3,
     }),
   });
 
@@ -268,11 +270,17 @@ async function callGeminiAI(messages, env) {
   }
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 512,
+        },
+      }),
     }
   );
 
@@ -398,17 +406,18 @@ ${languageInstructions[language] || languageInstructions.en}
 Context from Flutter documentation:
 ${context}
 
-Instructions:
+CRITICAL Instructions - Follow these strictly:
 1. Answer based ONLY on the provided context above - if the context doesn't contain enough information, say so clearly
-2. Keep your answer SHORT (2-3 paragraphs maximum, 150 words or less)
-3. Be CONCISE and avoid ALL repetition:
-   - Do NOT repeat the same information in different words
-   - Do NOT list the same points multiple times
-   - State each fact ONCE and move on
-4. Use SINGLE line breaks between paragraphs (not double)
+2. Keep your answer SHORT and FOCUSED (2-3 short paragraphs, 100-150 words total)
+3. Write NATURALLY and COHERENTLY:
+   - Use proper sentences with correct grammar
+   - Do NOT generate gibberish, broken text, or random characters
+   - Do NOT repeat the same phrase or sentence multiple times
+   - If you find yourself repeating, STOP immediately
+4. Use markdown for code examples when appropriate
 5. DO NOT include [Source X] citations in your answer
-6. DO NOT make lists unless absolutely necessary
-7. Focus on directly answering the question - no filler content`;
+6. DO NOT make long lists - prefer concise prose
+7. Quality over quantity - a short, clear answer is better than a long, repetitive one`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
