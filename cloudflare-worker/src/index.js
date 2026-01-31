@@ -584,9 +584,46 @@ NO greetings or casual language. Technical content only.`;
     answer = answer.replace(/```\s*\n+```dart\n/g, '\n');
     answer = answer.replace(/```dart\n+```dart\n/g, '```dart\n');
 
-    // 3. 잘못된 Dart 문법 수정 (공백 누락, 오타, 잘못된 메서드명)
+    // 3. 코드 블록 내 심각한 오류 감지
+    const codeBlockMatch = answer.match(/```dart([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      const codeContent = codeBlockMatch[1];
+      const severeErrors = [
+        /class\w{3,}extends/i,  // classMyAppextends (공백 없음)
+        /return\w{3,}\(/i,      // returnMaterialApp( (공백 없음)
+        /final\w{3,}=/i,        // finaltextcontroller= (공백 없음)
+        /@\w+\(\)[^;{]*[@}]/,   // @initiate()'...' (잘못된 어노테이션)
+        /@overridewidget/i,     // @overridewidgetBuild (공백 없음)
+        /import'[^']+'/,        // import'package (공백 없음)
+        /:\s*\/\//,             // 주석이 값 위치에
+        /\.\.\./,               // ... 잘림 표시가 코드 내에
+        /[가-힣]{5,}/,          // 한글이 코드 내에 많이 있음
+      ];
+      const hasSevereError = severeErrors.some(p => p.test(codeContent));
+
+      if (hasSevereError) {
+        console.log('⚠️ Severe code error detected, removing broken code block');
+        // 코드 블록 전 설명만 유지
+        const beforeCode = answer.split('```dart')[0].trim();
+        if (beforeCode.length > 100) {
+          answer = beforeCode + '\n\n코드 예제는 공식 Flutter 문서를 참고해주세요: https://docs.flutter.dev';
+        } else {
+          // 설명도 부족하면 기본 안내
+          answer = `${question}에 대한 정확한 코드 생성에 실패했습니다.\n\n공식 문서를 참고해주세요:\n- Flutter: https://docs.flutter.dev\n- Firebase: https://firebase.flutter.dev`;
+        }
+      }
+    }
+
+    // 4. 잘못된 Dart 문법 수정 (공백 누락, 오타, 잘못된 메서드명)
     answer = answer
-      // 공백 누락 수정
+      // 심각한 공백 누락 수정 (class, return, final, void 등)
+      .replace(/class(\w)/g, 'class $1')
+      .replace(/return(\w)/g, 'return $1')
+      .replace(/final(\w)/g, 'final $1')
+      .replace(/const(\w)/g, 'const $1')
+      .replace(/void(\w)/g, 'void $1')
+
+      // 기존 공백 누락 수정
       .replace(/voidmain\(\)/g, 'void main()')
       .replace(/void main\(\)\{/g, 'void main() {')
       .replace(/runApp\(MyApp\(\)\);}/g, 'runApp(MyApp());\n}')
@@ -611,10 +648,12 @@ NO greetings or casual language. Technical content only.`;
       .replace(/Widgetbuild/g, 'Widget build')
       .replace(/Widget create\(/g, 'Widget build(')
       .replace(/@Override/g, '@override')
-      .replace(/@overridewidgetcreate/gi, '@override\n  Widget build')
+      .replace(/@overridewidget/gi, '@override\n  Widget ')
+      .replace(/@initiate\(\)[^;]*/gi, '')  // 가짜 어노테이션 제거
       .replace(/Buildectx/g, 'BuildContext ctx')
       .replace(/notifyListners/g, 'notifyListeners')
-      .replace(/MaterialApplcation/g, 'MaterialApp')
+      .replace(/MaterialApplcation/gi, 'MaterialApp')
+      .replace(/MaterialAppllication/gi, 'MaterialApp')
       .replace(/Elevatedbutton/gi, 'ElevatedButton')
       .replace(/listview\.builder/gi, 'ListView.builder')
       .replace(/sizedbox/gi, 'SizedBox')
@@ -622,11 +661,10 @@ NO greetings or casual language. Technical content only.`;
 
       // 잘못된 extends 패턴
       .replace(/(\w+)extends(\w+)/g, '$1 extends $2')
-      .replace(/(\w+) extends (\w+)/g, '$1 extends $2')
 
       // 잘못된 import
       .replace(/import'package/g, "import 'package")
-      .replace(/import\s*'package\//g, "import 'package:")  // package/ -> package:
+      .replace(/import\s*'package\//g, "import 'package:")
       .replace(/FirebaseAuthentication\(\)/g, 'FirebaseAuth.instance')
 
       // 가상의 메서드 제거/수정
