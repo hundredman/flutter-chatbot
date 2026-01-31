@@ -373,8 +373,9 @@ async function handleChat(request, env, corsHeaders) {
 
     console.log(`Found ${results.matches.length} similar documents`);
 
-    // 질문 유형 감지 (설명/개념 질문인지)
+    // 질문 유형 감지
     const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|explain|how\s*to\s*use/i.test(question);
+    const isCodeExampleRequest = /코드\s*예제|예제\s*코드|샘플\s*코드|code\s*example|sample\s*code|구현\s*예제/i.test(question);
 
     // 주요 토픽별 공식 문서 링크 (구체적인 패턴이 먼저 와야 함!)
     const docLinks = {
@@ -502,6 +503,44 @@ ${explanation || `${topicName}에 대한 Flutter 공식 문서를 참고해주�
             similarity: match.score || 0,
           })),
           confidence: 0.9,
+          provider: 'direct',
+        },
+        { headers: corsHeaders }
+      );
+    }
+
+    // 코드 예제 요청인데 템플릿이 없는 경우: AI 우회하고 공식 문서 안내
+    // (AI가 이상한 코드를 생성하는 것 방지)
+    if (isCodeExampleRequest && relevantDocLink && !matchedTemplate) {
+      console.log('📖 Code example request without template, returning doc link');
+
+      // 토픽 이름 추출
+      const topicMatch = question.match(/(\w+|[가-힣]+)\s*(코드\s*예제|예제\s*코드|샘플)/i);
+      const topicName = topicMatch ? topicMatch[1] : 'Flutter';
+
+      const directAnswer = `## ${topicName} 코드 예제
+
+${topicName} 관련 코드 예제는 공식 문서에서 확인하실 수 있습니다.
+
+**공식 문서:** ${relevantDocLink}
+
+공식 문서에서 다음 내용을 확인하세요:
+- 설치 및 설정 방법
+- 기본 사용법 코드 예제
+- 고급 기능 및 옵션
+
+직접 복사해서 사용할 수 있는 코드 예제가 포함되어 있습니다.`;
+
+      return Response.json(
+        {
+          success: true,
+          answer: directAnswer,
+          sources: results.matches.slice(0, 3).map((match) => ({
+            title: match.metadata?.title || 'Flutter Documentation',
+            url: match.metadata?.url || '',
+            similarity: match.score || 0,
+          })),
+          confidence: 0.85,
           provider: 'direct',
         },
         { headers: corsHeaders }
