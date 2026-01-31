@@ -62,7 +62,7 @@
   word-wrap: break-word;
   white-space: pre-line;
   transition: all var(--transition-base);
-  overflow-x: auto;
+  overflow-x: visible;
   max-width: 100%;
 }
 
