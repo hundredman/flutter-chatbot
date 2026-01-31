@@ -261,9 +261,9 @@ async function callGeminiAI(messages, env) {
         body: JSON.stringify({
           contents,
           generationConfig: {
-            temperature: 0.4,
-            topP: 0.95,
-            maxOutputTokens: 512,
+            temperature: 0.2,  // 더 보수적으로
+            topP: 0.8,
+            maxOutputTokens: 350,  // 출력 제한
           },
         }),
         signal: controller.signal,
@@ -429,29 +429,55 @@ CRITICAL Instructions - Follow these strictly:
     // 응답 품질 검증 및 정리
     let answer = rawAnswer || '';
 
-    // 1. 이상한 패턴 감지 (gibberish 코드)
+    // 1. 깨진 코드 블록 정리 (``` 없이 시작하는 코드)
+    answer = answer.replace(/^(import |void main|class \w)/gm, '```dart\n$1');
+
+    // 2. 잘못된 Dart 문법 패턴 수정
+    answer = answer
+      .replace(/BuildContextcontext/g, 'BuildContext context')
+      .replace(/BuildContexctx/g, 'BuildContext ctx')
+      .replace(/Build Contex ctx/g, 'BuildContext ctx')
+      .replace(/_MyHomePageStatextends/g, '_MyHomePageState extends')
+      .replace(/StatelessWidget\{/g, 'StatelessWidget {')
+      .replace(/State<MyHome>\{/g, 'State<MyHome> {')
+      .replace(/@overrideWidgetbuild/g, '@override\n  Widget build')
+      .replace(/@Override Void Build/gi, '@override\n  Widget build')
+      .replace(/\)\{/g, ') {')
+      .replace(/appBar:title:/g, 'appBar: AppBar(title: Text(')
+      .replace(/Scaffoldelevatedbutton/g, 'Scaffold(\n  body: ElevatedButton');
+
+    // 3. 이상한 패턴 감지 (gibberish 코드)
     const gibberishPatterns = [
-      /\w{30,}/g,  // 30자 이상 연속 문자 (공백 없음)
-      /[a-z]{2,}[A-Z][a-z]+[A-Z]/g,  // 잘못된 camelCase 반복
-      /@override\s*Widget\s*build\s*\([^)]*\)\s*=>/gi,  // 잘못된 Dart 문법
+      /\w{35,}/g,  // 35자 이상 연속 문자
+      /@end override/gi,
+      /pref\.remove \('/g,  // 잘못된 따옴표
+      /_deletestoredunamemethod/gi,
     ];
 
-    const hasGibberish = gibberishPatterns.some(pattern => {
-      const matches = answer.match(pattern);
-      return matches && matches.length > 3;
-    });
+    const hasGibberish = gibberishPatterns.some(pattern => pattern.test(answer));
 
-    // 2. 너무 긴 응답이나 gibberish 감지시 첫 번째 코드 블록까지만 사용
-    if (hasGibberish || answer.length > 2000) {
-      const codeBlockEnd = answer.indexOf('```', answer.indexOf('```') + 3);
-      if (codeBlockEnd > 0) {
-        answer = answer.substring(0, codeBlockEnd + 3);
-        answer += '\n\n(응답이 잘려서 표시됩니다)';
+    // 4. gibberish 감지시 첫 번째 완전한 코드 블록까지만 사용
+    if (hasGibberish) {
+      const firstCodeStart = answer.indexOf('```');
+      const firstCodeEnd = answer.indexOf('```', firstCodeStart + 3);
+      if (firstCodeStart >= 0 && firstCodeEnd > firstCodeStart) {
+        // 코드 블록 앞의 설명 + 첫 번째 코드 블록만 유지
+        answer = answer.substring(0, firstCodeEnd + 3);
       }
     }
 
-    // 3. 줄바꿈 정리
-    answer = answer.replace(/\n\n+/g, '\n\n').trim();
+    // 5. 너무 긴 응답 자르기
+    if (answer.length > 1500) {
+      const lastCodeEnd = answer.lastIndexOf('```', 1500);
+      if (lastCodeEnd > 500) {
+        answer = answer.substring(0, lastCodeEnd + 3);
+      } else {
+        answer = answer.substring(0, 1500) + '...';
+      }
+    }
+
+    // 6. 줄바꿈 정리
+    answer = answer.replace(/\n{3,}/g, '\n\n').trim();
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
     if (conversationId && env.DB) {
