@@ -215,10 +215,10 @@ async function handleSyncDocs(request, env, corsHeaders) {
 async function callCloudflareAI(messages, env) {
   const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
     messages,
-    max_tokens: 400,
-    temperature: 0.3,  // 더 일관된 응답
-    repetition_penalty: 1.5,  // 반복 강하게 억제
-    frequency_penalty: 0.8,
+    max_tokens: 600,  // 더 충분한 응답
+    temperature: 0.3,
+    repetition_penalty: 1.3,
+    frequency_penalty: 0.5,
   });
   return response.response || 'No response generated';
 }
@@ -393,21 +393,19 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       en: 'Respond in English.',
     };
 
-    const systemPrompt = `You are a Flutter documentation assistant. Give concise, technical answers only.
+    const systemPrompt = `You are a Flutter documentation assistant.
 
 ${languageInstructions[language] || languageInstructions.en}
 
 Context:
 ${context}
 
-STRICT RULES:
-1. Give ONLY technical information - NO casual chat, greetings, or emojis
-2. Maximum 2-3 paragraphs of explanation
-3. If showing code, show exactly ONE complete example (max 15 lines)
-4. Use proper Dart syntax with correct spacing
-5. Do NOT write: "감사합니다", "안녕", "좋은 하루", "도움이 되었으면", or any pleasantries
-6. Do NOT repeat yourself or add filler content
-7. End your answer when the technical explanation is complete`;
+RULES:
+1. Provide COMPLETE answers - if there are multiple steps, explain ALL steps
+2. Include ONE working code example (15-25 lines) with proper Dart syntax
+3. NO greetings, thanks, or casual chat - technical content only
+4. Explain the concept briefly, then show the code
+5. If the question asks "how to", provide step-by-step instructions`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -476,13 +474,13 @@ STRICT RULES:
       }
     }
 
-    // 6. 길이 제한
-    if (answer.length > 1000) {
-      const lastCodeEnd = answer.lastIndexOf('```', 1000);
-      if (lastCodeEnd > 300) {
+    // 6. 길이 제한 (더 충분한 응답 허용)
+    if (answer.length > 1500) {
+      const lastCodeEnd = answer.lastIndexOf('```', 1500);
+      if (lastCodeEnd > 400) {
         answer = answer.substring(0, lastCodeEnd + 3);
       } else {
-        answer = answer.substring(0, 1000);
+        answer = answer.substring(0, 1500);
       }
     }
 
