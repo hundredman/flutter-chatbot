@@ -449,6 +449,50 @@ async function handleChat(request, env, corsHeaders) {
       }
     }
 
+    // 설명 질문일 때: AI 우회하고 직접 응답 생성 (코드 없이 링크만)
+    if (isExplanationQuestion && relevantDocLink) {
+      console.log('📖 Explanation question detected, returning doc link directly');
+
+      // 벡터 검색 결과에서 관련 설명 추출
+      const topMatch = results.matches[0];
+      let explanation = '';
+      if (topMatch?.metadata?.content) {
+        // 코드 블록 제외하고 텍스트만 추출
+        let content = topMatch.metadata.content;
+        content = content.replace(/```[\s\S]*?```/g, '').trim();
+        // 처음 500자만
+        explanation = content.substring(0, 500);
+        if (content.length > 500) explanation += '...';
+      }
+
+      // 토픽 이름 추출
+      const topicMatch = question.match(/(\w+|[가-힣]+)\s*(사용법|사용방법|뭔가요|무엇|설명)/i);
+      const topicName = topicMatch ? topicMatch[1] : 'Flutter';
+
+      const directAnswer = `## ${topicName} 개요
+
+${explanation || `${topicName}에 대한 Flutter 공식 문서를 참고해주세요.`}
+
+**공식 문서:** ${relevantDocLink}
+
+코드 예제가 필요하시면 "${topicName} 코드 예제"라고 질문해주세요.`;
+
+      return Response.json(
+        {
+          success: true,
+          answer: directAnswer,
+          sources: results.matches.slice(0, 3).map((match) => ({
+            title: match.metadata?.title || 'Flutter Documentation',
+            url: match.metadata?.url || '',
+            similarity: match.score || 0,
+          })),
+          confidence: 0.9,
+          provider: 'direct',
+        },
+        { headers: corsHeaders }
+      );
+    }
+
     // 직접 템플릿 반환 (키워드가 정확히 매칭되고 설명 질문이 아닐 때만)
     if (matchedTemplate && !isExplanationQuestion) {
       const templateContent = matchedTemplate.metadata?.content || '';
