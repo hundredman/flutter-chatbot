@@ -184,7 +184,7 @@ const MessageBubble = ({ message, language, onRegenerate }) => {
             }
           </button>
 
-          {!message.error && onRegenerate && (
+          {onRegenerate && (
             <button
               className="regenerate-btn"
               onClick={() => onRegenerate(message.id)}

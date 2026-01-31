@@ -204,7 +204,9 @@ async function callCloudflareAI(messages, env) {
   const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
     messages,
     max_tokens: 512,
-    temperature: 0.1,
+    temperature: 0.3,
+    repetition_penalty: 1.2,
+    frequency_penalty: 0.5,
   });
   return response.response || 'No response generated';
 }
