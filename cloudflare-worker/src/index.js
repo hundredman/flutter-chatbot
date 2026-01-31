@@ -436,8 +436,14 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       // 코드 블록 추출
       const codeMatch = topContent.match(/```dart[\s\S]*?```/);
       if (codeMatch) {
-        const title = bestMatch.metadata?.title || 'Flutter App';
-        const directAnswer = `${title}을 구현하는 방법입니다.\n\n${codeMatch[0]}\n\n위 코드를 복사하여 사용하세요.`;
+        // 제목에서 첫 번째 의미 있는 부분만 추출 (예: "ToDo 앱" from "ToDo 앱 투두앱 할일앱...")
+        const rawTitle = bestMatch.metadata?.title || 'Flutter App';
+        const cleanTitle = rawTitle.split(/\s+/).slice(0, 2).join(' ').replace(/만들기|구현|Flutter/gi, '').trim() || 'Flutter 앱';
+        // 을/를 구분 (받침 있으면 을, 없으면 를)
+        const lastChar = cleanTitle.charCodeAt(cleanTitle.length - 1);
+        const hasJongseong = lastChar >= 0xAC00 && lastChar <= 0xD7A3 && (lastChar - 0xAC00) % 28 !== 0;
+        const particle = hasJongseong ? '을' : '를';
+        const directAnswer = `${cleanTitle}${particle} 구현하는 방법입니다.\n\n${codeMatch[0]}\n\n위 코드를 복사하여 사용하세요.`;
 
         return Response.json(
           {
