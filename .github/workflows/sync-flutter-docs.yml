@@ -1,9 +1,9 @@
 name: Sync Flutter Documentation
 
 on:
-  # 매일 오전 3시 (UTC) - 한국시간 정오 12시
+  # 매일 오전 9시 (UTC) - 한국시간 오후 6시
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 9 * * *'
 
   # 수동 트리거 가능
   workflow_dispatch:
