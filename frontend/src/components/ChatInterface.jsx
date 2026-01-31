@@ -298,7 +298,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        content: `${currentLang.errorMessage}\n\nError: ${error.message}`,
+        content: `${currentLang.errorMessage}\nError: ${error.message}`,
         error: true,
         timestamp: new Date()
       };

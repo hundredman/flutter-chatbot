@@ -411,7 +411,7 @@ Instructions:
     console.log(`📊 Used provider: ${provider}`);
 
     // Clean up double line breaks (reduce spacing)
-    const answer = rawAnswer.replace(/\n\n+/g, '\n');
+    const answer = rawAnswer ? rawAnswer.replace(/\n\n+/g, '\n') : rawAnswer;
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
     if (conversationId && env.DB) {
