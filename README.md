@@ -258,7 +258,7 @@ vercel --prod
 5. "Add secret" 클릭
 
 **자동 동기화:**
-- **주기**: 매일 오전 9시 (UTC) - 한국시간 오후 6시
+- **주기**: 매일 정오 12시 (UTC) - 한국시간 오후 9시
 - **방법**: GitHub Actions (`.github/workflows/sync-flutter-docs.yml`)
 - **무료**: Public 저장소는 GitHub Actions 무료
 - **인증**: FLUTTER_DOCS_TOKEN secret 사용
