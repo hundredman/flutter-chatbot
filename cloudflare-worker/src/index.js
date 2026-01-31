@@ -366,7 +366,7 @@ async function handleChat(request, env, corsHeaders) {
     // 2. 벡터 검색 (Vectorize - 무료)
     console.log('Searching vector database...');
     const results = await env.VECTORIZE.query(queryVector, {
-      topK: 3,  // 토큰 한도 방지를 위해 3개로 제한
+      topK: 5,  // 앱 템플릿 매칭을 위해 5개로 확장
       returnValues: false,
       returnMetadata: 'all',
     });
@@ -385,6 +385,77 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       })
       .join('\n\n');
 
+    // 3.5 키워드 기반 템플릿 매칭 (질문에서 앱 유형 감지)
+    const appKeywordMap = {
+      'todo|투두|할일|할 일': 'ToDo',
+      '계산기|calculator': '계산기',
+      '로그인|login': '로그인',
+      '채팅|chat': '채팅',
+      '날씨|weather': '날씨',
+      '메모|note': '메모장',
+      '쇼핑|shopping|카트|cart': '쇼핑',
+      '프로필|profile': '프로필',
+      '설정|setting': '설정',
+      '갤러리|gallery|이미지': '갤러리',
+      '타이머|timer|스톱워치': '타이머',
+      '검색|search': '검색',
+      '네비게이션|navigation|탭|tab|바텀': '네비게이션',
+      '스플래시|splash': '스플래시',
+      '카운터|counter': '카운터',
+      '좋아요|like|하트': '좋아요',
+    };
+
+    // 질문에서 앱 유형 감지
+    let detectedAppType = null;
+    for (const [pattern, appType] of Object.entries(appKeywordMap)) {
+      if (new RegExp(pattern, 'i').test(question)) {
+        detectedAppType = appType;
+        break;
+      }
+    }
+
+    // 감지된 앱 유형으로 템플릿 찾기
+    let bestMatch = results.matches[0];
+    if (detectedAppType) {
+      const matchingTemplate = results.matches.find(m =>
+        (m.metadata?.title || '').includes(detectedAppType)
+      );
+      if (matchingTemplate) {
+        bestMatch = matchingTemplate;
+        console.log(`🎯 Keyword match: "${detectedAppType}" -> ${matchingTemplate.metadata?.title}`);
+      }
+    }
+
+    const topContent = bestMatch?.metadata?.content || '';
+    const topScore = bestMatch?.score || 0;
+
+    // 템플릿에 dart 코드 블록이 있으면 직접 반환
+    if (topContent.includes('```dart') && topContent.includes('void main()')) {
+      console.log('📦 Direct template match found, returning without AI');
+
+      // 코드 블록 추출
+      const codeMatch = topContent.match(/```dart[\s\S]*?```/);
+      if (codeMatch) {
+        const title = bestMatch.metadata?.title || 'Flutter App';
+        const directAnswer = `${title}을 구현하는 방법입니다.\n\n${codeMatch[0]}\n\n위 코드를 복사하여 사용하세요.`;
+
+        return Response.json(
+          {
+            success: true,
+            answer: directAnswer,
+            sources: results.matches.map((match) => ({
+              title: match.metadata?.title || 'Flutter Documentation',
+              url: match.metadata?.url || '',
+              similarity: match.score || 0,
+            })),
+            confidence: topScore,
+            provider: 'template',
+          },
+          { headers: corsHeaders }
+        );
+      }
+    }
+
     // 4. LLM 답변 생성 (Workers AI - 무료)
     console.log('Generating answer with LLM...');
 
@@ -396,8 +467,8 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
     // 복잡한 앱 요청 감지
     const isComplexAppRequest = /앱\s*(만들기|구현|개발)|calculator|todo\s*list|login|계산기|투두|로그인|채팅|날씨|메모|쇼핑|프로필|설정|갤러리|타이머|검색|네비게이션|스플래시/i.test(question);
 
-    // 템플릿이 있는지 확인 (Reference에 완전한 코드가 포함되어 있는지)
-    const hasTemplate = context.includes('완전한 코드:') || context.includes('Complete code:');
+    // 템플릿이 있는지 확인 (Reference에 dart 코드 블록이 있는지)
+    const hasTemplate = context.includes('```dart') && context.includes('void main()');
 
     const systemPrompt = `You are a senior Flutter/Dart developer. Write CORRECT, COMPILABLE code only.
 
@@ -407,16 +478,17 @@ Reference:
 ${context}
 
 ${isComplexAppRequest ? (hasTemplate ?
-`APP TEMPLATE FOUND - Use the code from Reference section as your answer.
-Copy the complete code example exactly as provided in the Reference.
+`CRITICAL: TEMPLATE CODE FOUND IN REFERENCE SECTION!
+You MUST copy the code block from Reference EXACTLY as written.
+DO NOT modify, summarize, or rewrite the code.
+DO NOT add spaces or change formatting.
+Just extract the \`\`\`dart code block from Reference and present it.
 ` :
-`COMPLEX APP REQUEST (No template available):
-1. Provide ONLY the basic app structure with Scaffold
-2. Keep it simple - just show the main UI skeleton
-3. At the end, ALWAYS suggest these follow-up questions:
-   - "더 자세한 기능 구현이 필요하시면 질문해주세요"
+`NO TEMPLATE AVAILABLE - Keep response simple:
+1. Provide basic app structure with Scaffold only
+2. Suggest follow-up questions:
+   - "더 자세한 기능이 필요하시면 질문해주세요"
    - "데이터 저장 방법이 궁금하시면 질문해주세요"
-   - "상태 관리 추가 방법이 궁금하시면 질문해주세요"
 `) : ''}
 CRITICAL CODE RULES:
 1. ALWAYS add spaces between keywords: "void main()" "extends StatelessWidget"
