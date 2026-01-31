@@ -200,8 +200,6 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
               user={user}
               onSignOut={onSignOut}
               isCompact={true} // Add compact mode for sidebar layout
-              onTestConversations={handleTestConversations}
-              onTestRetrieval={handleTestRetrieval}
               onDeleteAllConversations={handleDeleteAllConversations}
               language={language}
               onLanguageChange={onLanguageChange}
