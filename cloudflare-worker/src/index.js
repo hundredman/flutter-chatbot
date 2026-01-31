@@ -393,30 +393,21 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       en: 'Respond in English.',
     };
 
-    const systemPrompt = `You are a helpful Flutter development assistant. Answer the user's question based on the provided Flutter documentation context.
+    const systemPrompt = `You are a Flutter documentation assistant. Give concise, technical answers only.
 
 ${languageInstructions[language] || languageInstructions.en}
 
-Context from Flutter documentation:
+Context:
 ${context}
 
-CRITICAL Instructions - Follow these strictly:
-1. Answer based ONLY on the provided context above - if the context doesn't contain enough information, say so clearly
-2. Keep your answer SHORT and FOCUSED (2-3 short paragraphs, 100-150 words total)
-3. Write NATURALLY and COHERENTLY:
-   - Use proper sentences with correct grammar
-   - Do NOT generate gibberish, broken text, or random characters
-   - Do NOT repeat the same phrase or sentence multiple times
-   - If you find yourself repeating, STOP immediately
-4. For code examples:
-   - Only show ONE simple, complete, working example
-   - Keep code under 20 lines
-   - Use proper Dart/Flutter syntax with correct formatting
-   - Do NOT generate fake, broken, or incomplete code
-5. DO NOT include [Source X] citations in your answer
-6. DO NOT make long lists - prefer concise prose
-7. Quality over quantity - a short, clear answer is better than a long, repetitive one
-8. STOP generating when you've made your point - do not continue with more examples`;
+STRICT RULES:
+1. Give ONLY technical information - NO casual chat, greetings, or emojis
+2. Maximum 2-3 paragraphs of explanation
+3. If showing code, show exactly ONE complete example (max 15 lines)
+4. Use proper Dart syntax with correct spacing
+5. Do NOT write: "감사합니다", "안녕", "좋은 하루", "도움이 되었으면", or any pleasantries
+6. Do NOT repeat yourself or add filler content
+7. End your answer when the technical explanation is complete`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -430,60 +421,72 @@ CRITICAL Instructions - Follow these strictly:
     // 응답 품질 검증 및 정리
     let answer = rawAnswer || '';
 
-    // 1. 깨진 코드 블록 정리 (``` 없이 시작하는 코드)
-    answer = answer.replace(/^(import |void main|class \w)/gm, '```dart\n$1');
-
-    // 2. 잘못된 Dart 문법 패턴 수정
-    answer = answer
-      .replace(/BuildContextcontext/g, 'BuildContext context')
-      .replace(/BuildContexctx/g, 'BuildContext ctx')
-      .replace(/Build Contex ctx/g, 'BuildContext ctx')
-      .replace(/_MyHomePageStatextends/g, '_MyHomePageState extends')
-      .replace(/StatelessWidget\{/g, 'StatelessWidget {')
-      .replace(/State<MyHome>\{/g, 'State<MyHome> {')
-      .replace(/@overrideWidgetbuild/g, '@override\n  Widget build')
-      .replace(/@Override Void Build/gi, '@override\n  Widget build')
-      .replace(/Widget create\(/g, 'Widget build(')  // create → build
-      .replace(/\)\{/g, ') {')
-      .replace(/appBar:title:/g, 'appBar: AppBar(title: Text(')
-      .replace(/Scaffoldelevatedbutton/g, 'Scaffold(\n  body: ElevatedButton')
-      .replace(/appBar\s*:\s*AppBar\s*\(\s*title\s*:\s*'([^']+)'\s*\)/g, "appBar: AppBar(title: Text('$1'))");
-
-    // 3. 연속된 코드 블록 합치기 (```dart 가 여러 번 나오는 경우)
-    // ```dart ... ``` ```dart ... ``` → ```dart ... ... ```
-    answer = answer.replace(/```\s*\n*```dart\n/g, '\n');
-
-    // 4. 이상한 패턴 감지 (gibberish 코드)
-    const gibberishPatterns = [
-      /\w{35,}/g,  // 35자 이상 연속 문자
-      /@end override/gi,
-      /pref\.remove \('/g,  // 잘못된 따옴표
-      /_deletestoredunamemethod/gi,
-      /Day-by-day|Day-to-Day/gi,  // 이상한 표현
+    // 1. 불필요한 일상 대화 제거
+    const chatPatterns = [
+      /감사합니다[!.~]*\s*/gi,
+      /안녕[하세요~!.]*\s*/gi,
+      /좋은 하루[되세요!.~]*\s*/gi,
+      /도움이 되[었으면셨으면][!.~]*\s*/gi,
+      /질문 있으시면[^.]*[.!]/gi,
+      /언제든지 물어보세요[!.~]*/gi,
+      /다음에[는도]?\s*[다른 ]*질문[이나 ]?[있으시면도움이 필요하시면][^.]*[.!]*/gi,
+      /잘 부탁[드립니다해요!.~]*/gi,
+      /함께하[셨습니다였습니다][^.]*[.!]*/gi,
+      /아무거나[^.]*[.!]*/gi,
+      /후회없이[^.]*[.!]*/gi,
+      /\.trim\(\);[^`]*/g,  // 코드 잔해
     ];
+    chatPatterns.forEach(pattern => {
+      answer = answer.replace(pattern, '');
+    });
 
+    // 2. 연속된 코드 블록 합치기
+    answer = answer.replace(/```\s*\n+```dart\n/g, '\n');
+    answer = answer.replace(/```dart\n+```dart\n/g, '```dart\n');
+
+    // 3. 잘못된 Dart 문법 수정
+    answer = answer
+      .replace(/voidmain\(\)/g, 'void main()')
+      .replace(/runApp\(MyApp\(\)\);}/g, 'runApp(MyApp());\n}')
+      .replace(/BuildContextcontext/g, 'BuildContext context')
+      .replace(/Widget create\(/g, 'Widget build(')
+      .replace(/backgroundColorColors\./g, 'backgroundColor: Colors.')
+      .replace(/StatelessWidet/g, 'StatelessWidget')
+      .replace(/Buildectx/g, 'BuildContext ctx')
+      .replace(/MyAppextendsStatelessWidet/g, 'MyApp extends StatelessWidget')
+      .replace(/@overridewidgetcreate/gi, '@override\n  Widget build')
+      .replace(/returnMaterialApplcation/g, 'return MaterialApp')
+      .replace(/homepage\(\)/g, 'HomePage()')
+      .replace(/import'package/g, "import 'package");
+
+    // 4. 이상한 패턴 감지
+    const gibberishPatterns = [
+      /\w{40,}/g,  // 40자 이상 연속 문자
+      /안녕~~~?/g,
+      /\^\^/g,
+      /~{2,}/g,
+    ];
     const hasGibberish = gibberishPatterns.some(pattern => pattern.test(answer));
 
-    // 5. gibberish 감지시 첫 번째 완전한 코드 블록까지만 사용
+    // 5. gibberish 감지시 첫 번째 코드 블록까지만
     if (hasGibberish) {
-      const firstCodeStart = answer.indexOf('```');
-      const firstCodeEnd = answer.indexOf('```', firstCodeStart + 3);
-      if (firstCodeStart >= 0 && firstCodeEnd > firstCodeStart) {
+      const firstCodeEnd = answer.indexOf('```', answer.indexOf('```') + 3);
+      if (firstCodeEnd > 0) {
         answer = answer.substring(0, firstCodeEnd + 3);
       }
     }
 
-    // 6. 너무 긴 응답 자르기
-    if (answer.length > 1200) {
-      const lastCodeEnd = answer.lastIndexOf('```', 1200);
-      if (lastCodeEnd > 400) {
+    // 6. 길이 제한
+    if (answer.length > 1000) {
+      const lastCodeEnd = answer.lastIndexOf('```', 1000);
+      if (lastCodeEnd > 300) {
         answer = answer.substring(0, lastCodeEnd + 3);
       } else {
-        answer = answer.substring(0, 1200) + '...';
+        answer = answer.substring(0, 1000);
       }
     }
 
-    // 7. 줄바꿈 정리
+    // 7. 정리
     answer = answer.replace(/\n{3,}/g, '\n\n').trim();
 
     // 5. 대화 기록 저장 (D1 - 무료, 선택사항)
