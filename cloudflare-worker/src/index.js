@@ -385,7 +385,10 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       })
       .join('\n\n');
 
-    // 3.5 키워드 기반 템플릿 매칭 (질문에서 앱 유형 감지)
+    // 3.5 앱 만들기 요청인지 먼저 확인
+    const isAppCreationRequest = /앱\s*(만들|구현|개발|만드|코드)|앱을?\s*(만들|구현|개발)|만들기|만들어|구현해|개발해/i.test(question);
+
+    // 키워드 기반 템플릿 매칭 (앱 만들기 요청일 때만)
     const appKeywordMap = {
       'todo|투두|할일|할 일': 'ToDo',
       '계산기|calculator': '계산기',
@@ -399,18 +402,20 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       '갤러리|gallery|이미지': '갤러리',
       '타이머|timer|스톱워치': '타이머',
       '검색|search': '검색',
-      '네비게이션|navigation|탭|tab|바텀': '네비게이션',
+      '바텀\s*네비게이션|bottom\s*nav|탭\s*바': '네비게이션',
       '스플래시|splash': '스플래시',
       '카운터|counter': '카운터',
       '좋아요|like|하트': '좋아요',
     };
 
-    // 질문에서 앱 유형 감지
+    // 질문에서 앱 유형 감지 (앱 만들기 요청일 때만)
     let detectedAppType = null;
-    for (const [pattern, appType] of Object.entries(appKeywordMap)) {
-      if (new RegExp(pattern, 'i').test(question)) {
-        detectedAppType = appType;
-        break;
+    if (isAppCreationRequest) {
+      for (const [pattern, appType] of Object.entries(appKeywordMap)) {
+        if (new RegExp(pattern, 'i').test(question)) {
+          detectedAppType = appType;
+          break;
+        }
       }
     }
 
@@ -429,8 +434,8 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
     const topContent = bestMatch?.metadata?.content || '';
     const topScore = bestMatch?.score || 0;
 
-    // 템플릿에 dart 코드 블록이 있으면 직접 반환
-    if (topContent.includes('```dart') && topContent.includes('void main()')) {
+    // 템플릿에 dart 코드 블록이 있고, 앱 만들기 요청일 때만 직접 반환
+    if (isAppCreationRequest && topContent.includes('```dart') && topContent.includes('void main()')) {
       console.log('📦 Direct template match found, returning without AI');
 
       // 코드 블록 추출
