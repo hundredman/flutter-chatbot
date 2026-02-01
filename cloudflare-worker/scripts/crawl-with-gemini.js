@@ -195,8 +195,8 @@ async function syncWithGeminiEmbeddings(documents) {
         },
       });
 
-      // Gemini rate limit: 1500 req/분 = 25 req/초
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Gemini rate limit: 무료 계정 분당 60 요청 - 1.5초 대기
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     // Worker에 벡터 직접 전송 (임베딩 생성 없이)

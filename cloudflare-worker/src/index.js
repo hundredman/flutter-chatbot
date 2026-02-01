@@ -690,7 +690,8 @@ async function handleChat(request, env, corsHeaders) {
         url: 'https://docs.flutter.dev/ui/widgets/material#buttons',
         desc: 'ElevatedButton, TextButton, OutlinedButton, IconButton 등이 있습니다. onPressed 콜백으로 탭 이벤트를 처리합니다.',
       },
-      'text|텍스트|글자': {
+      // text 패턴 - BuildContext 등 합성어 제외 (단어 경계 사용)
+      '^text$|\\btext\\s*위젯|텍스트\\s*위젯|텍스트\\s*표시|글자\\s*표시': {
         url: 'https://api.flutter.dev/flutter/widgets/Text-class.html',
         desc: 'Text 위젯으로 텍스트를 표시합니다. TextStyle로 폰트, 크기, 색상을 지정하고, RichText로 부분 스타일링이 가능합니다.',
       },
@@ -844,13 +845,27 @@ async function handleChat(request, env, corsHeaders) {
         url: 'https://docs.flutter.dev/get-started/install',
         desc: 'Flutter SDK 설치 후 flutter doctor로 환경을 확인합니다. Android Studio나 VS Code에서 Flutter 확장을 설치합니다.',
       },
-      'widget|위젯': {
-        url: 'https://docs.flutter.dev/ui/widgets-intro',
-        desc: 'Flutter UI는 위젯으로 구성됩니다. 모든 것이 위젯이며, 작은 위젯을 조합하여 복잡한 UI를 만듭니다.',
+      // StatefulWidget - 구체적인 패턴 먼저
+      'statefulwidget|stateful\\s*widget|스테이트풀': {
+        url: 'https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html',
+        what: 'StatefulWidget은 변경 가능한 상태(State)를 가진 위젯입니다. State 객체가 위젯과 분리되어 있어 위젯이 rebuild되어도 상태가 유지됩니다. 사용자 입력, 애니메이션, 데이터 변경 등 동적 UI에 사용합니다.',
+        how: '1) StatefulWidget 클래스와 State<T> 클래스 쌍으로 구성 2) createState()에서 State 객체 반환 3) initState()에서 초기화 4) setState()로 상태 변경 및 rebuild 트리거 5) dispose()에서 리소스 정리',
       },
-      'stateless|stateful|상태': {
+      'statelesswidget|stateless\\s*widget|스테이트리스': {
+        url: 'https://api.flutter.dev/flutter/widgets/StatelessWidget-class.html',
+        what: 'StatelessWidget은 내부 상태가 없는 불변 위젯입니다. 생성자에서 받은 값만 사용하며, 부모가 rebuild하면 새로 생성됩니다. 정적 UI, 텍스트 표시, 아이콘 등 변하지 않는 요소에 사용합니다.',
+        how: '1) StatelessWidget 상속 2) build() 메서드만 구현 3) 모든 필드는 final 선언 4) const 생성자 사용 권장 5) 상태 변경 필요시 StatefulWidget으로 전환',
+      },
+      'stateful.*stateless|stateless.*stateful|차이점|차이가|비교': {
         url: 'https://docs.flutter.dev/ui/interactivity',
-        desc: 'StatelessWidget은 불변, StatefulWidget은 상태 변경이 가능합니다. setState()로 상태를 변경하면 UI가 다시 빌드됩니다.',
+        what: 'StatelessWidget과 StatefulWidget의 핵심 차이는 상태 관리입니다. StatelessWidget은 불변이고 props만 받아 표시합니다. StatefulWidget은 State 객체를 가지며 setState()로 UI를 동적으로 업데이트할 수 있습니다.',
+        how: '선택 기준: 1) UI가 변하지 않음 → StatelessWidget 2) 사용자 입력으로 UI 변경 → StatefulWidget 3) 애니메이션 필요 → StatefulWidget 4) 네트워크 데이터 표시 → StatefulWidget + FutureBuilder',
+      },
+      // widget 패턴 - 다른 Widget 합성어(InheritedWidget 등)에 매칭되지 않도록 단어 경계 사용
+      '^widget$|^위젯$|\\bwidget\\b이|위젯이\\s*뭐|what\\s*is\\s*widget': {
+        url: 'https://docs.flutter.dev/ui/widgets-intro',
+        what: 'Widget은 Flutter UI의 기본 구성 요소입니다. 모든 것이 위젯이며(텍스트, 버튼, 레이아웃, 앱 전체), 작은 위젯을 조합해 복잡한 UI를 선언적으로 구성합니다. 위젯은 불변이고 UI 설명일 뿐, 실제 렌더링은 Element와 RenderObject가 담당합니다.',
+        how: '1) 기존 위젯 조합으로 커스텀 위젯 생성 2) StatelessWidget 또는 StatefulWidget 상속 3) build() 메서드에서 위젯 트리 반환 4) const 위젯으로 성능 최적화',
       },
       'lifecycle|생명주기|라이프사이클': {
         url: 'https://api.flutter.dev/flutter/widgets/State-class.html',
@@ -1099,8 +1114,8 @@ ${relevantDocDesc || `${topicName} 관련 코드 예제입니다.`}
       }
     }
 
-    // 코드 생성이 필요한 요청인지 확인
-    const isCodeRequest = /만들어|구현|개발|코드|예제|sample|example|create|build/i.test(question);
+    // 코드 생성이 필요한 요청인지 확인 (BuildContext 같은 합성어 제외를 위해 단어 경계 사용)
+    const isCodeRequest = /만들어|구현해|개발해|코드\s*(작성|보여|줘)|예제\s*(보여|줘)|sample|example|create\s+a|build\s+a/i.test(question);
 
     // 코드 요청인데 템플릿이 없고 docLink도 없으면 -> 기본 Flutter 문서 안내
     if (isCodeRequest && !matchedTemplate && !relevantDocLink) {
@@ -1187,28 +1202,34 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       en: 'Respond in English.',
     };
 
-    // 모든 AI 응답에서 코드 생성 금지 - 개념 설명만
-    const systemPrompt = `You are a Flutter documentation assistant. You explain concepts clearly but DO NOT write code.
+    // LLM이 자체 Flutter 지식 + 검색 결과를 활용해 정확히 답변
+    const systemPrompt = `You are a Flutter/Dart expert. Use your knowledge of Flutter framework to answer accurately.
 
 ${languageInstructions[language] || languageInstructions.en}
 
-Reference:
+BACKGROUND REFERENCE (may or may not be relevant):
 ${context}
 
-CRITICAL RULES:
-1. DO NOT write any code blocks (\`\`\`dart or \`\`\`)
-2. DO NOT generate Flutter/Dart code
-3. DO NOT write pubspec.yaml content
-4. ONLY explain concepts in plain text
-5. Keep responses concise (3-5 sentences max)
-6. End with relevant documentation link if available
+CRITICAL INSTRUCTIONS:
+1. Answer the EXACT question asked - if user asks "StatefulWidget이 뭔가요?", explain StatefulWidget specifically
+2. Use your Flutter/Dart knowledge - do NOT rely solely on the reference above
+3. Be technically accurate with proper terms (Widget, State, BuildContext, Key, etc.)
+4. DO NOT write any code blocks (\`\`\`dart) - explain concepts only
+5. For comparison questions (차이점/비교), clearly contrast both items
 
 RESPONSE FORMAT:
-1. Brief explanation of the concept (2-3 sentences)
-2. Key points or steps (bullet points)
-3. Documentation link: ${relevantDocLink || 'https://docs.flutter.dev'}
+## [Topic Name in Korean if Korean question]
 
-NO greetings, NO casual language, NO exclamation marks. Technical content only.`;
+[Precise technical explanation - 3-4 sentences covering definition, purpose, and key characteristics]
+
+**핵심 포인트:**
+• [Key point 1 - specific technical detail]
+• [Key point 2 - when/why to use]
+• [Key point 3 - related concepts or tips]
+
+**공식 문서:** ${relevantDocLink || 'https://docs.flutter.dev'}
+
+Technical accuracy over brevity. No greetings or filler.`;
 
     const messages = [
       { role: 'system', content: systemPrompt },

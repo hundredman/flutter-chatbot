@@ -145,11 +145,11 @@ async function fetchAllDocuments(urls) {
  * Cloudflare Worker API를 통해 문서 삽입
  */
 async function syncToVectorize(documents) {
-  const batchSize = 2; // 한 번에 2개씩 삽입 (안정성 우선)
+  const batchSize = 1; // 한 번에 1개씩 삽입 (최대 안정성)
 
   console.log(`📤 Syncing ${documents.length} documents to Vectorize...`);
-  console.log(`   Batch size: ${batchSize} (slow but reliable)`);
-  console.log(`   Estimated time: ~${Math.ceil(documents.length / batchSize * 8 / 60)} minutes\n`);
+  console.log(`   Batch size: ${batchSize} (maximum stability)`);
+  console.log(`   Estimated time: ~${Math.ceil(documents.length * 10 / 60)} minutes\n`);
 
   let successCount = 0;
   let failCount = 0;
@@ -172,8 +172,8 @@ async function syncToVectorize(documents) {
       console.log(`   ✅ ${response.data.message}`);
       successCount += batch.length;
 
-      // Rate limiting: 배치 사이에 6초 대기
-      await new Promise(resolve => setTimeout(resolve, 6000));
+      // Rate limiting: 배치 사이에 8초 대기 (Cloudflare AI rate limit 대응)
+      await new Promise(resolve => setTimeout(resolve, 8000));
     } catch (error) {
       console.error(`   ❌ Failed batch ${batchNum}:`, error.message);
       if (error.response) {
