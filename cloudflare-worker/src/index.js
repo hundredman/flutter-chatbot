@@ -379,7 +379,14 @@ async function handleChat(request, env, corsHeaders) {
 
     // 맥락 없는 질문 감지 (이전 대화 참조)
     const isContextlessQuestion = /^(다음|이전|위|아래|그|이|저)\s*(단계|것|거|내용|코드)?\s*(추천|알려|보여|해줘|줘|뭐야|뭔가요)?[?]?$/i.test(question.trim()) ||
-                                   /^(추천|다음)\s*(해줘|해주세요|부탁)?[?]?$/i.test(question.trim());
+                                   /^(추천|다음)\s*(해줘|해주세요|부탁)?[?]?$/i.test(question.trim()) ||
+                                   /^.{2,10}\s*(후에는|다음에는|하고\s*나서는?|끝나면|완료\s*후)[?]?$/i.test(question.trim()) ||
+                                   /^(그러면|그럼|그래서|그\s*다음|그\s*후)[?]?$/i.test(question.trim()) ||
+                                   // 영어 맥락 없는 질문
+                                   /^(what'?s?\s*)?next[?]?$/i.test(question.trim()) ||
+                                   /^(and\s*)?(then|now)\s*(what)?[?]?$/i.test(question.trim()) ||
+                                   /^what\s*(should\s*i\s*do\s*)?(after\s*that|now)[?]?$/i.test(question.trim()) ||
+                                   /^(continue|go\s*on|proceed)[?]?$/i.test(question.trim());
 
     // 주요 토픽별 공식 문서 링크 (구체적인 패턴이 먼저 와야 함!)
     const docLinks = {
@@ -533,7 +540,19 @@ async function handleChat(request, env, corsHeaders) {
     // 맥락 없는 질문 처리 (이전 대화 참조하는 질문)
     if (isContextlessQuestion) {
       console.log('📖 Contextless question detected, returning guidance');
-      const directAnswer = `죄송합니다. 이전 대화 내용을 기억하지 못합니다.
+
+      // 영어/한국어 응답 구분
+      const isEnglishQuestion = /^[a-zA-Z\s?'!.,]+$/.test(question.trim());
+      const directAnswer = isEnglishQuestion
+        ? `I don't have context from previous conversations.
+
+Please ask a specific question:
+- **Build an app**: "Create a ToDo app", "Make a calculator app"
+- **Concept questions**: "How to use Provider", "What is Navigator"
+- **Code requests**: "Login screen code", "ListView example"
+
+What Flutter topic would you like to know about?`
+        : `죄송합니다. 이전 대화 내용을 기억하지 못합니다.
 
 구체적으로 질문해주시면 도움드릴 수 있습니다:
 - **앱 만들기**: "ToDo 앱 만들어줘", "계산기 앱 만들어줘"
@@ -571,10 +590,23 @@ async function handleChat(request, env, corsHeaders) {
       }
 
       // 토픽 이름 추출
-      const topicMatch = question.match(/(\w+|[가-힣]+)\s*(사용법|사용방법|뭔가요|무엇|설명)/i);
+      const topicMatch = question.match(/(\w+|[가-힣]+)\s*(사용법|사용방법|뭔가요|무엇|설명|what|how|explain)/i);
       const topicName = topicMatch ? topicMatch[1] : 'Flutter';
 
-      const directAnswer = `## ${topicName}
+      // 영어/한국어 응답 구분
+      const isEnglishQuestion = /^[a-zA-Z\s?'!.,]+$/.test(question.trim());
+      const directAnswer = isEnglishQuestion
+        ? `## ${topicName}
+
+**Official Documentation:** ${relevantDocLink}
+
+Check the official docs for:
+- Installation and setup guide
+- Basic usage and code examples
+- Advanced features and options
+
+Copy-paste ready code examples are included.`
+        : `## ${topicName}
 
 **공식 문서:** ${relevantDocLink}
 
@@ -607,10 +639,25 @@ async function handleChat(request, env, corsHeaders) {
       console.log('📖 Code example request without template, returning doc link');
 
       // 토픽 이름 추출
-      const topicMatch = question.match(/(\w+|[가-힣]+)\s*(코드\s*예제|예제\s*코드|샘플)/i);
+      const topicMatch = question.match(/(\w+|[가-힣]+)\s*(코드\s*예제|예제\s*코드|샘플|code\s*example|sample)/i);
       const topicName = topicMatch ? topicMatch[1] : 'Flutter';
 
-      const directAnswer = `## ${topicName} 코드 예제
+      // 영어/한국어 응답 구분
+      const isEnglishQuestion = /^[a-zA-Z\s?'!.,]+$/.test(question.trim());
+      const directAnswer = isEnglishQuestion
+        ? `## ${topicName} Code Examples
+
+Code examples for ${topicName} are available in the official documentation.
+
+**Official Documentation:** ${relevantDocLink}
+
+Check the official docs for:
+- Installation and setup guide
+- Basic usage code examples
+- Advanced features and options
+
+Copy-paste ready code examples are included.`
+        : `## ${topicName} 코드 예제
 
 ${topicName} 관련 코드 예제는 공식 문서에서 확인하실 수 있습니다.
 
@@ -679,7 +726,22 @@ ${topicName} 관련 코드 예제는 공식 문서에서 확인하실 수 있습
       const relatedDoc = results.matches.find(m => m.metadata?.url);
       const docUrl = relatedDoc?.metadata?.url || 'https://docs.flutter.dev';
 
-      const directAnswer = `## Flutter 개발 안내
+      // 영어/한국어 응답 구분
+      const isEnglishQuestion = /^[a-zA-Z\s?'!.,]+$/.test(question.trim());
+      const directAnswer = isEnglishQuestion
+        ? `## Flutter Development Guide
+
+No code template is available for your request.
+
+**Check official documentation:** ${docUrl}
+
+### Suggested questions:
+- **App templates**: "Create a ToDo app", "Calculator app", "Login screen"
+- **Widget usage**: "How to use ListView", "What is GridView"
+- **State management**: "How to use Provider", "What is Riverpod"
+
+Please ask about a specific topic for a more accurate response.`
+        : `## Flutter 개발 안내
 
 요청하신 내용에 대한 코드 템플릿이 준비되어 있지 않습니다.
 
@@ -795,6 +857,7 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       /문제나\s*궁금[증]?\s*있으실[경우에][^.]*[.!]*/gi,
       /부탁드립니다[!.~]*/gi,
       /따라서\s*이러한\s*이유[들]?때문에[^.]*[.!]*/gi,
+      /https?:\/\/[^\s]*[%\u0000-\u001f\u007f-\u009f\uD800-\uDFFF][^\s]*/g,  // 깨진 URL 제거
       /많이\s*이용중이다[!.~]*/gi,
     ];
     chatPatterns.forEach(pattern => {
