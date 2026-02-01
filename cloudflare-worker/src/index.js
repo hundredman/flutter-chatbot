@@ -860,6 +860,8 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       /따라서\s*이러한\s*이유[들]?때문에[^.]*[.!]*/gi,
       /https?:\/\/[^\s]*[%\u0000-\u001f\u007f-\u009f\uD800-\uDFFF][^\s]*/g,  // 깨진 URL 제거
       /많이\s*이용중이다[!.~]*/gi,
+      /https?:\/\/[^\s]*#[^\s]*/g,  // 앵커(#) 포함 URL 제거 (AI가 임의로 생성한 앵커)
+      /권환|권限/g,  // AI가 생성하는 이상한 한자 혼합
     ];
     chatPatterns.forEach(pattern => {
       answer = answer.replace(pattern, '');
