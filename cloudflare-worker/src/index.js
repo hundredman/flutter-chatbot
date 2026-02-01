@@ -381,6 +381,7 @@ async function handleChat(request, env, corsHeaders) {
     const isContextlessQuestion = /^(다음|이전|위|아래|그|이|저)\s*(단계|것|거|내용|코드)?\s*(추천|알려|보여|해줘|줘|뭐야|뭔가요)?[?]?$/i.test(question.trim()) ||
                                    /^(추천|다음)\s*(해줘|해주세요|부탁)?[?]?$/i.test(question.trim()) ||
                                    /^.{2,10}\s*(후에는|다음에는|하고\s*나서는?|끝나면|완료\s*후)[?]?$/i.test(question.trim()) ||
+                                   /^.{2,10}\s*후에\s*(뭐|무엇|어떻게)[?해]?[?]?$/i.test(question.trim()) ||  // "인증 후에 뭐해?"
                                    /^(그러면|그럼|그래서|그\s*다음|그\s*후)[?]?$/i.test(question.trim()) ||
                                    // 영어 맥락 없는 질문
                                    /^(what'?s?\s*)?next[?]?$/i.test(question.trim()) ||
