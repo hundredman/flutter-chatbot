@@ -751,7 +751,8 @@ async function handleChat(request, env, corsHeaders) {
         if (isDefinitionQuestion && docInfo.what) {
           relevantDocDesc = docInfo.what;
         } else if (isHowToQuestion && docInfo.how) {
-          relevantDocDesc = docInfo.how;
+          // how 응답: "1) ... 2) ..." 형식을 줄바꿈 리스트로 변환
+          relevantDocDesc = docInfo.how.replace(/\s*(\d+)\)\s*/g, '\n$1. ').trim();
         } else {
           // 기본값: what이 있으면 what, 없으면 desc (하위 호환)
           relevantDocDesc = docInfo.what || docInfo.desc || docInfo.how;
