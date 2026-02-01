@@ -389,112 +389,355 @@ async function handleChat(request, env, corsHeaders) {
                                    /^what\s*(should\s*i\s*do\s*)?(after\s*that|now)[?]?$/i.test(question.trim()) ||
                                    /^(continue|go\s*on|proceed)[?]?$/i.test(question.trim());
 
-    // 주요 토픽별 공식 문서 링크 (구체적인 패턴이 먼저 와야 함!)
+    // 주요 토픽별 공식 문서 링크 + 설명 (구체적인 패턴이 먼저 와야 함!)
+    // 형식: { url, desc } - desc는 간단한 설명
     const docLinks = {
       // Firebase 관련 - 구체적인 것 먼저
-      'firebaseauth|firebase\\s*auth|파이어베이스\\s*인증': 'https://firebase.flutter.dev/docs/auth/overview',
-      'firestore|파이어스토어|파이어\\s*스토어': 'https://firebase.flutter.dev/docs/firestore/overview',
-      'firebase\\s*storage|파이어베이스\\s*스토리지': 'https://firebase.flutter.dev/docs/storage/overview',
-      'firebase\\s*messaging|fcm|푸시\\s*알림': 'https://firebase.flutter.dev/docs/messaging/overview',
-      'crashlytics|크래시리틱스': 'https://firebase.flutter.dev/docs/crashlytics/overview',
-      'analytics|애널리틱스|분석': 'https://firebase.flutter.dev/docs/analytics/overview',
-      'firebase|파이어베이스': 'https://firebase.flutter.dev/docs/overview',
+      'firebaseauth|firebase\\s*auth|파이어베이스\\s*인증': {
+        url: 'https://firebase.flutter.dev/docs/auth/overview',
+        desc: 'Firebase Authentication은 이메일/비밀번호, Google, Facebook, Apple 등 다양한 로그인 방식을 지원합니다. 사용자 세션 관리, 토큰 발급, 비밀번호 재설정 등의 기능을 제공합니다.',
+      },
+      'firestore|파이어스토어|파이어\\s*스토어': {
+        url: 'https://firebase.flutter.dev/docs/firestore/overview',
+        desc: 'Cloud Firestore는 실시간 NoSQL 데이터베이스입니다. 문서-컬렉션 구조로 데이터를 저장하고, 실시간 동기화와 오프라인 지원을 제공합니다.',
+      },
+      'firebase\\s*storage|파이어베이스\\s*스토리지': {
+        url: 'https://firebase.flutter.dev/docs/storage/overview',
+        desc: 'Firebase Storage는 이미지, 동영상, 파일 등을 클라우드에 저장합니다. 업로드/다운로드 진행률 추적과 보안 규칙 설정이 가능합니다.',
+      },
+      'firebase\\s*messaging|fcm|푸시\\s*알림': {
+        url: 'https://firebase.flutter.dev/docs/messaging/overview',
+        desc: 'Firebase Cloud Messaging(FCM)으로 푸시 알림을 전송합니다. 백그라운드/포그라운드 메시지 처리, 토픽 구독, 알림 커스터마이징을 지원합니다.',
+      },
+      'crashlytics|크래시리틱스': {
+        url: 'https://firebase.flutter.dev/docs/crashlytics/overview',
+        desc: 'Firebase Crashlytics는 앱 크래시를 실시간으로 추적합니다. 스택 트레이스, 기기 정보, 사용자 경로를 수집하여 버그 수정을 돕습니다.',
+      },
+      'analytics|애널리틱스|분석': {
+        url: 'https://firebase.flutter.dev/docs/analytics/overview',
+        desc: 'Firebase Analytics로 사용자 행동을 분석합니다. 이벤트 로깅, 사용자 속성, 전환 추적 등을 통해 앱 사용 패턴을 파악할 수 있습니다.',
+      },
+      'firebase|파이어베이스': {
+        url: 'https://firebase.flutter.dev/docs/overview',
+        desc: 'Firebase는 앱 개발을 위한 통합 플랫폼입니다. 인증, 데이터베이스, 스토리지, 푸시 알림, 분석 등 다양한 백엔드 서비스를 제공합니다.',
+      },
 
       // 상태 관리
-      'riverpod|리버팟|리버\\s*팟': 'https://riverpod.dev/docs/introduction/getting_started',
-      'provider|프로바이더': 'https://pub.dev/packages/provider',
-      'bloc|블록|블락': 'https://bloclibrary.dev/#/gettingstarted',
-      'getx|겟엑스|get\\s*x': 'https://pub.dev/packages/get',
-      'mobx|몹엑스': 'https://pub.dev/packages/mobx',
-      'redux|리덕스': 'https://pub.dev/packages/flutter_redux',
-      'state\\s*management|상태\\s*관리': 'https://docs.flutter.dev/data-and-backend/state-mgmt',
-      'setstate|set\\s*state': 'https://docs.flutter.dev/data-and-backend/state-mgmt/ephemeral-vs-app',
+      'riverpod|리버팟|리버\\s*팟': {
+        url: 'https://riverpod.dev/docs/introduction/getting_started',
+        desc: 'Riverpod은 Provider의 개선된 버전으로, 컴파일 타임 안전성과 테스트 용이성을 제공합니다. 의존성 주입과 상태 관리를 동시에 해결합니다.',
+      },
+      'provider|프로바이더': {
+        url: 'https://pub.dev/packages/provider',
+        desc: 'Provider는 Flutter 공식 권장 상태 관리 솔루션입니다. InheritedWidget을 감싸서 위젯 트리에서 상태를 쉽게 공유하고 접근할 수 있게 합니다.',
+      },
+      'bloc|블록|블락': {
+        url: 'https://bloclibrary.dev/#/gettingstarted',
+        desc: 'BLoC 패턴은 비즈니스 로직을 UI와 분리합니다. 이벤트를 받아 상태를 변환하는 방식으로, 테스트와 유지보수가 용이합니다.',
+      },
+      'getx|겟엑스|get\\s*x': {
+        url: 'https://pub.dev/packages/get',
+        desc: 'GetX는 상태 관리, 라우팅, 의존성 주입을 제공하는 경량 프레임워크입니다. 적은 보일러플레이트로 빠른 개발이 가능합니다.',
+      },
+      'mobx|몹엑스': {
+        url: 'https://pub.dev/packages/mobx',
+        desc: 'MobX는 반응형 상태 관리 라이브러리입니다. Observable 상태와 자동 UI 업데이트로 선언적인 코드 작성이 가능합니다.',
+      },
+      'redux|리덕스': {
+        url: 'https://pub.dev/packages/flutter_redux',
+        desc: 'Redux는 단방향 데이터 흐름의 상태 관리 패턴입니다. 예측 가능한 상태 변화와 시간 여행 디버깅을 지원합니다.',
+      },
+      'state\\s*management|상태\\s*관리': {
+        url: 'https://docs.flutter.dev/data-and-backend/state-mgmt',
+        desc: 'Flutter 상태 관리는 위젯 간 데이터 공유 방법입니다. setState, Provider, Riverpod, BLoC 등 다양한 옵션이 있으며, 앱 규모에 따라 선택합니다.',
+      },
+      'setstate|set\\s*state': {
+        url: 'https://docs.flutter.dev/data-and-backend/state-mgmt/ephemeral-vs-app',
+        desc: 'setState는 StatefulWidget의 기본 상태 관리 방법입니다. 로컬 UI 상태에 적합하며, 호출 시 build()가 다시 실행됩니다.',
+      },
 
       // UI/레이아웃
-      'hero\\s*animation|히어로\\s*애니메이션': 'https://docs.flutter.dev/ui/animations/hero-animations',
-      'implicit\\s*animation|암시적\\s*애니메이션': 'https://docs.flutter.dev/ui/animations/implicit-animations',
-      'animation|애니메이션': 'https://docs.flutter.dev/ui/animations',
-      'named\\s*route|네임드\\s*라우트': 'https://docs.flutter.dev/cookbook/navigation/named-routes',
-      'go\\s*router|고\\s*라우터': 'https://pub.dev/packages/go_router',
-      'navigation|네비게이션|라우팅|라우트|페이지\\s*이동': 'https://docs.flutter.dev/ui/navigation',
-      'bottom\\s*nav|바텀\\s*네비게이션|하단\\s*탭': 'https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html',
-      'tab\\s*bar|탭\\s*바|탭바': 'https://docs.flutter.dev/cookbook/design/tabs',
-      'drawer|드로어|사이드\\s*메뉴': 'https://docs.flutter.dev/cookbook/design/drawer',
-      'appbar|앱바|앱\\s*바': 'https://api.flutter.dev/flutter/material/AppBar-class.html',
-      'scaffold|스캐폴드': 'https://api.flutter.dev/flutter/material/Scaffold-class.html',
-      'listview|리스트뷰|리스트\\s*뷰|목록': 'https://docs.flutter.dev/cookbook/lists',
-      'gridview|그리드뷰|그리드\\s*뷰|격자': 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
-      'column|row|컬럼|로우|열|행': 'https://docs.flutter.dev/ui/layout',
-      'stack|스택|겹치기': 'https://api.flutter.dev/flutter/widgets/Stack-class.html',
-      'container|컨테이너': 'https://api.flutter.dev/flutter/widgets/Container-class.html',
-      'padding|margin|패딩|마진|여백': 'https://docs.flutter.dev/ui/layout',
-      'sizedbox|sized\\s*box': 'https://api.flutter.dev/flutter/widgets/SizedBox-class.html',
-      'expanded|flexible|확장': 'https://docs.flutter.dev/ui/layout/constraints',
-      'form|폼|입력\\s*폼|텍스트\\s*필드': 'https://docs.flutter.dev/cookbook/forms',
-      'button|버튼': 'https://docs.flutter.dev/ui/widgets/material#buttons',
-      'text|텍스트|글자': 'https://api.flutter.dev/flutter/widgets/Text-class.html',
-      'image|이미지|사진\\s*표시': 'https://docs.flutter.dev/ui/assets/images',
-      'icon|아이콘': 'https://api.flutter.dev/flutter/widgets/Icon-class.html',
-      'dialog|다이얼로그|팝업|모달': 'https://docs.flutter.dev/cookbook/design/dialogs',
-      'snackbar|스낵바|토스트': 'https://docs.flutter.dev/cookbook/design/snackbars',
-      'theme|테마|다크\\s*모드': 'https://docs.flutter.dev/cookbook/design/themes',
+      'hero\\s*animation|히어로\\s*애니메이션': {
+        url: 'https://docs.flutter.dev/ui/animations/hero-animations',
+        desc: 'Hero 애니메이션은 화면 전환 시 공유 요소가 자연스럽게 이동하는 효과입니다. 같은 tag를 가진 Hero 위젯 간에 자동으로 애니메이션됩니다.',
+      },
+      'implicit\\s*animation|암시적\\s*애니메이션': {
+        url: 'https://docs.flutter.dev/ui/animations/implicit-animations',
+        desc: '암시적 애니메이션은 AnimatedContainer, AnimatedOpacity 등으로 속성 변경 시 자동 애니메이션됩니다. 간단한 애니메이션에 적합합니다.',
+      },
+      'animation|애니메이션': {
+        url: 'https://docs.flutter.dev/ui/animations',
+        desc: 'Flutter 애니메이션은 암시적(Animated 위젯)과 명시적(AnimationController) 방식이 있습니다. Tween, Curve로 다양한 효과를 구현합니다.',
+      },
+      'named\\s*route|네임드\\s*라우트': {
+        url: 'https://docs.flutter.dev/cookbook/navigation/named-routes',
+        desc: 'Named Routes는 문자열 이름으로 화면을 식별합니다. MaterialApp의 routes에 등록하고 Navigator.pushNamed()로 이동합니다.',
+      },
+      'go\\s*router|고\\s*라우터': {
+        url: 'https://pub.dev/packages/go_router',
+        desc: 'GoRouter는 선언적 라우팅 패키지입니다. URL 기반 네비게이션, 딥링크, 리다이렉트, 중첩 라우트를 지원합니다.',
+      },
+      'navigation|네비게이션|라우팅|라우트|페이지\\s*이동': {
+        url: 'https://docs.flutter.dev/ui/navigation',
+        desc: 'Flutter 네비게이션은 Navigator로 화면을 스택처럼 관리합니다. push/pop으로 이동하며, 데이터 전달과 반환이 가능합니다.',
+      },
+      'bottom\\s*nav|바텀\\s*네비게이션|하단\\s*탭': {
+        url: 'https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html',
+        desc: 'BottomNavigationBar는 하단 탭 네비게이션입니다. 3-5개 메인 화면 전환에 적합하며, currentIndex로 선택 상태를 관리합니다.',
+      },
+      'tab\\s*bar|탭\\s*바|탭바': {
+        url: 'https://docs.flutter.dev/cookbook/design/tabs',
+        desc: 'TabBar는 상단 탭 네비게이션입니다. TabController와 TabBarView를 함께 사용하여 스와이프 전환을 구현합니다.',
+      },
+      'drawer|드로어|사이드\\s*메뉴': {
+        url: 'https://docs.flutter.dev/cookbook/design/drawer',
+        desc: 'Drawer는 측면에서 슬라이드되는 메뉴입니다. Scaffold의 drawer 속성에 추가하고, ListTile로 메뉴 항목을 구성합니다.',
+      },
+      'appbar|앱바|앱\\s*바': {
+        url: 'https://api.flutter.dev/flutter/material/AppBar-class.html',
+        desc: 'AppBar는 화면 상단 앱 바입니다. title, leading, actions로 구성하며, SliverAppBar로 스크롤 효과를 추가할 수 있습니다.',
+      },
+      'scaffold|스캐폴드': {
+        url: 'https://api.flutter.dev/flutter/material/Scaffold-class.html',
+        desc: 'Scaffold는 Material Design 기본 레이아웃입니다. AppBar, Drawer, FloatingActionButton, BottomNavigationBar 등을 배치합니다.',
+      },
+      'listview|리스트뷰|리스트\\s*뷰|목록': {
+        url: 'https://docs.flutter.dev/cookbook/lists',
+        desc: 'ListView는 스크롤 가능한 목록입니다. ListView.builder로 대량 데이터를 효율적으로 렌더링하며, ListTile로 항목을 구성합니다.',
+      },
+      'gridview|그리드뷰|그리드\\s*뷰|격자': {
+        url: 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
+        desc: 'GridView는 2차원 격자 레이아웃입니다. GridView.count나 GridView.builder로 구성하며, 갤러리나 상품 목록에 적합합니다.',
+      },
+      'column|row|컬럼|로우|열|행': {
+        url: 'https://docs.flutter.dev/ui/layout',
+        desc: 'Column은 세로, Row는 가로로 자식을 배치합니다. mainAxisAlignment와 crossAxisAlignment로 정렬을 조절합니다.',
+      },
+      'stack|스택|겹치기': {
+        url: 'https://api.flutter.dev/flutter/widgets/Stack-class.html',
+        desc: 'Stack은 위젯을 겹쳐서 배치합니다. Positioned로 자식 위치를 지정하며, 오버레이나 배지 구현에 사용합니다.',
+      },
+      'container|컨테이너': {
+        url: 'https://api.flutter.dev/flutter/widgets/Container-class.html',
+        desc: 'Container는 장식, 패딩, 마진, 크기를 적용하는 기본 위젯입니다. decoration으로 배경색, 테두리, 그림자를 추가합니다.',
+      },
+      'padding|margin|패딩|마진|여백': {
+        url: 'https://docs.flutter.dev/ui/layout',
+        desc: 'Padding은 내부 여백, margin은 외부 여백입니다. EdgeInsets.all(), symmetric(), only()로 방향별 여백을 지정합니다.',
+      },
+      'sizedbox|sized\\s*box': {
+        url: 'https://api.flutter.dev/flutter/widgets/SizedBox-class.html',
+        desc: 'SizedBox는 고정 크기 박스입니다. 위젯 간 간격이나 특정 크기 지정에 사용하며, SizedBox.expand()로 최대 크기를 채웁니다.',
+      },
+      'expanded|flexible|확장': {
+        url: 'https://docs.flutter.dev/ui/layout/constraints',
+        desc: 'Expanded는 남은 공간을 채우고, Flexible은 비율로 공간을 나눕니다. flex 값으로 비율을 조절합니다.',
+      },
+      'form|폼|입력\\s*폼|텍스트\\s*필드': {
+        url: 'https://docs.flutter.dev/cookbook/forms',
+        desc: 'Form은 TextFormField를 감싸 유효성 검사를 관리합니다. GlobalKey<FormState>로 validate(), save(), reset()을 호출합니다.',
+      },
+      'button|버튼': {
+        url: 'https://docs.flutter.dev/ui/widgets/material#buttons',
+        desc: 'ElevatedButton, TextButton, OutlinedButton, IconButton 등이 있습니다. onPressed 콜백으로 탭 이벤트를 처리합니다.',
+      },
+      'text|텍스트|글자': {
+        url: 'https://api.flutter.dev/flutter/widgets/Text-class.html',
+        desc: 'Text 위젯으로 텍스트를 표시합니다. TextStyle로 폰트, 크기, 색상을 지정하고, RichText로 부분 스타일링이 가능합니다.',
+      },
+      'image|이미지|사진\\s*표시': {
+        url: 'https://docs.flutter.dev/ui/assets/images',
+        desc: 'Image.asset()은 로컬, Image.network()는 URL 이미지를 표시합니다. fit으로 크기 조절, CachedNetworkImage로 캐싱합니다.',
+      },
+      'icon|아이콘': {
+        url: 'https://api.flutter.dev/flutter/widgets/Icon-class.html',
+        desc: 'Icon 위젯은 Material Icons를 표시합니다. Icons 클래스에서 아이콘을 선택하고, size와 color로 스타일링합니다.',
+      },
+      'dialog|다이얼로그|팝업|모달': {
+        url: 'https://docs.flutter.dev/cookbook/design/dialogs',
+        desc: 'showDialog()로 AlertDialog를 표시합니다. title, content, actions로 구성하며, Navigator.pop()으로 닫습니다.',
+      },
+      'snackbar|스낵바|토스트': {
+        url: 'https://docs.flutter.dev/cookbook/design/snackbars',
+        desc: 'ScaffoldMessenger.of(context).showSnackBar()로 하단 메시지를 표시합니다. action으로 버튼을 추가할 수 있습니다.',
+      },
+      'theme|테마|다크\\s*모드': {
+        url: 'https://docs.flutter.dev/cookbook/design/themes',
+        desc: 'MaterialApp의 theme과 darkTheme으로 앱 테마를 정의합니다. ThemeData로 색상, 폰트, 위젯 스타일을 통일합니다.',
+      },
 
       // 네트워킹/데이터
-      'http\\s*요청|api\\s*call|api\\s*호출|fetch\\s*data|rest\\s*api': 'https://docs.flutter.dev/cookbook/networking/fetch-data',
-      'dio|디오': 'https://pub.dev/packages/dio',
-      'json|제이슨|파싱': 'https://docs.flutter.dev/data-and-backend/serialization/json',
-      'sqlite|sqflite|로컬\\s*db|로컬\\s*데이터베이스': 'https://docs.flutter.dev/cookbook/persistence/sqlite',
-      'hive|하이브': 'https://pub.dev/packages/hive',
-      'shared\\s*pref|sharedpreferences|로컬\\s*저장': 'https://pub.dev/packages/shared_preferences',
-      'websocket|웹소켓|실시간': 'https://docs.flutter.dev/cookbook/networking/web-sockets',
+      'http\\s*요청|api\\s*call|api\\s*호출|fetch\\s*data|rest\\s*api': {
+        url: 'https://docs.flutter.dev/cookbook/networking/fetch-data',
+        desc: 'http 패키지로 GET/POST 요청을 보냅니다. async/await로 비동기 처리하고, FutureBuilder로 UI에 결과를 표시합니다.',
+      },
+      'dio|디오': {
+        url: 'https://pub.dev/packages/dio',
+        desc: 'Dio는 강력한 HTTP 클라이언트입니다. 인터셉터, 취소, 파일 업로드, FormData 등 고급 기능을 제공합니다.',
+      },
+      'json|제이슨|파싱': {
+        url: 'https://docs.flutter.dev/data-and-backend/serialization/json',
+        desc: 'jsonDecode()로 JSON을 Map으로 변환합니다. factory 생성자나 json_serializable로 모델 클래스와 매핑합니다.',
+      },
+      'sqlite|sqflite|로컬\\s*db|로컬\\s*데이터베이스': {
+        url: 'https://docs.flutter.dev/cookbook/persistence/sqlite',
+        desc: 'sqflite는 로컬 SQLite 데이터베이스입니다. 테이블 생성, CRUD 쿼리를 지원하며, 오프라인 데이터 저장에 적합합니다.',
+      },
+      'hive|하이브': {
+        url: 'https://pub.dev/packages/hive',
+        desc: 'Hive는 빠른 NoSQL 로컬 데이터베이스입니다. Key-Value 저장소로, 간단한 데이터 캐싱에 적합합니다.',
+      },
+      'shared\\s*pref|sharedpreferences|로컬\\s*저장': {
+        url: 'https://pub.dev/packages/shared_preferences',
+        desc: 'SharedPreferences는 간단한 Key-Value 저장소입니다. 설정값, 토큰 등 작은 데이터를 영구 저장합니다.',
+      },
+      'websocket|웹소켓|실시간': {
+        url: 'https://docs.flutter.dev/cookbook/networking/web-sockets',
+        desc: 'WebSocket은 실시간 양방향 통신입니다. 채팅, 실시간 알림 등에 사용하며, StreamBuilder로 메시지를 처리합니다.',
+      },
 
       // 기기 기능
-      'camera|카메라|사진\\s*찍': 'https://pub.dev/packages/camera',
-      'image\\s*picker|이미지\\s*선택|갤러리\\s*선택': 'https://pub.dev/packages/image_picker',
-      'file\\s*picker|파일\\s*선택': 'https://pub.dev/packages/file_picker',
-      'permission|권한|퍼미션': 'https://pub.dev/packages/permission_handler',
-      'location|위치|gps': 'https://pub.dev/packages/geolocator',
-      'notification|알림': 'https://firebase.flutter.dev/docs/messaging/overview',
-      'local\\s*notification|로컬\\s*알림': 'https://pub.dev/packages/flutter_local_notifications',
-      'biometric|생체\\s*인증|지문|face\\s*id': 'https://pub.dev/packages/local_auth',
-      'qr\\s*code|큐알|바코드': 'https://pub.dev/packages/qr_code_scanner',
-      'bluetooth|블루투스': 'https://pub.dev/packages/flutter_blue_plus',
-      'share|공유하기': 'https://pub.dev/packages/share_plus',
-      'url\\s*launcher|url\\s*열기|링크\\s*열기': 'https://pub.dev/packages/url_launcher',
-      'webview|웹뷰': 'https://pub.dev/packages/webview_flutter',
+      'camera|카메라|사진\\s*찍': {
+        url: 'https://pub.dev/packages/camera',
+        desc: 'camera 패키지로 카메라 미리보기와 촬영을 구현합니다. 전/후면 카메라 전환, 플래시, 줌 조절이 가능합니다.',
+      },
+      'image\\s*picker|이미지\\s*선택|갤러리\\s*선택': {
+        url: 'https://pub.dev/packages/image_picker',
+        desc: 'image_picker로 갤러리에서 이미지를 선택하거나 카메라로 촬영합니다. 이미지 크기와 품질을 조절할 수 있습니다.',
+      },
+      'file\\s*picker|파일\\s*선택': {
+        url: 'https://pub.dev/packages/file_picker',
+        desc: 'file_picker로 문서, 이미지 등 파일을 선택합니다. 다중 선택과 파일 타입 필터링을 지원합니다.',
+      },
+      'permission|권한|퍼미션': {
+        url: 'https://pub.dev/packages/permission_handler',
+        desc: 'permission_handler로 카메라, 위치, 저장소 등 권한을 요청합니다. 권한 상태 확인과 설정 화면 이동을 지원합니다.',
+      },
+      'location|위치|gps': {
+        url: 'https://pub.dev/packages/geolocator',
+        desc: 'geolocator로 현재 위치를 가져옵니다. 좌표, 속도, 고도 정보와 위치 변경 스트림을 제공합니다.',
+      },
+      'notification|알림': {
+        url: 'https://firebase.flutter.dev/docs/messaging/overview',
+        desc: 'Firebase Cloud Messaging으로 푸시 알림을 구현합니다. 토큰 등록, 메시지 수신, 알림 탭 처리를 지원합니다.',
+      },
+      'local\\s*notification|로컬\\s*알림': {
+        url: 'https://pub.dev/packages/flutter_local_notifications',
+        desc: 'flutter_local_notifications로 로컬 알림을 예약합니다. 반복 알림, 커스텀 소리, 액션 버튼을 지원합니다.',
+      },
+      'biometric|생체\\s*인증|지문|face\\s*id': {
+        url: 'https://pub.dev/packages/local_auth',
+        desc: 'local_auth로 지문, Face ID 인증을 구현합니다. 생체 인증 가능 여부 확인 후 인증을 요청합니다.',
+      },
+      'qr\\s*code|큐알|바코드': {
+        url: 'https://pub.dev/packages/qr_code_scanner',
+        desc: 'qr_code_scanner로 QR 코드와 바코드를 스캔합니다. 카메라 미리보기에서 실시간으로 인식합니다.',
+      },
+      'bluetooth|블루투스': {
+        url: 'https://pub.dev/packages/flutter_blue_plus',
+        desc: 'flutter_blue_plus로 BLE 기기와 통신합니다. 스캔, 연결, 서비스/특성 읽기/쓰기를 지원합니다.',
+      },
+      'share|공유하기': {
+        url: 'https://pub.dev/packages/share_plus',
+        desc: 'share_plus로 텍스트, 파일을 다른 앱과 공유합니다. 시스템 공유 시트를 표시합니다.',
+      },
+      'url\\s*launcher|url\\s*열기|링크\\s*열기': {
+        url: 'https://pub.dev/packages/url_launcher',
+        desc: 'url_launcher로 웹 URL, 전화, 이메일, 지도를 엽니다. canLaunchUrl()로 가능 여부를 먼저 확인합니다.',
+      },
+      'webview|웹뷰': {
+        url: 'https://pub.dev/packages/webview_flutter',
+        desc: 'webview_flutter로 앱 내 웹페이지를 표시합니다. JavaScript 통신, 네비게이션 제어, 쿠키 관리를 지원합니다.',
+      },
 
       // 테스트/디버깅
-      'test|테스트|유닛\\s*테스트': 'https://docs.flutter.dev/testing/overview',
-      'widget\\s*test|위젯\\s*테스트': 'https://docs.flutter.dev/cookbook/testing/widget/introduction',
-      'integration\\s*test|통합\\s*테스트': 'https://docs.flutter.dev/testing/integration-tests',
-      'debug|디버그|디버깅': 'https://docs.flutter.dev/testing/debugging',
-      'devtools|개발자\\s*도구': 'https://docs.flutter.dev/tools/devtools/overview',
+      'test|테스트|유닛\\s*테스트': {
+        url: 'https://docs.flutter.dev/testing/overview',
+        desc: 'Flutter 테스트는 Unit, Widget, Integration 테스트로 구분됩니다. test() 함수와 expect()로 검증합니다.',
+      },
+      'widget\\s*test|위젯\\s*테스트': {
+        url: 'https://docs.flutter.dev/cookbook/testing/widget/introduction',
+        desc: 'Widget 테스트는 UI 컴포넌트를 검증합니다. testWidgets()와 WidgetTester로 탭, 입력 등을 시뮬레이션합니다.',
+      },
+      'integration\\s*test|통합\\s*테스트': {
+        url: 'https://docs.flutter.dev/testing/integration-tests',
+        desc: 'Integration 테스트는 실제 기기에서 전체 앱을 테스트합니다. 사용자 시나리오를 자동화하여 검증합니다.',
+      },
+      'debug|디버그|디버깅': {
+        url: 'https://docs.flutter.dev/testing/debugging',
+        desc: 'Flutter DevTools로 UI 검사, 성능 프로파일링, 네트워크 모니터링을 합니다. debugPrint()로 로그를 출력합니다.',
+      },
+      'devtools|개발자\\s*도구': {
+        url: 'https://docs.flutter.dev/tools/devtools/overview',
+        desc: 'Flutter DevTools는 위젯 인스펙터, 타임라인, 메모리, 네트워크 탭을 제공합니다. 브라우저에서 실행됩니다.',
+      },
 
       // 배포
-      'android\\s*release|안드로이드\\s*배포|플레이\\s*스토어': 'https://docs.flutter.dev/deployment/android',
-      'ios\\s*release|ios\\s*배포|앱\\s*스토어': 'https://docs.flutter.dev/deployment/ios',
-      'web\\s*deploy|웹\\s*배포': 'https://docs.flutter.dev/deployment/web',
-      'release|배포|빌드': 'https://docs.flutter.dev/deployment',
+      'android\\s*release|안드로이드\\s*배포|플레이\\s*스토어': {
+        url: 'https://docs.flutter.dev/deployment/android',
+        desc: 'Android 배포는 서명된 APK/AAB를 생성합니다. keystore 생성, gradle 설정, 버전 관리 후 Play Console에 업로드합니다.',
+      },
+      'ios\\s*release|ios\\s*배포|앱\\s*스토어': {
+        url: 'https://docs.flutter.dev/deployment/ios',
+        desc: 'iOS 배포는 Archive를 생성하여 App Store Connect에 업로드합니다. 인증서, 프로비저닝 프로파일 설정이 필요합니다.',
+      },
+      'web\\s*deploy|웹\\s*배포': {
+        url: 'https://docs.flutter.dev/deployment/web',
+        desc: 'flutter build web으로 정적 파일을 생성합니다. Firebase Hosting, GitHub Pages 등에 배포할 수 있습니다.',
+      },
+      'release|배포|빌드': {
+        url: 'https://docs.flutter.dev/deployment',
+        desc: 'flutter build로 릴리즈 빌드를 생성합니다. 플랫폼별로 서명, 난독화, 최적화 설정을 적용합니다.',
+      },
 
       // 기본/입문
-      'flutter\\s*설치|install|시작하기': 'https://docs.flutter.dev/get-started/install',
-      'widget|위젯': 'https://docs.flutter.dev/ui/widgets-intro',
-      'stateless|stateful|상태': 'https://docs.flutter.dev/ui/interactivity',
-      'lifecycle|생명주기|라이프사이클': 'https://api.flutter.dev/flutter/widgets/State-class.html',
-      'pubspec|패키지|의존성': 'https://docs.flutter.dev/packages-and-plugins/using-packages',
-      'asset|에셋|리소스': 'https://docs.flutter.dev/ui/assets/assets-and-images',
-      'font|폰트|글꼴': 'https://docs.flutter.dev/cookbook/design/fonts',
-      'internationalization|i18n|다국어|번역': 'https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization',
+      'flutter\\s*설치|install|시작하기': {
+        url: 'https://docs.flutter.dev/get-started/install',
+        desc: 'Flutter SDK 설치 후 flutter doctor로 환경을 확인합니다. Android Studio나 VS Code에서 Flutter 확장을 설치합니다.',
+      },
+      'widget|위젯': {
+        url: 'https://docs.flutter.dev/ui/widgets-intro',
+        desc: 'Flutter UI는 위젯으로 구성됩니다. 모든 것이 위젯이며, 작은 위젯을 조합하여 복잡한 UI를 만듭니다.',
+      },
+      'stateless|stateful|상태': {
+        url: 'https://docs.flutter.dev/ui/interactivity',
+        desc: 'StatelessWidget은 불변, StatefulWidget은 상태 변경이 가능합니다. setState()로 상태를 변경하면 UI가 다시 빌드됩니다.',
+      },
+      'lifecycle|생명주기|라이프사이클': {
+        url: 'https://api.flutter.dev/flutter/widgets/State-class.html',
+        desc: 'State 생명주기: initState → build → didUpdateWidget → dispose 순서입니다. 리소스 초기화와 정리에 활용합니다.',
+      },
+      'pubspec|패키지|의존성': {
+        url: 'https://docs.flutter.dev/packages-and-plugins/using-packages',
+        desc: 'pubspec.yaml에 dependencies를 추가하고 flutter pub get으로 설치합니다. pub.dev에서 패키지를 검색합니다.',
+      },
+      'asset|에셋|리소스': {
+        url: 'https://docs.flutter.dev/ui/assets/assets-and-images',
+        desc: 'pubspec.yaml의 assets에 경로를 등록합니다. Image.asset(), rootBundle로 이미지, 파일을 로드합니다.',
+      },
+      'font|폰트|글꼴': {
+        url: 'https://docs.flutter.dev/cookbook/design/fonts',
+        desc: 'pubspec.yaml의 fonts에 폰트 파일을 등록합니다. TextStyle의 fontFamily로 적용하고, GoogleFonts 패키지도 활용 가능합니다.',
+      },
+      'internationalization|i18n|다국어|번역': {
+        url: 'https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization',
+        desc: 'flutter_localizations로 다국어를 지원합니다. ARB 파일에 번역을 정의하고, Localizations.of()로 접근합니다.',
+      },
 
       // 인증 (Firebase 외)
-      '인증|로그인\\s*구현|auth': 'https://firebase.flutter.dev/docs/auth/overview',
+      '인증|로그인\\s*구현|auth': {
+        url: 'https://firebase.flutter.dev/docs/auth/overview',
+        desc: 'Firebase Authentication은 이메일/비밀번호, 소셜 로그인, 익명 로그인을 지원합니다. 사용자 상태는 authStateChanges()로 감시합니다.',
+      },
     };
 
     // 질문에서 관련 문서 링크 찾기
     let relevantDocLink = null;
-    for (const [pattern, url] of Object.entries(docLinks)) {
+    let relevantDocDesc = null;
+    for (const [pattern, docInfo] of Object.entries(docLinks)) {
       if (new RegExp(pattern, 'i').test(question)) {
-        relevantDocLink = url;
+        relevantDocLink = docInfo.url;
+        relevantDocDesc = docInfo.desc;
         break;
       }
     }
@@ -574,21 +817,9 @@ What Flutter topic would you like to know about?`
       );
     }
 
-    // 설명 질문일 때: AI 우회하고 직접 응답 생성 (코드 없이 링크만)
+    // 설명 질문일 때: AI 우회하고 직접 응답 생성 (설명 + 링크)
     if (isExplanationQuestion && relevantDocLink) {
       console.log('📖 Explanation question detected, returning doc link directly');
-
-      // 벡터 검색 결과에서 관련 설명 추출
-      const topMatch = results.matches[0];
-      let explanation = '';
-      if (topMatch?.metadata?.content) {
-        // 코드 블록 제외하고 텍스트만 추출
-        let content = topMatch.metadata.content;
-        content = content.replace(/```[\s\S]*?```/g, '').trim();
-        // 처음 500자만
-        explanation = content.substring(0, 500);
-        if (content.length > 500) explanation += '...';
-      }
 
       // 토픽 이름 추출
       const topicMatch = question.match(/(\w+|[가-힣]+)\s*(사용법|사용방법|뭔가요|무엇|설명|what|how|explain)/i);
@@ -599,24 +830,18 @@ What Flutter topic would you like to know about?`
       const directAnswer = isEnglishQuestion
         ? `## ${topicName}
 
+${relevantDocDesc || 'A Flutter development component.'}
+
 **Official Documentation:** ${relevantDocLink}
 
-Check the official docs for:
-- Installation and setup guide
-- Basic usage and code examples
-- Advanced features and options
-
-Copy-paste ready code examples are included.`
+The official docs include installation guides and code examples.`
         : `## ${topicName}
+
+${relevantDocDesc || 'Flutter 개발 컴포넌트입니다.'}
 
 **공식 문서:** ${relevantDocLink}
 
-공식 문서에서 다음 내용을 확인하세요:
-- 설치 및 설정 방법
-- 기본 사용법 및 코드 예제
-- 고급 기능 및 옵션
-
-직접 복사해서 사용할 수 있는 코드 예제가 포함되어 있습니다.`;
+공식 문서에서 설치 방법과 코드 예제를 확인하세요.`;
 
       return Response.json(
         {
@@ -648,28 +873,18 @@ Copy-paste ready code examples are included.`
       const directAnswer = isEnglishQuestion
         ? `## ${topicName} Code Examples
 
-Code examples for ${topicName} are available in the official documentation.
+${relevantDocDesc || `Code examples for ${topicName} are available.`}
 
 **Official Documentation:** ${relevantDocLink}
 
-Check the official docs for:
-- Installation and setup guide
-- Basic usage code examples
-- Advanced features and options
-
-Copy-paste ready code examples are included.`
+The official docs include installation guides and code examples.`
         : `## ${topicName} 코드 예제
 
-${topicName} 관련 코드 예제는 공식 문서에서 확인하실 수 있습니다.
+${relevantDocDesc || `${topicName} 관련 코드 예제입니다.`}
 
 **공식 문서:** ${relevantDocLink}
 
-공식 문서에서 다음 내용을 확인하세요:
-- 설치 및 설정 방법
-- 기본 사용법 코드 예제
-- 고급 기능 및 옵션
-
-직접 복사해서 사용할 수 있는 코드 예제가 포함되어 있습니다.`;
+공식 문서에서 설치 방법과 코드 예제를 확인하세요.`;
 
       return Response.json(
         {
