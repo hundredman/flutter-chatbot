@@ -390,16 +390,18 @@ async function handleChat(request, env, corsHeaders) {
                                    /^(continue|go\s*on|proceed)[?]?$/i.test(question.trim());
 
     // 주요 토픽별 공식 문서 링크 + 설명 (구체적인 패턴이 먼저 와야 함!)
-    // 형식: { url, desc } - desc는 간단한 설명
+    // 형식: { url, what, how } - what은 정의/개념, how는 사용법
     const docLinks = {
       // Firebase 관련 - 구체적인 것 먼저
       'firebaseauth|firebase\\s*auth|파이어베이스\\s*인증': {
         url: 'https://firebase.flutter.dev/docs/auth/overview',
-        desc: 'Firebase Authentication은 이메일/비밀번호, Google, Facebook, Apple 등 다양한 로그인 방식을 지원합니다. 사용자 세션 관리, 토큰 발급, 비밀번호 재설정 등의 기능을 제공합니다.',
+        what: 'Firebase Authentication은 사용자 인증을 처리하는 Firebase 서비스입니다. 이메일/비밀번호, Google, Facebook, Apple, 익명 로그인 등 다양한 인증 방식을 제공하며, 사용자 세션과 토큰을 자동으로 관리합니다.',
+        how: '1) pubspec.yaml에 firebase_auth 추가 2) Firebase 콘솔에서 인증 방식 활성화 3) FirebaseAuth.instance로 signIn/signOut 호출 4) authStateChanges()로 로그인 상태 감시',
       },
       'firestore|파이어스토어|파이어\\s*스토어': {
         url: 'https://firebase.flutter.dev/docs/firestore/overview',
-        desc: 'Cloud Firestore는 실시간 NoSQL 데이터베이스입니다. 문서-컬렉션 구조로 데이터를 저장하고, 실시간 동기화와 오프라인 지원을 제공합니다.',
+        what: 'Cloud Firestore는 Firebase의 실시간 NoSQL 클라우드 데이터베이스입니다. 문서-컬렉션 구조로 데이터를 저장하고, 여러 기기 간 실시간 동기화와 오프라인 지원을 제공합니다.',
+        how: '1) pubspec.yaml에 cloud_firestore 추가 2) FirebaseFirestore.instance로 접근 3) collection().doc().set()/get()으로 CRUD 4) snapshots()로 실시간 리스닝',
       },
       'firebase\\s*storage|파이어베이스\\s*스토리지': {
         url: 'https://firebase.flutter.dev/docs/storage/overview',
@@ -425,11 +427,13 @@ async function handleChat(request, env, corsHeaders) {
       // 상태 관리
       'riverpod|리버팟|리버\\s*팟': {
         url: 'https://riverpod.dev/docs/introduction/getting_started',
-        desc: 'Riverpod은 Provider의 개선된 버전으로, 컴파일 타임 안전성과 테스트 용이성을 제공합니다. 의존성 주입과 상태 관리를 동시에 해결합니다.',
+        what: 'Riverpod은 Provider의 개선된 버전으로, 컴파일 타임 안전성과 테스트 용이성이 뛰어난 상태 관리 라이브러리입니다. BuildContext 없이도 상태에 접근 가능하며, 의존성 주입도 지원합니다.',
+        how: '1) pubspec.yaml에 flutter_riverpod 추가 2) Provider 정의 (StateProvider, FutureProvider 등) 3) ProviderScope로 앱 감싸기 4) ref.watch/read로 상태 접근',
       },
       'provider|프로바이더': {
         url: 'https://pub.dev/packages/provider',
-        desc: 'Provider는 Flutter 공식 권장 상태 관리 솔루션입니다. InheritedWidget을 감싸서 위젯 트리에서 상태를 쉽게 공유하고 접근할 수 있게 합니다.',
+        what: 'Provider는 Flutter 공식 권장 상태 관리 라이브러리입니다. InheritedWidget을 감싸서 위젯 트리 전체에서 상태를 쉽게 공유하고 접근할 수 있게 합니다. 간단하면서도 확장성이 좋습니다.',
+        how: '1) pubspec.yaml에 provider 추가 2) ChangeNotifier 클래스 생성 3) ChangeNotifierProvider로 앱 감싸기 4) context.watch/read로 상태 접근 5) notifyListeners()로 UI 업데이트',
       },
       'bloc|블록|블락': {
         url: 'https://bloclibrary.dev/#/gettingstarted',
@@ -479,7 +483,8 @@ async function handleChat(request, env, corsHeaders) {
       },
       'navigation|네비게이션|라우팅|라우트|페이지\\s*이동': {
         url: 'https://docs.flutter.dev/ui/navigation',
-        desc: 'Flutter 네비게이션은 Navigator로 화면을 스택처럼 관리합니다. push/pop으로 이동하며, 데이터 전달과 반환이 가능합니다.',
+        what: 'Flutter Navigation은 화면 전환을 관리하는 시스템입니다. Navigator가 화면을 스택처럼 관리하며, push로 새 화면 추가, pop으로 이전 화면 복귀합니다. 데이터 전달과 반환도 가능합니다.',
+        how: '1) Navigator.push()로 새 화면 이동 2) Navigator.pop()으로 뒤로가기 3) MaterialPageRoute로 화면 전환 애니메이션 4) arguments로 데이터 전달 5) Named Routes로 경로 관리',
       },
       'bottom\\s*nav|바텀\\s*네비게이션|하단\\s*탭': {
         url: 'https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html',
@@ -503,7 +508,8 @@ async function handleChat(request, env, corsHeaders) {
       },
       'listview|리스트뷰|리스트\\s*뷰|목록': {
         url: 'https://docs.flutter.dev/cookbook/lists',
-        desc: 'ListView는 스크롤 가능한 목록입니다. ListView.builder로 대량 데이터를 효율적으로 렌더링하며, ListTile로 항목을 구성합니다.',
+        what: 'ListView는 스크롤 가능한 목록을 표시하는 Flutter 위젯입니다. 세로 또는 가로 방향으로 여러 항목을 나열하며, builder를 사용하면 대량 데이터도 효율적으로 렌더링합니다.',
+        how: '1) ListView()로 기본 목록 생성 2) ListView.builder()로 대량 데이터 처리 3) itemCount와 itemBuilder 설정 4) ListTile로 항목 구성 5) Divider로 구분선 추가',
       },
       'gridview|그리드뷰|그리드\\s*뷰|격자': {
         url: 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
@@ -731,13 +737,25 @@ async function handleChat(request, env, corsHeaders) {
       },
     };
 
+    // 질문 유형 세분화: "뭔데/뭐야" = 정의 질문, "사용법/방법" = 사용법 질문
+    const isDefinitionQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|뭔데|뭐지|뭐임|뭔지|what\s*is|what'?s/i.test(question);
+    const isHowToQuestion = /사용법|사용방법|어떻게|방법|설정|연동|how\s*to|how\s*do/i.test(question);
+
     // 질문에서 관련 문서 링크 찾기
     let relevantDocLink = null;
     let relevantDocDesc = null;
     for (const [pattern, docInfo] of Object.entries(docLinks)) {
       if (new RegExp(pattern, 'i').test(question)) {
         relevantDocLink = docInfo.url;
-        relevantDocDesc = docInfo.desc;
+        // 질문 유형에 따라 다른 설명 선택
+        if (isDefinitionQuestion && docInfo.what) {
+          relevantDocDesc = docInfo.what;
+        } else if (isHowToQuestion && docInfo.how) {
+          relevantDocDesc = docInfo.how;
+        } else {
+          // 기본값: what이 있으면 what, 없으면 desc (하위 호환)
+          relevantDocDesc = docInfo.what || docInfo.desc || docInfo.how;
+        }
         break;
       }
     }
