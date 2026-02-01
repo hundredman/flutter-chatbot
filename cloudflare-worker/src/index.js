@@ -377,6 +377,10 @@ async function handleChat(request, env, corsHeaders) {
     const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|explain|how\s*to\s*use/i.test(question);
     const isCodeExampleRequest = /코드\s*예제|예제\s*코드|샘플\s*코드|code\s*example|sample\s*code|구현\s*예제/i.test(question);
 
+    // 맥락 없는 질문 감지 (이전 대화 참조)
+    const isContextlessQuestion = /^(다음|이전|위|아래|그|이|저)\s*(단계|것|거|내용|코드)?\s*(추천|알려|보여|해줘|줘|뭐야|뭔가요)?[?]?$/i.test(question.trim()) ||
+                                   /^(추천|다음)\s*(해줘|해주세요|부탁)?[?]?$/i.test(question.trim());
+
     // 주요 토픽별 공식 문서 링크 (구체적인 패턴이 먼저 와야 함!)
     const docLinks = {
       // Firebase 관련 - 구체적인 것 먼저
@@ -384,34 +388,95 @@ async function handleChat(request, env, corsHeaders) {
       'firestore|파이어스토어|파이어\\s*스토어': 'https://firebase.flutter.dev/docs/firestore/overview',
       'firebase\\s*storage|파이어베이스\\s*스토리지': 'https://firebase.flutter.dev/docs/storage/overview',
       'firebase\\s*messaging|fcm|푸시\\s*알림': 'https://firebase.flutter.dev/docs/messaging/overview',
-      'firebase|파이어베이스': 'https://firebase.flutter.dev/docs/overview',  // 일반 firebase는 마지막
+      'crashlytics|크래시리틱스': 'https://firebase.flutter.dev/docs/crashlytics/overview',
+      'analytics|애널리틱스|분석': 'https://firebase.flutter.dev/docs/analytics/overview',
+      'firebase|파이어베이스': 'https://firebase.flutter.dev/docs/overview',
 
       // 상태 관리
       'riverpod|리버팟|리버\\s*팟': 'https://riverpod.dev/docs/introduction/getting_started',
       'provider|프로바이더': 'https://pub.dev/packages/provider',
       'bloc|블록|블락': 'https://bloclibrary.dev/#/gettingstarted',
       'getx|겟엑스|get\\s*x': 'https://pub.dev/packages/get',
+      'mobx|몹엑스': 'https://pub.dev/packages/mobx',
+      'redux|리덕스': 'https://pub.dev/packages/flutter_redux',
       'state\\s*management|상태\\s*관리': 'https://docs.flutter.dev/data-and-backend/state-mgmt',
+      'setstate|set\\s*state': 'https://docs.flutter.dev/data-and-backend/state-mgmt/ephemeral-vs-app',
 
-      // UI/네비게이션
+      // UI/레이아웃
       'hero\\s*animation|히어로\\s*애니메이션': 'https://docs.flutter.dev/ui/animations/hero-animations',
+      'implicit\\s*animation|암시적\\s*애니메이션': 'https://docs.flutter.dev/ui/animations/implicit-animations',
       'animation|애니메이션': 'https://docs.flutter.dev/ui/animations',
       'named\\s*route|네임드\\s*라우트': 'https://docs.flutter.dev/cookbook/navigation/named-routes',
-      'navigation|네비게이션|라우팅|라우트': 'https://docs.flutter.dev/ui/navigation',
-      'listview|리스트뷰|리스트\\s*뷰': 'https://docs.flutter.dev/cookbook/lists',
-      'gridview|그리드뷰|그리드\\s*뷰': 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
-      'form|폼|입력\\s*폼': 'https://docs.flutter.dev/cookbook/forms',
+      'go\\s*router|고\\s*라우터': 'https://pub.dev/packages/go_router',
+      'navigation|네비게이션|라우팅|라우트|페이지\\s*이동': 'https://docs.flutter.dev/ui/navigation',
+      'bottom\\s*nav|바텀\\s*네비게이션|하단\\s*탭': 'https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html',
+      'tab\\s*bar|탭\\s*바|탭바': 'https://docs.flutter.dev/cookbook/design/tabs',
+      'drawer|드로어|사이드\\s*메뉴': 'https://docs.flutter.dev/cookbook/design/drawer',
+      'appbar|앱바|앱\\s*바': 'https://api.flutter.dev/flutter/material/AppBar-class.html',
+      'scaffold|스캐폴드': 'https://api.flutter.dev/flutter/material/Scaffold-class.html',
+      'listview|리스트뷰|리스트\\s*뷰|목록': 'https://docs.flutter.dev/cookbook/lists',
+      'gridview|그리드뷰|그리드\\s*뷰|격자': 'https://api.flutter.dev/flutter/widgets/GridView-class.html',
+      'column|row|컬럼|로우|열|행': 'https://docs.flutter.dev/ui/layout',
+      'stack|스택|겹치기': 'https://api.flutter.dev/flutter/widgets/Stack-class.html',
+      'container|컨테이너': 'https://api.flutter.dev/flutter/widgets/Container-class.html',
+      'padding|margin|패딩|마진|여백': 'https://docs.flutter.dev/ui/layout',
+      'sizedbox|sized\\s*box': 'https://api.flutter.dev/flutter/widgets/SizedBox-class.html',
+      'expanded|flexible|확장': 'https://docs.flutter.dev/ui/layout/constraints',
+      'form|폼|입력\\s*폼|텍스트\\s*필드': 'https://docs.flutter.dev/cookbook/forms',
+      'button|버튼': 'https://docs.flutter.dev/ui/widgets/material#buttons',
+      'text|텍스트|글자': 'https://api.flutter.dev/flutter/widgets/Text-class.html',
+      'image|이미지|사진\\s*표시': 'https://docs.flutter.dev/ui/assets/images',
+      'icon|아이콘': 'https://api.flutter.dev/flutter/widgets/Icon-class.html',
+      'dialog|다이얼로그|팝업|모달': 'https://docs.flutter.dev/cookbook/design/dialogs',
+      'snackbar|스낵바|토스트': 'https://docs.flutter.dev/cookbook/design/snackbars',
+      'theme|테마|다크\\s*모드': 'https://docs.flutter.dev/cookbook/design/themes',
 
       // 네트워킹/데이터
-      'http\\s*요청|api\\s*call|api\\s*호출|fetch\\s*data': 'https://docs.flutter.dev/cookbook/networking/fetch-data',
+      'http\\s*요청|api\\s*call|api\\s*호출|fetch\\s*data|rest\\s*api': 'https://docs.flutter.dev/cookbook/networking/fetch-data',
+      'dio|디오': 'https://pub.dev/packages/dio',
+      'json|제이슨|파싱': 'https://docs.flutter.dev/data-and-backend/serialization/json',
       'sqlite|sqflite|로컬\\s*db|로컬\\s*데이터베이스': 'https://docs.flutter.dev/cookbook/persistence/sqlite',
+      'hive|하이브': 'https://pub.dev/packages/hive',
       'shared\\s*pref|sharedpreferences|로컬\\s*저장': 'https://pub.dev/packages/shared_preferences',
+      'websocket|웹소켓|실시간': 'https://docs.flutter.dev/cookbook/networking/web-sockets',
 
       // 기기 기능
       'camera|카메라|사진\\s*찍': 'https://pub.dev/packages/camera',
       'image\\s*picker|이미지\\s*선택|갤러리\\s*선택': 'https://pub.dev/packages/image_picker',
+      'file\\s*picker|파일\\s*선택': 'https://pub.dev/packages/file_picker',
       'permission|권한|퍼미션': 'https://pub.dev/packages/permission_handler',
+      'location|위치|gps': 'https://pub.dev/packages/geolocator',
       'notification|알림': 'https://firebase.flutter.dev/docs/messaging/overview',
+      'local\\s*notification|로컬\\s*알림': 'https://pub.dev/packages/flutter_local_notifications',
+      'biometric|생체\\s*인증|지문|face\\s*id': 'https://pub.dev/packages/local_auth',
+      'qr\\s*code|큐알|바코드': 'https://pub.dev/packages/qr_code_scanner',
+      'bluetooth|블루투스': 'https://pub.dev/packages/flutter_blue_plus',
+      'share|공유하기': 'https://pub.dev/packages/share_plus',
+      'url\\s*launcher|url\\s*열기|링크\\s*열기': 'https://pub.dev/packages/url_launcher',
+      'webview|웹뷰': 'https://pub.dev/packages/webview_flutter',
+
+      // 테스트/디버깅
+      'test|테스트|유닛\\s*테스트': 'https://docs.flutter.dev/testing/overview',
+      'widget\\s*test|위젯\\s*테스트': 'https://docs.flutter.dev/cookbook/testing/widget/introduction',
+      'integration\\s*test|통합\\s*테스트': 'https://docs.flutter.dev/testing/integration-tests',
+      'debug|디버그|디버깅': 'https://docs.flutter.dev/testing/debugging',
+      'devtools|개발자\\s*도구': 'https://docs.flutter.dev/tools/devtools/overview',
+
+      // 배포
+      'android\\s*release|안드로이드\\s*배포|플레이\\s*스토어': 'https://docs.flutter.dev/deployment/android',
+      'ios\\s*release|ios\\s*배포|앱\\s*스토어': 'https://docs.flutter.dev/deployment/ios',
+      'web\\s*deploy|웹\\s*배포': 'https://docs.flutter.dev/deployment/web',
+      'release|배포|빌드': 'https://docs.flutter.dev/deployment',
+
+      // 기본/입문
+      'flutter\\s*설치|install|시작하기': 'https://docs.flutter.dev/get-started/install',
+      'widget|위젯': 'https://docs.flutter.dev/ui/widgets-intro',
+      'stateless|stateful|상태': 'https://docs.flutter.dev/ui/interactivity',
+      'lifecycle|생명주기|라이프사이클': 'https://api.flutter.dev/flutter/widgets/State-class.html',
+      'pubspec|패키지|의존성': 'https://docs.flutter.dev/packages-and-plugins/using-packages',
+      'asset|에셋|리소스': 'https://docs.flutter.dev/ui/assets/assets-and-images',
+      'font|폰트|글꼴': 'https://docs.flutter.dev/cookbook/design/fonts',
+      'internationalization|i18n|다국어|번역': 'https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization',
 
       // 인증 (Firebase 외)
       '인증|로그인\\s*구현|auth': 'https://firebase.flutter.dev/docs/auth/overview',
@@ -463,6 +528,30 @@ async function handleChat(request, env, corsHeaders) {
         }
         break;
       }
+    }
+
+    // 맥락 없는 질문 처리 (이전 대화 참조하는 질문)
+    if (isContextlessQuestion) {
+      console.log('📖 Contextless question detected, returning guidance');
+      const directAnswer = `죄송합니다. 이전 대화 내용을 기억하지 못합니다.
+
+구체적으로 질문해주시면 도움드릴 수 있습니다:
+- **앱 만들기**: "ToDo 앱 만들어줘", "계산기 앱 만들어줘"
+- **개념 질문**: "Provider 사용법", "Navigator 뭔가요"
+- **코드 요청**: "로그인 화면 코드", "리스트뷰 예제"
+
+어떤 Flutter 주제가 궁금하신가요?`;
+
+      return Response.json(
+        {
+          success: true,
+          answer: directAnswer,
+          sources: [],
+          confidence: 1.0,
+          provider: 'direct',
+        },
+        { headers: corsHeaders }
+      );
     }
 
     // 설명 질문일 때: AI 우회하고 직접 응답 생성 (코드 없이 링크만)
@@ -579,6 +668,46 @@ ${topicName} 관련 코드 예제는 공식 문서에서 확인하실 수 있습
       }
     }
 
+    // 코드 생성이 필요한 요청인지 확인
+    const isCodeRequest = /만들어|구현|개발|코드|예제|sample|example|create|build/i.test(question);
+
+    // 코드 요청인데 템플릿이 없고 docLink도 없으면 -> 기본 Flutter 문서 안내
+    if (isCodeRequest && !matchedTemplate && !relevantDocLink) {
+      console.log('📖 Code request without template/docLink, returning Flutter docs');
+
+      // 벡터 검색에서 관련 문서 URL 찾기
+      const relatedDoc = results.matches.find(m => m.metadata?.url);
+      const docUrl = relatedDoc?.metadata?.url || 'https://docs.flutter.dev';
+
+      const directAnswer = `## Flutter 개발 안내
+
+요청하신 내용에 대한 코드 템플릿이 준비되어 있지 않습니다.
+
+**공식 문서에서 확인하세요:** ${docUrl}
+
+### 추천 질문 예시:
+- **앱 템플릿**: "ToDo 앱 만들어줘", "계산기 앱", "로그인 화면"
+- **위젯 사용법**: "ListView 사용법", "GridView 뭔가요"
+- **상태관리**: "Provider 사용법", "Riverpod 뭔가요"
+
+구체적인 주제로 다시 질문해주시면 더 정확한 답변을 드릴 수 있습니다.`;
+
+      return Response.json(
+        {
+          success: true,
+          answer: directAnswer,
+          sources: results.matches.slice(0, 3).map((match) => ({
+            title: match.metadata?.title || 'Flutter Documentation',
+            url: match.metadata?.url || '',
+            similarity: match.score || 0,
+          })),
+          confidence: 0.7,
+          provider: 'direct',
+        },
+        { headers: corsHeaders }
+      );
+    }
+
     // 3. 컨텍스트 구성 (템플릿 전체 코드는 제외, 문서 내용만)
     const context = results.matches
       .map((match, i) => {
@@ -604,89 +733,36 @@ Content: ${content}${content.length >= 1000 ? '...' : ''}
       .filter(Boolean)
       .join('\n\n');
 
-    // 벡터 검색 결과 정보
-    const topScore = results.matches[0]?.score || 0;
-
-    // 4. LLM 답변 생성 (Workers AI - 무료)
-    console.log('Generating answer with LLM...');
+    // 4. LLM 답변 생성 - 코드 생성 금지, 개념 설명만
+    console.log('Generating answer with LLM (concept only, no code)...');
 
     const languageInstructions = {
       ko: 'IMPORTANT: You MUST respond in Korean (한국어). 모든 답변은 반드시 한국어로 작성해야 합니다.',
       en: 'Respond in English.',
     };
 
-    // 복잡한 앱 요청 감지
-    const isComplexAppRequest = /앱\s*(만들기|구현|개발)|calculator|todo\s*list|login|계산기|투두|로그인|채팅|날씨|메모|쇼핑|프로필|설정|갤러리|타이머|검색|네비게이션|스플래시/i.test(question);
-
-    // 템플릿이 있는지 확인 (Reference에 dart 코드 블록이 있는지)
-    const hasTemplate = context.includes('```dart') && context.includes('void main()');
-
-    const systemPrompt = `You are a senior Flutter/Dart developer. Write CORRECT, COMPILABLE code only.
+    // 모든 AI 응답에서 코드 생성 금지 - 개념 설명만
+    const systemPrompt = `You are a Flutter documentation assistant. You explain concepts clearly but DO NOT write code.
 
 ${languageInstructions[language] || languageInstructions.en}
 
 Reference:
 ${context}
 
-${isExplanationQuestion ?
-`EXPLANATION QUESTION DETECTED - User wants to understand a concept.
-DO NOT generate code. Instead:
-1. Explain the concept clearly in 3-5 sentences
-2. Describe when and why to use it
-3. List key classes/methods involved (e.g., "FirebaseAuth.instance, signInWithEmailAndPassword()")
-4. End with: "공식 문서: ${relevantDocLink || 'https://docs.flutter.dev'}"
-
-IMPORTANT: Do NOT write any \`\`\`dart code blocks. Just explain and provide the documentation link.
-The user can ask for code examples separately if needed.
-` :
-(isComplexAppRequest ? (hasTemplate ?
-`CRITICAL: TEMPLATE CODE FOUND IN REFERENCE SECTION!
-You MUST copy the code block from Reference EXACTLY as written.
-DO NOT modify, summarize, or rewrite the code.
-DO NOT add spaces or change formatting.
-Just extract the \`\`\`dart code block from Reference and present it.
-` :
-`NO TEMPLATE AVAILABLE - Keep response simple:
-1. Provide basic app structure with Scaffold only
-2. Suggest follow-up questions:
-   - "더 자세한 기능이 필요하시면 질문해주세요"
-   - "데이터 저장 방법이 궁금하시면 질문해주세요"
-`) : '')}
-CRITICAL CODE RULES:
-1. ALWAYS add spaces between keywords: "void main()" "extends StatelessWidget"
-2. ALWAYS use exact class names: StatelessWidget, StatefulWidget, BuildContext
-3. ALWAYS use @override (lowercase), Widget build() method
-4. ALWAYS match opening and closing brackets { }
-5. ONLY use real Flutter widgets and methods
-6. StatefulWidget State class format: class _WidgetNameState extends State<WidgetName>
+CRITICAL RULES:
+1. DO NOT write any code blocks (\`\`\`dart or \`\`\`)
+2. DO NOT generate Flutter/Dart code
+3. DO NOT write pubspec.yaml content
+4. ONLY explain concepts in plain text
+5. Keep responses concise (3-5 sentences max)
+6. End with relevant documentation link if available
 
 RESPONSE FORMAT:
-1. Brief explanation (2-3 sentences)
-2. Complete, runnable code example:
-\`\`\`dart
-import 'package:flutter/material.dart';
+1. Brief explanation of the concept (2-3 sentences)
+2. Key points or steps (bullet points)
+3. Documentation link: ${relevantDocLink || 'https://docs.flutter.dev'}
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Title')),
-        body: const Center(child: Text('Content')),
-      ),
-    );
-  }
-}
-\`\`\`
-3. Brief usage tip
-
-NO greetings or casual language. Technical content only.`;
+NO greetings, NO casual language, NO exclamation marks. Technical content only.`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -714,6 +790,12 @@ NO greetings or casual language. Technical content only.`;
       /아무거나[^.]*[.!]*/gi,
       /후회없이[^.]*[.!]*/gi,
       /\.trim\(\);[^`]*/g,  // 코드 잔해
+      /[!]{2,}/g,  // 느낌표 여러 개
+      /궁금[증한점]?\s*있으시[면][^.]*[.!]*/gi,
+      /문제나\s*궁금[증]?\s*있으실[경우에][^.]*[.!]*/gi,
+      /부탁드립니다[!.~]*/gi,
+      /따라서\s*이러한\s*이유[들]?때문에[^.]*[.!]*/gi,
+      /많이\s*이용중이다[!.~]*/gi,
     ];
     chatPatterns.forEach(pattern => {
       answer = answer.replace(pattern, '');
@@ -724,7 +806,7 @@ NO greetings or casual language. Technical content only.`;
     answer = answer.replace(/```dart\n+```dart\n/g, '```dart\n');
 
     // 3. 코드 블록 내 심각한 오류 감지
-    const codeBlockMatch = answer.match(/```dart([\s\S]*?)```/);
+    const codeBlockMatch = answer.match(/```(?:dart|yaml)?([\s\S]*?)```/);
     if (codeBlockMatch) {
       const codeContent = codeBlockMatch[1];
       const severeErrors = [
@@ -737,13 +819,25 @@ NO greetings or casual language. Technical content only.`;
         /:\s*\/\//,             // 주석이 값 위치에
         /\.\.\./,               // ... 잘림 표시가 코드 내에
         /[가-힣]{5,}/,          // 한글이 코드 내에 많이 있음
+        /Extends\s+stateless/i, // Extends statelesswidget (대소문자 오류)
+        /statelesswidget/,      // 소문자 (StatelessWidget이어야 함)
+        /statefulwidget/,       // 소문자 (StatefulWidget이어야 함)
+        /builddcontext/i,       // builddcontext 오타
+        /my\s*app\s*\(/i,       // my app ( 공백 오류
+        /scaffold\s*\(\s*appbar\s*:\s*title\s*:/i,  // scaffold(appbar:title: 잘못된 구조
+        /sdk\s*path/i,          // sdk path (잘못된 pubspec)
+        /\^\s*\+/,              // ^+ (잘못된 버전 형식)
+        /\$\{[^}]+\}/,          // ${variable} (해석 안 된 템플릿)
+        /path\/to\//i,          // path/to/ (플레이스홀더)
+        /dependency_overrides\s*:/i,  // 빈 dependency_overrides
+        /environment\s*:\s*\n\s*sdk_path/i,  // 잘못된 environment
       ];
       const hasSevereError = severeErrors.some(p => p.test(codeContent));
 
       if (hasSevereError) {
         console.log('⚠️ Severe code error detected, removing broken code block');
         // 코드 블록 전 설명만 유지
-        const beforeCode = answer.split('```dart')[0].trim();
+        const beforeCode = answer.split(/```(?:dart|yaml)?/)[0].trim();
         if (beforeCode.length > 100) {
           answer = beforeCode + '\n\n코드 예제는 공식 Flutter 문서를 참고해주세요: https://docs.flutter.dev';
         } else {
