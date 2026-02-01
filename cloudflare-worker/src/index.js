@@ -1096,6 +1096,15 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       /많이\s*이용중이다[!.~]*/gi,
       /https?:\/\/[^\s]*#[^\s]*/g,  // 앵커(#) 포함 URL 제거 (AI가 임의로 생성한 앵커)
       /권환|권限/g,  // AI가 생성하는 이상한 한자 혼합
+      // AI가 생성하는 잘못된/존재하지 않는 URL 제거
+      /https?:\/\/api\.dartlang\.org[^\s]*/g,  // 존재하지 않는 dartlang API URL
+      /https?:\/\/www\.youtube\.com[^\s]*/g,  // 관련 없는 YouTube 링크
+      /https?:\/\/youtube\.com[^\s]*/g,
+      /https?:\/\/youtu\.be[^\s]*/g,
+      /https?:\/\/medium\.com[^\s]*/g,  // 블로그 링크
+      /https?:\/\/stackoverflow\.com[^\s]*/g,  // StackOverflow 링크
+      /https?:\/\/github\.com\/[^\s]*\/issues[^\s]*/g,  // GitHub issues 링크
+      /https?:\/\/dartpad\.dev[^\s]*/g,  // DartPad 링크 (보통 잘못된 것)
     ];
     chatPatterns.forEach(pattern => {
       answer = answer.replace(pattern, '');
