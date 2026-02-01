@@ -374,7 +374,7 @@ async function handleChat(request, env, corsHeaders) {
     console.log(`Found ${results.matches.length} similar documents`);
 
     // 질문 유형 감지
-    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|explain|how\s*to\s*use/i.test(question);
+    const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|뭔데|뭐지|뭐임|뭔지|알려줘|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|what'?s|explain|how\s*to\s*use|how\s*does/i.test(question);
     const isCodeExampleRequest = /코드\s*예제|예제\s*코드|샘플\s*코드|code\s*example|sample\s*code|구현\s*예제/i.test(question);
 
     // 맥락 없는 질문 감지 (이전 대화 참조)
