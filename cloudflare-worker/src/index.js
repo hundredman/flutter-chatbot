@@ -1123,6 +1123,25 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       // Flutter 공식 문서 중 존재하지 않는 경로 패턴
       /https?:\/\/docs\.flutter\.dev\/tutorial[^\s]*/g,  // /tutorial 경로는 존재하지 않음
       /https?:\/\/flutter\.dev\/docs\/[^\s]*/g,  // flutter.dev/docs는 잘못된 경로 (docs.flutter.dev가 맞음)
+      // 추가 잘못된 URL 패턴
+      /https?:\/\/firebase\.google\.com[^\s]*/g,  // firebase.flutter.dev가 올바른 Flutter Firebase 문서
+      /https?:\/\/pub\.dartlang\.org[^\s]*/g,  // 옛날 도메인 (pub.dev가 현재 도메인)
+      /https?:\/\/flutter\.io[^\s)]*/g,  // 옛날 도메인 (flutter.dev가 현재 도메인)
+      /https?:\/\/www\.dartlang\.org[^\s]*/g,  // 옛날 도메인 (dart.dev가 현재 도메인)
+      /https?:\/\/dartlang\.org[^\s]*/g,
+      // URL 인코딩 깨진 문자열 제거 (%26gt;%28 등)
+      /https?:\/\/[^\s]*%[0-9A-Fa-f]{2}[a-zA-Z]+%[0-9A-Fa-f]{2}[^\s]*/g,
+      /%[0-9A-Fa-f]{2}gt;%[0-9A-Fa-f]{2}[^\s]*/g,  // %26gt;%28 같은 깨진 인코딩
+      // HTML 태그 제거
+      /<a\s+href="[^"]*"[^>]*>[^<]*<\/a>/gi,  // <a href="...">text</a>
+      /<a\s+href='[^']*'[^>]*>[^<]*<\/a>/gi,
+      // 깨진 마크다운 링크 제거
+      /\[[^\]]*\]\(<https?:\/\/[^>]*>\)?\)?/g,  // [text](<https://...>))
+      /\[[^\]]*\]\(https?:\/\/[^\s)]*\)\)/g,  // [text](url)) - 괄호 중복
+      // 빈 참조 문장 추가
+      /또\s*다른\s*링크\s*:\s*\n/gi,  // "또 다른 링크 :\n"
+      /더\s*자세[히한]\s*[내용은]?\s*:\s*\n/gi,  // "더 자세히 :\n"
+      /관련\s*링크\s*:\s*\n/gi,  // "관련 링크 :\n"
     ];
     chatPatterns.forEach(pattern => {
       answer = answer.replace(pattern, '');
