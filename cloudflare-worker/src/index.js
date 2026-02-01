@@ -782,9 +782,15 @@ async function handleChat(request, env, corsHeaders) {
     };
 
     // 질문에서 앱 템플릿 키워드 매칭 (더 엄격하게)
+    // 개념/상태관리 질문은 템플릿 매칭에서 제외
+    const isConceptQuestion = /상태\s*관리|사용법|사용방법|뭔가요|뭐야|어떻게|방법|설정|연동|주의\s*사항|best\s*practice/i.test(question);
+
     let matchedTemplate = null;
     let templateDisplayName = null;
     for (const [pattern, [templateKey, displayName]] of Object.entries(appTemplateMap)) {
+      // 개념 질문이면 템플릿 매칭 건너뛰기
+      if (isConceptQuestion) break;
+
       if (new RegExp(pattern, 'i').test(question)) {
         // 벡터 검색 결과에서 해당 템플릿 찾기
         const template = results.matches.find(m =>
@@ -1099,6 +1105,11 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       /[\u3040-\u309F\u30A0-\u30FF]+/g,  // 일본어 히라가나/가타카나 제거
       /\$\w*>[\w<>\s\/]+<\/\w+>/g,  // $lang>key</lang> 같은 이상한 태그 제거
       /<\/?lang>/g,  // <lang> 태그 제거
+      // 링크가 제거되어 빈 참조 문장 제거
+      /공식\s*문서\s*:\s*\n/gi,  // "공식 문서 :\n" (링크 없이 끝남)
+      /[또다른 ]*좋은\s*자료\s*:\s*\n/gi,  // "또 다른 좋은 자료 :\n"
+      /참[고조]?\s*문서\s*:\s*\n/gi,  // "참고 문서 :\n"
+      /자세[히한]\s*[내용은]?\s*:\s*\n/gi,  // "자세히 :\n"
       // AI가 생성하는 잘못된/존재하지 않는 URL 제거
       /https?:\/\/api\.dart\.dev[^\s]*/g,  // 관련 없는 Dart API 링크
       /https?:\/\/api\.dartlang\.org[^\s]*/g,  // 존재하지 않는 dartlang API URL
