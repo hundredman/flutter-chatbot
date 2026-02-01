@@ -1,0 +1,36 @@
+name: Sync Flutter Docs to Vectorize
+
+on:
+  # 매주 월요일 오전 9시 (한국 시간) 실행
+  schedule:
+    - cron: '0 0 * * 1'  # UTC 00:00 = KST 09:00
+
+  # 수동 실행 가능
+  workflow_dispatch:
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./cloudflare-worker/scripts
+        run: npm install axios cheerio xml2js
+
+      - name: Run crawler with Gemini embeddings
+        working-directory: ./cloudflare-worker/scripts
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node crawl-with-gemini.js
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "Sync failed! Check the logs."

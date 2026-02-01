@@ -145,12 +145,15 @@ async function fetchAllDocuments(urls) {
  * Cloudflare Worker API를 통해 문서 삽입
  */
 async function syncToVectorize(documents) {
-  const batchSize = 10; // 한 번에 10개씩 삽입
+  const batchSize = 2; // 한 번에 2개씩 삽입 (안정성 우선)
 
-  console.log(`📤 Syncing ${documents.length} documents to Vectorize...\n`);
+  console.log(`📤 Syncing ${documents.length} documents to Vectorize...`);
+  console.log(`   Batch size: ${batchSize} (slow but reliable)`);
+  console.log(`   Estimated time: ~${Math.ceil(documents.length / batchSize * 8 / 60)} minutes\n`);
 
   let successCount = 0;
   let failCount = 0;
+  let retryQueue = [];
 
   for (let i = 0; i < documents.length; i += batchSize) {
     const batch = documents.slice(i, i + batchSize);
@@ -163,20 +166,21 @@ async function syncToVectorize(documents) {
       const response = await axios.post(`${WORKER_URL}/api/sync-docs`, {
         documents: batch,
       }, {
-        timeout: 60000, // 60초 타임아웃
+        timeout: 120000, // 120초 타임아웃
       });
 
       console.log(`   ✅ ${response.data.message}`);
       successCount += batch.length;
 
-      // Rate limiting: 배치 사이에 3초 대기
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Rate limiting: 배치 사이에 6초 대기
+      await new Promise(resolve => setTimeout(resolve, 6000));
     } catch (error) {
       console.error(`   ❌ Failed batch ${batchNum}:`, error.message);
       if (error.response) {
         console.error(`      Status: ${error.response.status}`);
       }
       failCount += batch.length;
+      retryQueue.push(...batch); // 실패한 문서 재시도 큐에 추가
 
       // 실패 시 5초 대기 후 재시도
       console.log(`      ⏳ Waiting 5s before continuing...`);
@@ -184,7 +188,35 @@ async function syncToVectorize(documents) {
     }
   }
 
-  console.log(`\n📊 Sync Summary:`);
+  // 실패한 문서 재시도 (1개씩)
+  if (retryQueue.length > 0) {
+    console.log(`\n🔄 Retrying ${retryQueue.length} failed documents (1 at a time)...\n`);
+
+    for (let i = 0; i < retryQueue.length; i++) {
+      const doc = retryQueue[i];
+      try {
+        console.log(`🔄 Retry ${i + 1}/${retryQueue.length}: ${doc.title?.substring(0, 40)}...`);
+
+        const response = await axios.post(`${WORKER_URL}/api/sync-docs`, {
+          documents: [doc],
+        }, {
+          timeout: 120000,
+        });
+
+        console.log(`   ✅ ${response.data.message}`);
+        successCount += 1;
+        failCount -= 1;
+
+        // 재시도 시 10초 대기
+        await new Promise(resolve => setTimeout(resolve, 10000));
+      } catch (error) {
+        console.error(`   ❌ Retry failed: ${error.message}`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+  }
+
+  console.log(`\n📊 Final Sync Summary:`);
   console.log(`   ✅ Success: ${successCount} documents`);
   console.log(`   ❌ Failed: ${failCount} documents`);
   console.log(`   📈 Success Rate: ${((successCount / documents.length) * 100).toFixed(1)}%\n`);

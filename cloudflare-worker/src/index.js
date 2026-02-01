@@ -63,6 +63,11 @@ export default {
       return handleSyncDocs(request, env, corsHeaders);
     }
 
+    // 벡터 직접 삽입 (외부에서 임베딩 생성 후)
+    if (url.pathname === '/api/sync-vectors' && request.method === 'POST') {
+      return handleSyncVectors(request, env, corsHeaders);
+    }
+
     return Response.json(
       { error: 'Not found' },
       { status: 404, headers: corsHeaders }
@@ -121,7 +126,7 @@ async function handleTestInsert(request, env, corsHeaders) {
     }
 
     // Vectorize에 벡터 삽입
-    await env.VECTORIZE.insert(vectors);
+    await env.VECTORIZE.upsert(vectors);
 
     console.log(`Successfully inserted ${vectors.length} test documents`);
 
@@ -190,7 +195,7 @@ async function handleSyncDocs(request, env, corsHeaders) {
 
     // Vectorize에 벡터 삽입
     if (vectors.length > 0) {
-      await env.VECTORIZE.insert(vectors);
+      await env.VECTORIZE.upsert(vectors);
       console.log(`Successfully inserted ${vectors.length} documents`);
     }
 
@@ -205,6 +210,60 @@ async function handleSyncDocs(request, env, corsHeaders) {
     return Response.json({
       success: false,
       error: error.message,
+    }, { status: 500, headers: corsHeaders });
+  }
+}
+
+/**
+ * 벡터 직접 삽입 (외부에서 임베딩 생성 후)
+ * Gemini 등 외부 API로 임베딩을 생성하고 벡터만 전송받아 저장
+ */
+async function handleSyncVectors(request, env, corsHeaders) {
+  let vectorIds = [];
+  try {
+    const body = await request.json();
+    const vectors = body.vectors;
+
+    if (!vectors || !Array.isArray(vectors)) {
+      return Response.json(
+        { error: 'vectors array is required' },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    vectorIds = vectors.map(v => v.id);
+
+    // 벡터 유효성 검사
+    const validVectors = vectors.filter(v =>
+      v.id &&
+      v.values &&
+      Array.isArray(v.values) &&
+      v.values.length === 768 &&  // Gemini text-embedding-004는 768차원
+      v.metadata
+    );
+
+    if (validVectors.length === 0) {
+      return Response.json(
+        { error: 'No valid vectors (need id, values[768], metadata)' },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    // Vectorize에 직접 삽입 (upsert로 중복 허용)
+    await env.VECTORIZE.upsert(validVectors);
+
+    return Response.json({
+      success: true,
+      message: `Inserted ${validVectors.length} vectors`,
+      count: validVectors.length,
+    }, { headers: corsHeaders });
+
+  } catch (error) {
+    console.error('Sync vectors error:', error);
+    return Response.json({
+      success: false,
+      error: error.message,
+      vectorIds: vectorIds,
     }, { status: 500, headers: corsHeaders });
   }
 }
