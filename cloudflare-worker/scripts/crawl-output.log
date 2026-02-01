@@ -1,0 +1,1658 @@
+══════════════════════════════════════════════════════════════════════
+🤖 Flutter Documentation Complete Crawler (Sitemap-based)
+══════════════════════════════════════════════════════════════════════
+
+This will crawl ALL Flutter documentation pages from sitemap.
+Estimated time: 30-60 minutes depending on network speed.
+
+📡 Fetching sitemap from https://docs.flutter.dev/sitemap.xml...
+🔍 Parsing sitemap XML...
+✅ Found 752 documentation URLs
+
+📊 Will process 752 documentation pages
+
+
+🚀 Starting to crawl 752 documentation pages...
+
+📄 [1/752] https://docs.flutter.dev/
+   ✅ Flutter documentation (2231 chars)
+📄 [2/752] https://docs.flutter.dev/flutter-for/android-devs
+   ✅ Flutter for Android developers (8000 chars)
+📄 [3/752] https://docs.flutter.dev/flutter-for/swiftui-devs
+   ✅ Flutter for SwiftUI Developers (8000 chars)
+📄 [4/752] https://docs.flutter.dev/flutter-for/declarative
+   ✅ Introduction to declarative UI (2691 chars)
+📄 [5/752] https://docs.flutter.dev/flutter-for/web-devs
+   ✅ Flutter for web developers (8000 chars)
+📄 [6/752] https://docs.flutter.dev/flutter-for/dart-swift-concurrency
+   ✅ Flutter concurrency for Swift developers (8000 chars)
+📄 [7/752] https://docs.flutter.dev/flutter-for/compose-devs
+   ✅ Flutter for Jetpack Compose developers (8000 chars)
+📄 [8/752] https://docs.flutter.dev/flutter-for/uikit-devs
+   ✅ Flutter for UIKit developers (8000 chars)
+📄 [9/752] https://docs.flutter.dev/flutter-for/react-native-devs
+   ✅ Flutter for React Native developers (8000 chars)
+📄 [10/752] https://docs.flutter.dev/flutter-for/xamarin-forms-devs
+   ✅ Flutter for Xamarin.Forms developers (8000 chars)
+📄 [11/752] https://docs.flutter.dev/ui/adaptive-responsive/more-info
+   ✅ Additional resources (1635 chars)
+📄 [12/752] https://docs.flutter.dev/ui/adaptive-responsive/idioms
+   ✅ Platform idioms (8000 chars)
+📄 [13/752] https://docs.flutter.dev/ui/adaptive-responsive/capabilities
+   ✅ Capabilities & policies (6926 chars)
+📄 [14/752] https://docs.flutter.dev/ui/adaptive-responsive/input
+   ✅ User input & accessibility (8000 chars)
+📄 [15/752] https://docs.flutter.dev/ui/adaptive-responsive/best-practices
+   ✅ Best practices for adaptive design (7549 chars)
+📄 [16/752] https://docs.flutter.dev/ui/adaptive-responsive/platform-adaptations
+   ✅ Automatic platform adaptations (8000 chars)
+📄 [17/752] https://docs.flutter.dev/ui/adaptive-responsive/safearea-mediaquery
+   ✅ SafeArea & MediaQuery (4138 chars)
+📄 [18/752] https://docs.flutter.dev/ui/adaptive-responsive/large-screens
+   ✅ Large screen devices (7101 chars)
+📄 [19/752] https://docs.flutter.dev/ui/adaptive-responsive/general
+   ✅ General approach to adaptive apps (5540 chars)
+📄 [20/752] https://docs.flutter.dev/ui/adaptive-responsive
+   ✅ Adaptive and responsive design in Flutter (2081 chars)
+📄 [21/752] https://docs.flutter.dev/ui/internationalization
+   ✅ Internationalizing Flutter apps (8000 chars)
+📄 [22/752] https://docs.flutter.dev/ui/interactivity/actions-and-shortcuts
+   ✅ Using Actions and Shortcuts (8000 chars)
+📄 [23/752] https://docs.flutter.dev/ui/interactivity/gestures/drag-outside
+   ✅ Drag outside an app (1874 chars)
+📄 [24/752] https://docs.flutter.dev/ui/interactivity/gestures
+   ✅ Taps, drags, and other gestures (7593 chars)
+📄 [25/752] https://docs.flutter.dev/ui/interactivity/focus
+   ✅ Understanding Flutter's keyboard focus system (8000 chars)
+📄 [26/752] https://docs.flutter.dev/ui/interactivity
+   ✅ Add interactivity to your Flutter app (8000 chars)
+📄 [27/752] https://docs.flutter.dev/ui/layout/scrolling/slivers
+   ✅ Using slivers to achieve fancy scrolling (1831 chars)
+📄 [28/752] https://docs.flutter.dev/ui/layout/scrolling
+   ✅ Scrolling (2650 chars)
+📄 [29/752] https://docs.flutter.dev/ui/layout/constraints
+   ✅ Understanding constraints (8000 chars)
+📄 [30/752] https://docs.flutter.dev/ui/layout/tutorial
+   ✅ Build a Flutter layout (8000 chars)
+📄 [31/752] https://docs.flutter.dev/ui/layout
+   ✅ Layouts in Flutter (8000 chars)
+📄 [32/752] https://docs.flutter.dev/ui/navigation/url-strategies
+   ✅ Configuring the URL strategy on the web (2651 chars)
+📄 [33/752] https://docs.flutter.dev/ui/navigation/deep-linking
+   ✅ Deep linking (3407 chars)
+📄 [34/752] https://docs.flutter.dev/ui/navigation
+   ✅ Navigation and routing (6661 chars)
+📄 [35/752] https://docs.flutter.dev/ui/assets/asset-transformation
+   ✅ Transforming assets at build time (3069 chars)
+📄 [36/752] https://docs.flutter.dev/ui/assets/assets-and-images
+   ✅ Adding assets and images (8000 chars)
+📄 [37/752] https://docs.flutter.dev/ui/assets
+   ✅ Assets & media (580 chars)
+📄 [38/752] https://docs.flutter.dev/ui/animations/staggered-animations
+   ✅ Staggered animations (8000 chars)
+📄 [39/752] https://docs.flutter.dev/ui/animations/tutorial
+   ✅ Animations tutorial (8000 chars)
+📄 [40/752] https://docs.flutter.dev/ui/animations/overview
+   ✅ Animations API overview (8000 chars)
+📄 [41/752] https://docs.flutter.dev/ui/animations/hero-animations
+   ✅ Hero animations (8000 chars)
+📄 [42/752] https://docs.flutter.dev/ui/animations/implicit-animations
+   ✅ Implicit animations (2615 chars)
+📄 [43/752] https://docs.flutter.dev/ui/animations
+   ✅ Introduction to animations (8000 chars)
+📄 [44/752] https://docs.flutter.dev/ui/accessibility/assistive-technologies
+   ✅ Accessibility technologies (4936 chars)
+📄 [45/752] https://docs.flutter.dev/ui/accessibility/web-accessibility
+   ✅ Web accessibility (3890 chars)
+📄 [46/752] https://docs.flutter.dev/ui/accessibility/accessibility-testing
+   ✅ Accessibility testing (4167 chars)
+📄 [47/752] https://docs.flutter.dev/ui/accessibility
+   ✅ Accessibility (4872 chars)
+📄 [48/752] https://docs.flutter.dev/ui/accessibility/ui-design-and-styling
+   ✅ UI design & styling (2841 chars)
+📄 [49/752] https://docs.flutter.dev/ui/widgets
+   ✅ Widget catalog (2691 chars)
+📄 [50/752] https://docs.flutter.dev/ui/design/cupertino
+   ✅ Cupertino design for Flutter (1721 chars)
+
+📊 Progress: 50/752 (7%)
+   ✅ Success: 50
+   ❌ Failed: 0
+
+📄 [51/752] https://docs.flutter.dev/ui/design/graphics/fragment-shaders
+   ✅ Writing and using fragment shaders (8000 chars)
+📄 [52/752] https://docs.flutter.dev/ui/design/material
+   ✅ Material Design for Flutter (1663 chars)
+📄 [53/752] https://docs.flutter.dev/ui/design/text/typography
+   ✅ Flutter's fonts and typography (4466 chars)
+📄 [54/752] https://docs.flutter.dev/ui
+   ✅ Building user interfaces with Flutter (8000 chars)
+📄 [55/752] https://docs.flutter.dev/dash
+   ✅ Who is Dash? (4012 chars)
+📄 [56/752] https://docs.flutter.dev/packages-and-plugins/favorites
+   ✅ Flutter Favorite program (4319 chars)
+📄 [57/752] https://docs.flutter.dev/packages-and-plugins/swift-package-manager/for-app-developers
+   ✅ Swift Package Manager for app developers (8000 chars)
+📄 [58/752] https://docs.flutter.dev/packages-and-plugins/swift-package-manager/for-plugin-authors
+   ✅ Swift Package Manager for plugin authors (8000 chars)
+📄 [59/752] https://docs.flutter.dev/packages-and-plugins/swift-package-manager
+   ✅ Swift Package Manager for Flutter (619 chars)
+📄 [60/752] https://docs.flutter.dev/packages-and-plugins/using-packages
+   ✅ Using packages (8000 chars)
+📄 [61/752] https://docs.flutter.dev/packages-and-plugins/developing-packages
+   ✅ Developing packages & plugins (8000 chars)
+📄 [62/752] https://docs.flutter.dev/packages-and-plugins/background-processes
+   ✅ Background processes (1436 chars)
+📄 [63/752] https://docs.flutter.dev/packages-and-plugins
+   ✅ Packages & plugins (819 chars)
+📄 [64/752] https://docs.flutter.dev/tools/property-editor
+   ✅ Flutter Property Editor (7267 chars)
+📄 [65/752] https://docs.flutter.dev/tools/devtools/debugger
+   ✅ Use the debugger (3077 chars)
+📄 [66/752] https://docs.flutter.dev/tools/devtools/inspector
+   ✅ Use the Flutter inspector (8000 chars)
+📄 [67/752] https://docs.flutter.dev/tools/devtools/vscode
+   ✅ Run DevTools from VS Code (1651 chars)
+📄 [68/752] https://docs.flutter.dev/tools/devtools/logging
+   ✅ Use the Logging view (1326 chars)
+📄 [69/752] https://docs.flutter.dev/tools/devtools/console
+   ✅ Use the Debug console (1781 chars)
+📄 [70/752] https://docs.flutter.dev/tools/devtools/app-size
+   ✅ Use the app size tool (8000 chars)
+📄 [71/752] https://docs.flutter.dev/tools/devtools/performance
+   ✅ Use the Performance view (8000 chars)
+📄 [72/752] https://docs.flutter.dev/tools/devtools/extensions
+   ✅ DevTools extensions (2868 chars)
+📄 [73/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.16.0
+   ✅ DevTools 2.16.0 release notes (821 chars)
+📄 [74/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.16.0.md
+   ✅  (638 chars)
+📄 [75/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.11.2
+   ✅ DevTools 2.11.2 release notes (1093 chars)
+📄 [76/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.11.2.md
+   ✅  (1449 chars)
+📄 [77/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.29.0
+   ✅ DevTools 2.29.0 release notes (1885 chars)
+📄 [78/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.29.0.md
+   ✅  (2551 chars)
+📄 [79/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.20.0
+   ✅ DevTools 2.20.0 release notes (1548 chars)
+📄 [80/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.20.0.md
+   ✅  (2308 chars)
+📄 [81/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.39.0
+   ✅ DevTools 2.39.0 release notes (1328 chars)
+📄 [82/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.39.0.md
+   ✅  (1472 chars)
+📄 [83/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.41.0
+   ✅ DevTools 2.41.0 release notes (2096 chars)
+📄 [84/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.41.0.md
+   ✅  (3350 chars)
+📄 [85/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.51.1
+   ✅ DevTools 2.51.1 release notes (1548 chars)
+📄 [86/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.51.1.md
+   ✅  (1756 chars)
+📄 [87/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.10.0
+   ✅ DevTools 2.10.0 release notes (1278 chars)
+📄 [88/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.10.0.md
+   ✅  (1466 chars)
+📄 [89/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.32.0
+   ✅ DevTools 2.32.0 release notes (2341 chars)
+📄 [90/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.32.0.md
+   ✅  (3025 chars)
+📄 [91/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.51.0
+   ✅ DevTools 2.51.0 release notes (1023 chars)
+📄 [92/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.51.0.md
+   ✅  (916 chars)
+📄 [93/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.30.0
+   ✅ DevTools 2.30.0 release notes (1341 chars)
+📄 [94/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.30.0.md
+   ✅  (1533 chars)
+📄 [95/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.5
+   ✅ DevTools 2.28.5 release notes (1094 chars)
+📄 [96/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.5.md
+   ✅  (1155 chars)
+📄 [97/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.18.0
+   ✅ DevTools 2.18.0 release notes (1764 chars)
+📄 [98/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.18.0.md
+   ✅  (2817 chars)
+📄 [99/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.9.1
+   ✅ DevTools 2.9.1 release notes (1116 chars)
+📄 [100/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.9.1.md
+   ✅  (1489 chars)
+
+📊 Progress: 100/752 (13%)
+   ✅ Success: 100
+   ❌ Failed: 0
+
+📄 [101/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.21.1
+   ✅ DevTools 2.21.1 release notes (1988 chars)
+📄 [102/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.21.1.md
+   ✅  (2893 chars)
+📄 [103/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.8.0
+   ✅ DevTools 2.8.0 release notes (3274 chars)
+📄 [104/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.8.0.md
+   ✅  (4131 chars)
+📄 [105/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.47.0
+   ✅ DevTools 2.47.0 release notes (794 chars)
+📄 [106/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.47.0.md
+   ✅  (636 chars)
+📄 [107/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.46.0
+   ✅ DevTools 2.46.0 release notes (1066 chars)
+📄 [108/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.46.0.md
+   ✅  (1060 chars)
+📄 [109/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.45.0
+   ✅ DevTools 2.45.0 release notes (1509 chars)
+📄 [110/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.45.0.md
+   ✅  (1807 chars)
+📄 [111/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.7.0
+   ✅ DevTools 2.7.0 release notes (1598 chars)
+📄 [112/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.7.0.md
+   ✅  (2607 chars)
+📄 [113/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.14.0
+   ✅ DevTools 2.14.0 release notes (1650 chars)
+📄 [114/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.14.0.md
+   ✅  (2441 chars)
+📄 [115/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.15.0
+   ✅ DevTools 2.15.0 release notes (1376 chars)
+📄 [116/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.15.0.md
+   ✅  (1883 chars)
+📄 [117/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.38.0
+   ✅ DevTools 2.38.0 release notes (1392 chars)
+📄 [118/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.38.0.md
+   ✅  (1490 chars)
+📄 [119/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.4
+   ✅ DevTools 2.28.4 release notes (1035 chars)
+📄 [120/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.4.md
+   ✅  (995 chars)
+📄 [121/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.17.0
+   ✅ DevTools 2.17.0 release notes (1763 chars)
+📄 [122/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.17.0.md
+   ✅  (1955 chars)
+📄 [123/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.40.2
+   ✅ DevTools 2.40.2 release notes (2093 chars)
+📄 [124/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.40.2.md
+   ✅  (3019 chars)
+📄 [125/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.44.0
+   ✅ DevTools 2.44.0 release notes (1736 chars)
+📄 [126/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.44.0.md
+   ✅  (3050 chars)
+📄 [127/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.3
+   ✅ DevTools 2.28.3 release notes (1332 chars)
+📄 [128/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.3.md
+   ✅  (1616 chars)
+📄 [129/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.12.1
+   ✅ DevTools 2.12.1 release notes (1044 chars)
+📄 [130/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.12.1.md
+   ✅  (1239 chars)
+📄 [131/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.25.0
+   ✅ DevTools 2.25.0 release notes (935 chars)
+📄 [132/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.25.0.md
+   ✅  (1069 chars)
+📄 [133/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.19.0
+   ✅ DevTools 2.19.0 release notes (1340 chars)
+📄 [134/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.19.0.md
+   ✅  (1615 chars)
+📄 [135/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.9.2
+   ✅ DevTools 2.9.2 release notes (1444 chars)
+📄 [136/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.9.2.md
+   ✅  (1829 chars)
+📄 [137/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.54.0
+   ✅ DevTools 2.54.0 release notes (1180 chars)
+📄 [138/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.54.0.md
+   ✅  (1227 chars)
+📄 [139/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.13.1
+   ✅ DevTools 2.13.1 release notes (1731 chars)
+📄 [140/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.13.1.md
+   ✅  (2332 chars)
+📄 [141/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.48.0
+   ✅ DevTools 2.48.0 release notes (1158 chars)
+📄 [142/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.48.0.md
+   ✅  (1104 chars)
+📄 [143/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.24.0
+   ✅ DevTools 2.24.0 release notes (1501 chars)
+📄 [144/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.24.0.md
+   ✅  (1832 chars)
+📄 [145/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.23.1
+   ✅ DevTools 2.23.1 release notes (3201 chars)
+📄 [146/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.23.1.md
+   ✅  (5128 chars)
+📄 [147/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.31.0
+   ✅ DevTools 2.31.0 release notes (2036 chars)
+📄 [148/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.31.0.md
+   ✅  (2889 chars)
+📄 [149/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.36.0
+   ✅ DevTools 2.36.0 release notes (1758 chars)
+📄 [150/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.36.0.md
+   ✅  (2588 chars)
+
+📊 Progress: 150/752 (20%)
+   ✅ Success: 150
+   ❌ Failed: 0
+
+📄 [151/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.49.0
+   ✅ DevTools 2.49.0 release notes (823 chars)
+📄 [152/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.49.0.md
+   ✅  (663 chars)
+📄 [153/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.1
+   ✅ DevTools 2.28.1 release notes (1565 chars)
+📄 [154/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.1.md
+   ✅  (2191 chars)
+📄 [155/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.2
+   ✅ DevTools 2.28.2 release notes (1023 chars)
+📄 [156/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.28.2.md
+   ✅  (968 chars)
+📄 [157/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.52.0
+   ✅ DevTools 2.52.0 release notes (1215 chars)
+📄 [158/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.52.0.md
+   ✅  (1319 chars)
+📄 [159/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.33.0
+   ✅ DevTools 2.33.0 release notes (2495 chars)
+📄 [160/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.33.0.md
+   ✅  (3405 chars)
+📄 [161/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.37.2
+   ✅ DevTools 2.37.2 release notes (1635 chars)
+📄 [162/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.37.2.md
+   ✅  (2116 chars)
+📄 [163/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.50.0
+   ✅ DevTools 2.50.0 release notes (807 chars)
+📄 [164/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.50.0.md
+   ✅  (649 chars)
+📄 [165/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.12.2
+   ✅ DevTools 2.12.2 release notes (741 chars)
+📄 [166/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.12.2.md
+   ✅  (609 chars)
+📄 [167/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.26.1
+   ✅ DevTools 2.26.1 release notes (1573 chars)
+📄 [168/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.26.1.md
+   ✅  (1817 chars)
+📄 [169/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.53.0
+   ✅ DevTools 2.53.0 release notes (991 chars)
+📄 [170/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.53.0.md
+   ✅  (938 chars)
+📄 [171/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.27.0
+   ✅ DevTools 2.27.0 release notes (778 chars)
+📄 [172/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.27.0.md
+   ✅  (824 chars)
+📄 [173/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.22.2
+   ✅ DevTools 2.22.2 release notes (1571 chars)
+📄 [174/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.22.2.md
+   ✅  (2561 chars)
+📄 [175/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.34.1
+   ✅ DevTools 2.34.1 release notes (2176 chars)
+📄 [176/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.34.1.md
+   ✅  (3393 chars)
+📄 [177/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.42.3
+   ✅ DevTools 2.42.3 release notes (1466 chars)
+📄 [178/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.42.3.md
+   ✅  (1963 chars)
+📄 [179/752] https://docs.flutter.dev/tools/devtools/release-notes
+   ✅ DevTools release notes (1834 chars)
+📄 [180/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.35.0
+   ✅ DevTools 2.35.0 release notes (2048 chars)
+📄 [181/752] https://docs.flutter.dev/tools/devtools/release-notes/release-notes-2.35.0.md
+   ✅  (3105 chars)
+📄 [182/752] https://docs.flutter.dev/tools/devtools/network
+   ✅ Use the Network View (3701 chars)
+📄 [183/752] https://docs.flutter.dev/tools/devtools/legacy-inspector
+   ✅ Use the legacy Flutter inspector (8000 chars)
+📄 [184/752] https://docs.flutter.dev/tools/devtools/android-studio
+   ✅ Run DevTools from Android Studio (1868 chars)
+📄 [185/752] https://docs.flutter.dev/tools/devtools/cli
+   ✅ Run DevTools from the command line (2286 chars)
+📄 [186/752] https://docs.flutter.dev/tools/devtools/deep-links
+   ✅ Validate deep links (1016 chars)
+📄 [187/752] https://docs.flutter.dev/tools/devtools/cpu-profiler
+   ✅ Use the CPU profiler view (7750 chars)
+📄 [188/752] https://docs.flutter.dev/tools/devtools
+   ✅ Flutter and Dart DevTools (3052 chars)
+📄 [189/752] https://docs.flutter.dev/tools/devtools/memory
+   ✅ Use the Memory view (8000 chars)
+📄 [190/752] https://docs.flutter.dev/tools/widget-previewer
+   ✅ Flutter Widget Previewer (8000 chars)
+📄 [191/752] https://docs.flutter.dev/tools/formatting
+   ✅ Code formatting (2083 chars)
+📄 [192/752] https://docs.flutter.dev/tools/editors
+   ✅ Flutter editor support (1790 chars)
+📄 [193/752] https://docs.flutter.dev/tools/vs-code
+   ✅ Visual Studio Code (8000 chars)
+📄 [194/752] https://docs.flutter.dev/tools/hot-reload
+   ✅ Hot reload (8000 chars)
+📄 [195/752] https://docs.flutter.dev/tools/android-studio
+   ✅ Android Studio and IntelliJ (8000 chars)
+📄 [196/752] https://docs.flutter.dev/tools/pubspec
+   ✅ Flutter pubspec options (8000 chars)
+📄 [197/752] https://docs.flutter.dev/tools/flutter-fix
+   ✅ Flutter fix (2327 chars)
+📄 [198/752] https://docs.flutter.dev/tools/sdk
+   ✅ Flutter SDK overview (1852 chars)
+📄 [199/752] https://docs.flutter.dev/tools
+   ✅ Tools & techniques (1331 chars)
+📄 [200/752] https://docs.flutter.dev/security
+   ✅ Security (4972 chars)
+
+📊 Progress: 200/752 (27%)
+   ✅ Success: 200
+   ❌ Failed: 0
+
+📄 [201/752] https://docs.flutter.dev/search-all
+   ✅ Search Flutter-related sites (440 chars)
+📄 [202/752] https://docs.flutter.dev/search
+   ✅ Search Flutter docs (370 chars)
+📄 [203/752] https://docs.flutter.dev/learn/pathway/quick-install
+   ✅ Quick install (7384 chars)
+📄 [204/752] https://docs.flutter.dev/learn/pathway/how-flutter-works
+   ✅ How Flutter Works (5609 chars)
+📄 [205/752] https://docs.flutter.dev/learn/pathway/tutorial/user-input
+   ✅ User input (8000 chars)
+📄 [206/752] https://docs.flutter.dev/learn/pathway/tutorial/layout
+   ✅ Layout (8000 chars)
+📄 [207/752] https://docs.flutter.dev/learn/pathway/tutorial/navigation
+   ✅ Stack-based navigation (8000 chars)
+📄 [208/752] https://docs.flutter.dev/learn/pathway/tutorial/devtools
+   ✅ DevTools (8000 chars)
+📄 [209/752] https://docs.flutter.dev/learn/pathway/tutorial/http-requests
+   ✅ Fetch data from the internet (7046 chars)
+📄 [210/752] https://docs.flutter.dev/learn/pathway/tutorial/adaptive-layout
+   ✅ LayoutBuilder and adaptive layouts (8000 chars)
+📄 [211/752] https://docs.flutter.dev/learn/pathway/tutorial/advanced-ui
+   ✅ Advanced UI features (8000 chars)
+📄 [212/752] https://docs.flutter.dev/learn/pathway/tutorial/widget-fundamentals
+   ✅ Create widgets (8000 chars)
+📄 [213/752] https://docs.flutter.dev/learn/pathway/tutorial/listenable-builder
+   ✅ Rebuild UI when state changes (8000 chars)
+📄 [214/752] https://docs.flutter.dev/learn/pathway/tutorial/create-an-app
+   ✅ Create an app (6390 chars)
+📄 [215/752] https://docs.flutter.dev/learn/pathway/tutorial/change-notifier
+   ✅ State management in Flutter (8000 chars)
+📄 [216/752] https://docs.flutter.dev/learn/pathway/tutorial/slivers
+   ✅ Advanced scrolling and slivers (8000 chars)
+📄 [217/752] https://docs.flutter.dev/learn/pathway/tutorial/stateful-widget
+   ✅ Stateful widgets (8000 chars)
+📄 [218/752] https://docs.flutter.dev/learn/pathway/tutorial/set-up-state-project
+   ✅ Set up your project (8000 chars)
+📄 [219/752] https://docs.flutter.dev/learn/pathway/tutorial/implicit-animations
+   ✅ Simple animations (8000 chars)
+📄 [220/752] https://docs.flutter.dev/learn/pathway/tutorial
+   ✅ Flutter tutorial (2042 chars)
+📄 [221/752] https://docs.flutter.dev/learn/pathway
+   ✅ Overview (2862 chars)
+📄 [222/752] https://docs.flutter.dev/learn/learning-resources
+   ✅ Flutter learning resources (8000 chars)
+📄 [223/752] https://docs.flutter.dev/learn
+   ✅ Learn Flutter (1527 chars)
+📄 [224/752] https://docs.flutter.dev/resources/in-app-purchases-overview
+   ✅ In-app purchases overview (584 chars)
+📄 [225/752] https://docs.flutter.dev/resources/news-toolkit
+   ✅ Flutter News Toolkit (513 chars)
+📄 [226/752] https://docs.flutter.dev/resources/inside-flutter
+   ✅ Inside Flutter (8000 chars)
+📄 [227/752] https://docs.flutter.dev/resources/faq
+   ✅ FAQ (8000 chars)
+📄 [228/752] https://docs.flutter.dev/resources/ads-overview
+   ✅ Ads overview (1363 chars)
+📄 [229/752] https://docs.flutter.dev/resources/games-toolkit
+   ✅ Casual Games Toolkit (6678 chars)
+📄 [230/752] https://docs.flutter.dev/resources/videos
+   ✅ Videos (4620 chars)
+📄 [231/752] https://docs.flutter.dev/resources/support
+   ✅ Flutter support (1856 chars)
+📄 [232/752] https://docs.flutter.dev/resources/payments-overview
+   ✅ Payments overview (589 chars)
+📄 [233/752] https://docs.flutter.dev/resources/architectural-overview
+   ✅ Flutter architectural overview (8000 chars)
+📄 [234/752] https://docs.flutter.dev/resources/bug-reports
+   ✅ Create useful bug reports (3985 chars)
+📄 [235/752] https://docs.flutter.dev/resources/courses
+   ✅ Online courses (1709 chars)
+📄 [236/752] https://docs.flutter.dev/resources
+   ✅ Resources (1531 chars)
+📄 [237/752] https://docs.flutter.dev/contribute
+   ✅ Contribute to Flutter (8000 chars)
+📄 [238/752] https://docs.flutter.dev/brand
+   ✅ Flutter Brand Guidelines (6877 chars)
+📄 [239/752] https://docs.flutter.dev/community/china
+   ✅ Using Flutter in China (8000 chars)
+📄 [240/752] https://docs.flutter.dev/install/upgrade
+   ✅ Upgrade Flutter (5366 chars)
+📄 [241/752] https://docs.flutter.dev/install/manual
+   ✅ Install Flutter manually (8000 chars)
+📄 [242/752] https://docs.flutter.dev/install/troubleshoot
+   ✅ Troubleshooting installation (7783 chars)
+📄 [243/752] https://docs.flutter.dev/install/add-to-path
+   ✅ Add Flutter to your PATH (8000 chars)
+📄 [244/752] https://docs.flutter.dev/install/uninstall
+   ✅ Uninstall Flutter (3732 chars)
+📄 [245/752] https://docs.flutter.dev/install/archive
+   ✅ Flutter SDK archive (4428 chars)
+📄 [246/752] https://docs.flutter.dev/install/with-vs-code
+   ✅ Install Flutter using VS Code (5589 chars)
+📄 [247/752] https://docs.flutter.dev/install
+   ✅ Install Flutter (2105 chars)
+📄 [248/752] https://docs.flutter.dev/release/compatibility-policy
+   ✅ Flutter compatibility policy (2627 chars)
+📄 [249/752] https://docs.flutter.dev/release/breaking-changes/integration-test-default-golden-comparator
+   ✅ Integration test default golden-file comparators changed on Android and iOS. (3485 chars)
+📄 [250/752] https://docs.flutter.dev/release/breaking-changes/material-state
+   ✅ Rename MaterialState to WidgetState (3693 chars)
+
+📊 Progress: 250/752 (33%)
+   ✅ Success: 250
+   ❌ Failed: 0
+
+📄 [251/752] https://docs.flutter.dev/release/breaking-changes/hero-controller-scope
+   ✅ More strict assertions in the Navigator and the Hero controller scope (3548 chars)
+📄 [252/752] https://docs.flutter.dev/release/breaking-changes/text-input-client-current-value
+   ✅ TextInputClient currentTextEditingValue (4729 chars)
+📄 [253/752] https://docs.flutter.dev/release/breaking-changes/annotations-return-local-position-relative-to-object
+   ✅ AnnotatedRegionLayers return local position relative to clipping region (3802 chars)
+📄 [254/752] https://docs.flutter.dev/release/breaking-changes/image-provider-load-buffer
+   ✅ Adding ImageProvider.loadBuffer (4809 chars)
+📄 [255/752] https://docs.flutter.dev/release/breaking-changes/mouse-tracker-moved-to-rendering
+   ✅ MouseTracker moved to rendering (2293 chars)
+📄 [256/752] https://docs.flutter.dev/release/breaking-changes/editable-text-scroll-into-view
+   ✅ Updated EditableText scroll into view behavior (1740 chars)
+📄 [257/752] https://docs.flutter.dev/release/breaking-changes/3-13-deprecations
+   ✅ Deprecated API removed after v3.13 (8000 chars)
+📄 [258/752] https://docs.flutter.dev/release/breaking-changes/uiscenedelegate
+   ✅ UISceneDelegate adoption (8000 chars)
+📄 [259/752] https://docs.flutter.dev/release/breaking-changes/default-scroll-behavior-drag
+   ✅ Default drag scrolling devices (5814 chars)
+📄 [260/752] https://docs.flutter.dev/release/breaking-changes/appbar-theme-color
+   ✅ AppBar theme color parameter deprecation (3194 chars)
+📄 [261/752] https://docs.flutter.dev/release/breaking-changes/visibility-maintainfocusability
+   ✅ The Visibility widget is no longer focusable by default when maintainState is enabled (2374 chars)
+📄 [262/752] https://docs.flutter.dev/release/breaking-changes/expansion-tile-controller
+   ✅ Deprecated ExpansionTileController (2997 chars)
+📄 [263/752] https://docs.flutter.dev/release/breaking-changes/scribble-text-input-client
+   ✅ Scribble Text Input Client (2994 chars)
+📄 [264/752] https://docs.flutter.dev/release/breaking-changes/modal-router-semantics-order
+   ✅ Semantics Order of the Overlay Entries in Modal Routes (5029 chars)
+📄 [265/752] https://docs.flutter.dev/release/breaking-changes/test-text-input
+   ✅ TestTextInput state reset (2451 chars)
+📄 [266/752] https://docs.flutter.dev/release/breaking-changes/zone-errors
+   ✅ "Zone mismatch" message (5441 chars)
+📄 [267/752] https://docs.flutter.dev/release/breaking-changes/dialog-border-radius
+   ✅ Dialogs' Default BorderRadius (2759 chars)
+📄 [268/752] https://docs.flutter.dev/release/breaking-changes/platform-views-using-html-slots-web
+   ✅ Using HTML slots to render platform views in the web (6472 chars)
+📄 [269/752] https://docs.flutter.dev/release/breaking-changes/wide-gamut-cupertino-dynamic-color
+   ✅ Migration guide for wide gamut CupertinoDynamicColor (3528 chars)
+📄 [270/752] https://docs.flutter.dev/release/breaking-changes/default-android-page-transition
+   ✅ The default page transition on Android is now PredictiveBackPageTransitionsBuilder (6030 chars)
+📄 [271/752] https://docs.flutter.dev/release/breaking-changes/new-color-scheme-roles
+   ✅ Introduce new ColorScheme roles for Material 3 (4743 chars)
+📄 [272/752] https://docs.flutter.dev/release/breaking-changes/buildtextspan-buildcontext
+   ✅ Added BuildContext parameter to TextEditingController.buildTextSpan (5179 chars)
+📄 [273/752] https://docs.flutter.dev/release/breaking-changes/separated-builder-find-child-index-callback
+   ✅ Deprecate findChildIndexCallback in favor of findItemIndexCallback in ListView
+                   and SliverList separated constructors (5053 chars)
+📄 [274/752] https://docs.flutter.dev/release/breaking-changes/network-policy-ios-android
+   ✅ Insecure HTTP connections are disabled by default on iOS and Android (4044 chars)
+📄 [275/752] https://docs.flutter.dev/release/breaking-changes/key-event-migration
+   ✅ Migrate RawKeyEvent/RawKeyboard system to KeyEvent/HardwareKeyboard system (7703 chars)
+📄 [276/752] https://docs.flutter.dev/release/breaking-changes/deprecate-contains-semantics
+   ✅ Deprecate containsSemantics in favor of isSemantics (2316 chars)
+📄 [277/752] https://docs.flutter.dev/release/breaking-changes/ignoringsemantics-migration
+   ✅ Migration guide for ignoringSemantics in IgnorePointer and related classes (4469 chars)
+📄 [278/752] https://docs.flutter.dev/release/breaking-changes/route-navigator-refactoring
+   ✅ Route and Navigator Refactoring (4268 chars)
+📄 [279/752] https://docs.flutter.dev/release/breaking-changes/menus-text-style
+   ✅ Updated default text styles for menus (4708 chars)
+📄 [280/752] https://docs.flutter.dev/release/breaking-changes/1-22-deprecations
+   ✅ Deprecated API removed after v1.22 (8000 chars)
+📄 [281/752] https://docs.flutter.dev/release/breaking-changes/material-theme-system-updates
+   ✅ Material Theme System Updates (2721 chars)
+📄 [282/752] https://docs.flutter.dev/release/breaking-changes/migrate-to-agp-9
+   ✅ Migrating Flutter Android app to Android Gradle Plugin 9.0.0 (4236 chars)
+📄 [283/752] https://docs.flutter.dev/release/breaking-changes/services-scheduler-dependency-reversed
+   ✅ Reversing the dependency between the scheduler and services layer (2269 chars)
+📄 [284/752] https://docs.flutter.dev/release/breaking-changes/actions-api-revision
+   ✅ Actions API revision (8000 chars)
+📄 [285/752] https://docs.flutter.dev/release/breaking-changes/material-localized-strings
+   ✅ Migration guide for material localized strings (2663 chars)
+📄 [286/752] https://docs.flutter.dev/release/breaking-changes/default-desktop-scrollbars
+   ✅ Default Scrollbars on Desktop (7912 chars)
+📄 [287/752] https://docs.flutter.dev/release/breaking-changes/windows-run-loop
+   ✅ Migrate a Windows project to the idiomatic run loop (1977 chars)
+📄 [288/752] https://docs.flutter.dev/release/breaking-changes/insert-content-text-input-client
+   ✅ Insert content text input client (2929 chars)
+📄 [289/752] https://docs.flutter.dev/release/breaking-changes/describe-enum
+   ✅ Migration guide for describeEnum and EnumProperty (2853 chars)
+📄 [290/752] https://docs.flutter.dev/release/breaking-changes/spring-description-underdamped
+   ✅ Underdamped spring formula changed (4076 chars)
+📄 [291/752] https://docs.flutter.dev/release/breaking-changes/plugin-api-migration
+   ✅ Supporting the new Android plugins APIs (8000 chars)
+📄 [292/752] https://docs.flutter.dev/release/breaking-changes/cupertino-icons-1.0.0
+   ✅ New CupertinoIcons has icon glyph changes (3978 chars)
+📄 [293/752] https://docs.flutter.dev/release/breaking-changes/cupertino-icons-1.0.0.md
+   ✅  (3853 chars)
+📄 [294/752] https://docs.flutter.dev/release/breaking-changes/forgetchild-call-super
+   ✅ The forgetChild() method must call super (2726 chars)
+📄 [295/752] https://docs.flutter.dev/release/breaking-changes/gesture-recognizer-add-allowed-pointer
+   ✅ GestureRecognizer cleanup (2644 chars)
+📄 [296/752] https://docs.flutter.dev/release/breaking-changes/3-7-deprecations
+   ✅ Deprecated API removed after v3.7 (7742 chars)
+📄 [297/752] https://docs.flutter.dev/release/breaking-changes/deprecate-themedata-indicatorcolor
+   ✅ Deprecate ThemeData.indicatorColor in favor of TabBarThemeData.indicatorColor (2367 chars)
+📄 [298/752] https://docs.flutter.dev/release/breaking-changes/add-showAutocorrectionPromptRect
+   ✅ showAutocorrectionPromptRect method added to TextInputClient (3342 chars)
+📄 [299/752] https://docs.flutter.dev/release/breaking-changes/2-2-deprecations
+   ✅ Deprecated API removed after v2.2 (6907 chars)
+📄 [300/752] https://docs.flutter.dev/release/breaking-changes/component-theme-normalization
+   ✅ Component theme normalization (2793 chars)
+
+📊 Progress: 300/752 (40%)
+   ✅ Success: 300
+   ❌ Failed: 0
+
+📄 [301/752] https://docs.flutter.dev/release/breaking-changes/component-theme-normalization-updates
+   ✅ Component theme normalization updates (4950 chars)
+📄 [302/752] https://docs.flutter.dev/release/breaking-changes/navigator-complete-route
+   ✅ When a route is removed from the stack, associated futures must complete (2767 chars)
+📄 [303/752] https://docs.flutter.dev/release/breaking-changes/template
+   ✅ Replace with title of breaking change (1218 chars)
+📄 [304/752] https://docs.flutter.dev/release/breaking-changes/route-transition-record-and-transition-delegate
+   ✅ Route transition record and transition delegate updates (5180 chars)
+📄 [305/752] https://docs.flutter.dev/release/breaking-changes/trackpad-gestures
+   ✅ Trackpad gestures can trigger GestureRecognizer (8000 chars)
+📄 [306/752] https://docs.flutter.dev/release/breaking-changes/notifications
+   ✅ Removing Notification.visitAncestor (3761 chars)
+📄 [307/752] https://docs.flutter.dev/release/breaking-changes/tab-alignment
+   ✅ Customizing tabs alignment using the new TabBar.tabAlignment property (3445 chars)
+📄 [308/752] https://docs.flutter.dev/release/breaking-changes/material-3-default
+   ✅ The ThemeData.useMaterial3 flag is true by default (3147 chars)
+📄 [309/752] https://docs.flutter.dev/release/breaking-changes/multi-touch-scrolling
+   ✅ Default multitouch scrolling (5208 chars)
+📄 [310/752] https://docs.flutter.dev/release/breaking-changes/renderbox-dry-layout
+   ✅ Dry layout support for RenderBox (4222 chars)
+📄 [311/752] https://docs.flutter.dev/release/breaking-changes/3-10-deprecations
+   ✅ Deprecated API removed after v3.10 (8000 chars)
+📄 [312/752] https://docs.flutter.dev/release/breaking-changes/clip-behavior
+   ✅ Clip Behavior (6015 chars)
+📄 [313/752] https://docs.flutter.dev/release/breaking-changes/scrollable-alert-dialog
+   ✅ Scrollable AlertDialog (No longer deprecated) (5496 chars)
+📄 [314/752] https://docs.flutter.dev/release/breaking-changes/2-5-deprecations
+   ✅ Deprecated API removed after v2.5 (8000 chars)
+📄 [315/752] https://docs.flutter.dev/release/breaking-changes/page-transition-replaced-by-ZoomPageTransitionBuilder
+   ✅ Page transitions replaced by ZoomPageTransitionsBuilder (4555 chars)
+📄 [316/752] https://docs.flutter.dev/release/breaking-changes/checkbox-fillColor
+   ✅ Updated Checkbox.fillColor behavior (3370 chars)
+📄 [317/752] https://docs.flutter.dev/release/breaking-changes/primary-scroll-controller-desktop
+   ✅ Default PrimaryScrollController on Desktop (6678 chars)
+📄 [318/752] https://docs.flutter.dev/release/breaking-changes/container-color
+   ✅ Container with color optimization (3116 chars)
+📄 [319/752] https://docs.flutter.dev/release/breaking-changes/add-currentAutofillScope-to-TextInputClient
+   ✅ Adding TextInputClient.currentAutofillScope property (3597 chars)
+📄 [320/752] https://docs.flutter.dev/release/breaking-changes/windows-version-information
+   ✅ Migrate a Windows project to set version information (2304 chars)
+📄 [321/752] https://docs.flutter.dev/release/breaking-changes/remove-semantics-elevation-and-thickness
+   ✅ Removed semantics elevation and thickness (2065 chars)
+📄 [322/752] https://docs.flutter.dev/release/breaking-changes/add-applifecyclestate-hidden
+   ✅ Migration guide for adding AppLifecycleState.hidden (3041 chars)
+📄 [323/752] https://docs.flutter.dev/release/breaking-changes/buttons
+   ✅ New Buttons and Button themes (8000 chars)
+📄 [324/752] https://docs.flutter.dev/release/breaking-changes/material-chip-button-semantics
+   ✅ Material Chip button semantics (4340 chars)
+📄 [325/752] https://docs.flutter.dev/release/breaking-changes/updated-material-3-progress-indicators
+   ✅ Updated Material 3 progress indicators (3877 chars)
+📄 [326/752] https://docs.flutter.dev/release/breaking-changes/clipboard-data-required
+   ✅ At least one clipboard data variant must be provided (2087 chars)
+📄 [327/752] https://docs.flutter.dev/release/breaking-changes/raw-images-on-web-uses-correct-origin-and-colors
+   ✅ Raw images on Web uses correct origin and colors (6458 chars)
+📄 [328/752] https://docs.flutter.dev/release/breaking-changes/wide-gamut-framework
+   ✅ Migration guide for wide gamut Color (6992 chars)
+📄 [329/752] https://docs.flutter.dev/release/breaking-changes/flutter-driver-migration
+   ✅ Migrating from flutter_driver (8000 chars)
+📄 [330/752] https://docs.flutter.dev/release/breaking-changes/updated-material-3-slider
+   ✅ Updated Material 3 Slider (2671 chars)
+📄 [331/752] https://docs.flutter.dev/release/breaking-changes/default-systemuimode-edge-to-edge
+   ✅ Set default of SystemUiMode to edge-to-edge (5379 chars)
+📄 [332/752] https://docs.flutter.dev/release/breaking-changes/windows-show-window-migration
+   ✅ Migrate a Windows project to ensure the window is shown (2081 chars)
+📄 [333/752] https://docs.flutter.dev/release/breaking-changes/cupertino-tab-bar-localizations
+   ✅ CupertinoTabBar requires Localizations parent (4489 chars)
+📄 [334/752] https://docs.flutter.dev/release/breaking-changes/font-weight-variation
+   ✅ FontWeight also controls the weight attribute of variable fonts (3251 chars)
+📄 [335/752] https://docs.flutter.dev/release/breaking-changes/snackbar-with-action-behavior-update
+   ✅ SnackBar with action no longer auto-dismisses (3067 chars)
+📄 [336/752] https://docs.flutter.dev/release/breaking-changes/input-decoration-collapsed
+   ✅ Remove invalid parameters for InputDecoration.collapsed (2293 chars)
+📄 [337/752] https://docs.flutter.dev/release/breaking-changes/asset-manifest-dot-json
+   ✅ Removal of AssetManifest.json (3601 chars)
+📄 [338/752] https://docs.flutter.dev/release/breaking-changes/navigator-and-page-api
+   ✅ Navigator's page APIs breaking change (3059 chars)
+📄 [339/752] https://docs.flutter.dev/release/breaking-changes/popscope-with-result
+   ✅ Generic types in PopScope (3238 chars)
+📄 [340/752] https://docs.flutter.dev/release/breaking-changes/kotlin-version
+   ✅ Required Kotlin version (2437 chars)
+📄 [341/752] https://docs.flutter.dev/release/breaking-changes/splash-screen-migration
+   ✅ Deprecated Splash Screen API Migration (3476 chars)
+📄 [342/752] https://docs.flutter.dev/release/breaking-changes/overlay-entry-rebuilds
+   ✅ Rebuild optimization for OverlayEntries and Routes (3489 chars)
+📄 [343/752] https://docs.flutter.dev/release/breaking-changes/android-kitkat-deprecation
+   ✅ Dropping support for Android KitKat (1426 chars)
+📄 [344/752] https://docs.flutter.dev/release/breaking-changes/deprecate-textscalefactor
+   ✅ Deprecate textScaleFactor in favor of TextScaler (8000 chars)
+📄 [345/752] https://docs.flutter.dev/release/breaking-changes/android-v1-embedding-create-deprecation
+   ✅ Android v1 embedding app and plugin creation deprecation (3033 chars)
+📄 [346/752] https://docs.flutter.dev/release/breaking-changes/paint-enableDithering
+   ✅ Paint.enableDithering is now true by default. (4030 chars)
+📄 [347/752] https://docs.flutter.dev/release/breaking-changes/2-10-deprecations
+   ✅ Deprecated API removed after v2.10 (8000 chars)
+📄 [348/752] https://docs.flutter.dev/release/breaking-changes/mock-platform-channels
+   ✅ Transition of platform channel test interfaces to flutter_test package (6992 chars)
+📄 [349/752] https://docs.flutter.dev/release/breaking-changes/android-java-gradle-migration-guide
+   ✅ Android Java Gradle migration guide (5315 chars)
+📄 [350/752] https://docs.flutter.dev/release/breaking-changes/flutter-plugins-configuration
+   ✅ .flutter-plugins-dependencies replaces .flutter-plugins. (4619 chars)
+
+📊 Progress: 350/752 (47%)
+   ✅ Success: 350
+   ❌ Failed: 0
+
+📄 [351/752] https://docs.flutter.dev/release/breaking-changes/3-19-deprecations
+   ✅ Deprecated API removed after v3.19 (8000 chars)
+📄 [352/752] https://docs.flutter.dev/release/breaking-changes/deprecate-buttonbar
+   ✅ Deprecate ButtonBar in favor of OverflowBar (4151 chars)
+📄 [353/752] https://docs.flutter.dev/release/breaking-changes/deprecate-themedata-dialogbackgroundcolor
+   ✅ Deprecate ThemeData.dialogBackgroundColor in favor of DialogThemeData.backgroundColor (2350 chars)
+📄 [354/752] https://docs.flutter.dev/release/breaking-changes/editable-text-focus-attachment
+   ✅ TextField FocusNode attach location change (4411 chars)
+📄 [355/752] https://docs.flutter.dev/release/breaking-changes/deprecate-focusable
+   ✅ Deprecate SemanticsProperties.focusable and SemanticsConfiguration.isFocusable (3240 chars)
+📄 [356/752] https://docs.flutter.dev/release/breaking-changes/test-widgets-flutter-binding-clock
+   ✅ TestWidgetsFlutterBinding.clock change (3668 chars)
+📄 [357/752] https://docs.flutter.dev/release/breaking-changes/3-16-deprecations
+   ✅ Deprecated API removed after v3.16 (4838 chars)
+📄 [358/752] https://docs.flutter.dev/release/breaking-changes/android-predictive-back
+   ✅ Android predictive back (8000 chars)
+📄 [359/752] https://docs.flutter.dev/release/breaking-changes/web-golden-comparator
+   ✅ Web-specific golden comparisons are no longer supported (3317 chars)
+📄 [360/752] https://docs.flutter.dev/release/breaking-changes/nullable-cupertinothemedata-brightness
+   ✅ Nullable CupertinoThemeData.brightness (2434 chars)
+📄 [361/752] https://docs.flutter.dev/release/breaking-changes/win-lifecycle-process-function
+   ✅ Introduction of FlutterEngine::ProcessExternalWindowMessage (2466 chars)
+📄 [362/752] https://docs.flutter.dev/release/breaking-changes/text-field-material-localizations
+   ✅ TextField requires a MaterialLocalizations widget (3747 chars)
+📄 [363/752] https://docs.flutter.dev/release/breaking-changes/dispose
+   ✅ Added missing dispose() for some disposable objects in Flutter (2557 chars)
+📄 [364/752] https://docs.flutter.dev/release/breaking-changes/v1-android-embedding
+   ✅ Removal of v1 Android embedding Java APIs (3492 chars)
+📄 [365/752] https://docs.flutter.dev/release/breaking-changes/android-surface-plugins
+   ✅ New APIs for Android plugins that render to a Surface (5711 chars)
+📄 [366/752] https://docs.flutter.dev/release/breaking-changes/fab-theme-data-accent-properties
+   ✅ FloatingActionButton and ThemeData's accent properties (4606 chars)
+📄 [367/752] https://docs.flutter.dev/release/breaking-changes/material-color-utilities
+   ✅ Material Color Utilities update in Flutter (1745 chars)
+📄 [368/752] https://docs.flutter.dev/release/breaking-changes/deprecate-dropdownbuttonformfield-value
+   ✅ Deprecated the 'value' parameter of the 'DropdownButtonFormField' constructor (2286 chars)
+📄 [369/752] https://docs.flutter.dev/release/breaking-changes/chip-usedeletebuttontooltip-migration
+   ✅ Migrate useDeleteButtonTooltip to deleteButtonTooltipMessage of Chips (2978 chars)
+📄 [370/752] https://docs.flutter.dev/release/breaking-changes/material-3-migration
+   ✅ Migrate to Material 3 (8000 chars)
+📄 [371/752] https://docs.flutter.dev/release/breaking-changes/mouse-tracker-no-longer-attaches-annotations
+   ✅ MouseTracker no longer attaches annotations (5172 chars)
+📄 [372/752] https://docs.flutter.dev/release/breaking-changes/toggleable-active-color
+   ✅ ThemeData's toggleableActiveColor property has been deprecated (3369 chars)
+📄 [373/752] https://docs.flutter.dev/release/breaking-changes/windows-dark-mode
+   ✅ Migrate a Windows project to support dark title bars (2245 chars)
+📄 [374/752] https://docs.flutter.dev/release/breaking-changes/flutter-root-version-file
+   ✅ $FLUTTER_ROOT/bin/cache/flutter.version.json replaces $FLUTTER_ROOT/version (3470 chars)
+📄 [375/752] https://docs.flutter.dev/release/breaking-changes/target-platform-linux-windows
+   ✅ Adding 'linux' and 'windows' to TargetPlatform enum (4201 chars)
+📄 [376/752] https://docs.flutter.dev/release/breaking-changes/ios-flutterviewcontroller-splashscreenview-nullable
+   ✅ iOS FlutterViewController splashScreenView made nullable (3053 chars)
+📄 [377/752] https://docs.flutter.dev/release/breaking-changes/bottom-navigation-title-to-label
+   ✅ Bottom Navigation Title To Label (2270 chars)
+📄 [378/752] https://docs.flutter.dev/release/breaking-changes/animation-sheet-builder-display
+   ✅ Replace AnimationSheetBuilder.display with collate (5048 chars)
+📄 [379/752] https://docs.flutter.dev/release/breaking-changes/flutter-generate-i10n-source
+   ✅ Localized messages are generated into source, not a synthetic package. (3263 chars)
+📄 [380/752] https://docs.flutter.dev/release/breaking-changes/decouple-page-transition-builders
+   ✅ Page transition builders reorganization (3059 chars)
+📄 [381/752] https://docs.flutter.dev/release/breaking-changes/deprecate-overlay-portal-targets-root
+   ✅ Deprecate OverlayPortal.targetsRootOverlay and enforce LookupBoundary in Overlay.of (2815 chars)
+📄 [382/752] https://docs.flutter.dev/release/breaking-changes/rendereditable-layout-before-hit-test
+   ✅ The RenderEditable needs to be laid out before hit testing (4317 chars)
+📄 [383/752] https://docs.flutter.dev/release/breaking-changes/tooltip-semantics-order
+   ✅ Accessibility traversal order of tooltip changed (3688 chars)
+📄 [384/752] https://docs.flutter.dev/release/breaking-changes/android-setIsRunningInRobolectricTest-removed
+   ✅ FlutterMain.setIsRunningInRobolectricTest on Android removed (2902 chars)
+📄 [385/752] https://docs.flutter.dev/release/breaking-changes/radio-api-redesign
+   ✅ Redesigned the Radio widget (4275 chars)
+📄 [386/752] https://docs.flutter.dev/release/breaking-changes/macos-windows-merged-threads
+   ✅ Merged threads on macOS and Windows (1700 chars)
+📄 [387/752] https://docs.flutter.dev/release/breaking-changes/window-singleton
+   ✅ The window singleton is deprecated (8000 chars)
+📄 [388/752] https://docs.flutter.dev/release/breaking-changes/form-semantics
+   ✅ The Form widget no longer supports being a sliver. (2685 chars)
+📄 [389/752] https://docs.flutter.dev/release/breaking-changes/image-filter-blur-tilemode
+   ✅ ImageFilter.blur default tile mode automatic selection. (2574 chars)
+📄 [390/752] https://docs.flutter.dev/release/breaking-changes/flutter-lints-package
+   ✅ Introducing package:flutter_lints (5469 chars)
+📄 [391/752] https://docs.flutter.dev/release/breaking-changes/deep-links-flag-change
+   ✅ Deep links flag change (2060 chars)
+📄 [392/752] https://docs.flutter.dev/release/breaking-changes/form-field-autovalidation-api
+   ✅ The new Form, FormField auto-validation API (2916 chars)
+📄 [393/752] https://docs.flutter.dev/release/breaking-changes/parent-data-widget-generic-type
+   ✅ The generic type of ParentDataWidget changed to ParentData (4342 chars)
+📄 [394/752] https://docs.flutter.dev/release/breaking-changes/androidx-migration
+   ✅ AndroidX migration (3981 chars)
+📄 [395/752] https://docs.flutter.dev/release/breaking-changes/linux-merged-threads
+   ✅ Merged threads on Linux (1366 chars)
+📄 [396/752] https://docs.flutter.dev/release/breaking-changes/text-selection-theme
+   ✅ TextSelectionTheme migration (3418 chars)
+📄 [397/752] https://docs.flutter.dev/release/breaking-changes/pageview-controller
+   ✅ Make PageView.controller nullable (1284 chars)
+📄 [398/752] https://docs.flutter.dev/release/breaking-changes/scaffold-messenger
+   ✅ SnackBars managed by the ScaffoldMessenger (6702 chars)
+📄 [399/752] https://docs.flutter.dev/release/breaking-changes/material-design-3-token-update
+   ✅ Material 3 tokens update in Flutter (2961 chars)
+📄 [400/752] https://docs.flutter.dev/release/breaking-changes/use-maxLengthEnforcement-instead-of-maxLengthEnforced
+   ✅ Use maxLengthEnforcement instead of maxLengthEnforced (7918 chars)
+
+📊 Progress: 400/752 (53%)
+   ✅ Success: 400
+   ❌ Failed: 0
+
+📄 [401/752] https://docs.flutter.dev/release/breaking-changes/route-information-uri
+   ✅ Migration guide for RouteInformation.location (3020 chars)
+📄 [402/752] https://docs.flutter.dev/release/breaking-changes/default-abi-filters-android
+   ✅ Flutter now sets default abiFilters in Android builds (3395 chars)
+📄 [403/752] https://docs.flutter.dev/release/breaking-changes/android-14-nonlinear-text-scaling-migration
+   ✅ Android 14 nonlinear font scaling enabled (2683 chars)
+📄 [404/752] https://docs.flutter.dev/release/breaking-changes/enterText-trailing-caret
+   ✅ Change the enterText method to move the caret to the end of the input text (3699 chars)
+📄 [405/752] https://docs.flutter.dev/release/breaking-changes/flutter-memory-allocations
+   ✅ Deprecate MemoryAllocations in favor of FlutterMemoryAllocations (1790 chars)
+📄 [406/752] https://docs.flutter.dev/release/breaking-changes/eliminating-nullok-parameters
+   ✅ Eliminating nullOk Parameters (6361 chars)
+📄 [407/752] https://docs.flutter.dev/release/breaking-changes/deprecate-inputdecoration-maintainhintheight
+   ✅ Deprecate InputDecoration.maintainHintHeight in favor of InputDecoration.maintainHintSize (2426 chars)
+📄 [408/752] https://docs.flutter.dev/release/breaking-changes/imagecache-large-images
+   ✅ ImageCache large images (2824 chars)
+📄 [409/752] https://docs.flutter.dev/release/breaking-changes/system_context_menu_controller_show
+   ✅ SystemContextMenuController.show Deprecated (3967 chars)
+📄 [410/752] https://docs.flutter.dev/release/breaking-changes/windows-build-architecture
+   ✅ Windows build path changed to add the target architecture (1996 chars)
+📄 [411/752] https://docs.flutter.dev/release/breaking-changes/routesettings-copywith-migration
+   ✅ Migration guide for RouteSettings copyWith (1594 chars)
+📄 [412/752] https://docs.flutter.dev/release/breaking-changes/flutter-gradle-plugin-apply
+   ✅ Deprecated imperative apply of Flutter's Gradle plugins (8000 chars)
+📄 [413/752] https://docs.flutter.dev/release/breaking-changes/image-cache-and-provider
+   ✅ ImageCache and ImageProvider changes (3995 chars)
+📄 [414/752] https://docs.flutter.dev/release/breaking-changes/android-activity-control-surface-attach
+   ✅ Android ActivityControlSurface attachToActivity signature change (4131 chars)
+📄 [415/752] https://docs.flutter.dev/release/breaking-changes/rendering-changes
+   ✅ Notable rendering and layout changes after v3.7 (2845 chars)
+📄 [416/752] https://docs.flutter.dev/release/breaking-changes/context-menus
+   ✅ A new way to customize context menus (8000 chars)
+📄 [417/752] https://docs.flutter.dev/release/breaking-changes/layout-builder-optimization
+   ✅ LayoutBuilder optimization (7535 chars)
+📄 [418/752] https://docs.flutter.dev/release/breaking-changes/theme-data-accent-properties
+   ✅ ThemeData's accent properties have been deprecated (5187 chars)
+📄 [419/752] https://docs.flutter.dev/release/breaking-changes/shortcut-key-event-migration
+   ✅ Migrate ShortcutActivator and ShortcutManager to KeyEvent system (5913 chars)
+📄 [420/752] https://docs.flutter.dev/release/breaking-changes/3-3-deprecations
+   ✅ Deprecated API removed after v3.3 (6561 chars)
+📄 [421/752] https://docs.flutter.dev/release/breaking-changes/supplemental-maybeOf-migration
+   ✅ Migrate of to non-nullable return values, and add maybeOf (4684 chars)
+📄 [422/752] https://docs.flutter.dev/release/breaking-changes
+   ✅ Breaking changes and migration guides (8000 chars)
+📄 [423/752] https://docs.flutter.dev/release/release-notes/release-notes-1.12.13
+   ✅ Flutter 1.12.13 release notes (8000 chars)
+📄 [424/752] https://docs.flutter.dev/release/release-notes/release-notes-1.12.13.md
+   ✅  (8000 chars)
+📄 [425/752] https://docs.flutter.dev/release/release-notes/release-notes-3.24.0
+   ✅ Flutter 3.24.0 release notes (8000 chars)
+📄 [426/752] https://docs.flutter.dev/release/release-notes/release-notes-3.24.0.md
+   ✅  (8000 chars)
+📄 [427/752] https://docs.flutter.dev/release/release-notes/release-notes-2.2.0
+   ✅ Flutter 2.2.0 release notes (8000 chars)
+📄 [428/752] https://docs.flutter.dev/release/release-notes/release-notes-2.2.0.md
+   ✅  (8000 chars)
+📄 [429/752] https://docs.flutter.dev/release/release-notes/release-notes-2.10.0
+   ✅ Flutter 2.10.0 release notes (8000 chars)
+📄 [430/752] https://docs.flutter.dev/release/release-notes/release-notes-2.10.0.md
+   ✅  (8000 chars)
+📄 [431/752] https://docs.flutter.dev/release/release-notes/release-notes-1.22.0
+   ✅ Flutter 1.22.0 release notes (8000 chars)
+📄 [432/752] https://docs.flutter.dev/release/release-notes/release-notes-1.22.0.md
+   ✅  (8000 chars)
+📄 [433/752] https://docs.flutter.dev/release/release-notes/release-notes-3.22.0
+   ✅ Flutter 3.22.0 release notes (8000 chars)
+📄 [434/752] https://docs.flutter.dev/release/release-notes/release-notes-3.22.0.md
+   ✅  (8000 chars)
+📄 [435/752] https://docs.flutter.dev/release/release-notes/release-notes-1.2.1
+   ✅ Flutter 1.2.1 release notes (8000 chars)
+📄 [436/752] https://docs.flutter.dev/release/release-notes/release-notes-1.2.1.md
+   ✅  (8000 chars)
+📄 [437/752] https://docs.flutter.dev/release/release-notes/release-notes-3.16.0
+   ✅ Flutter 3.16.0 release notes (8000 chars)
+📄 [438/752] https://docs.flutter.dev/release/release-notes/release-notes-3.16.0.md
+   ✅  (8000 chars)
+📄 [439/752] https://docs.flutter.dev/release/release-notes/release-notes-1.9.1
+   ✅ Flutter 1.9.1 release notes (8000 chars)
+📄 [440/752] https://docs.flutter.dev/release/release-notes/release-notes-1.9.1.md
+   ✅  (8000 chars)
+📄 [441/752] https://docs.flutter.dev/release/release-notes/release-notes-1.7.8
+   ✅ Flutter 1.7.8 release notes (8000 chars)
+📄 [442/752] https://docs.flutter.dev/release/release-notes/release-notes-1.7.8.md
+   ✅  (8000 chars)
+📄 [443/752] https://docs.flutter.dev/release/release-notes/release-notes-3.27.0
+   ✅ Flutter 3.27.0 release notes (8000 chars)
+📄 [444/752] https://docs.flutter.dev/release/release-notes/release-notes-3.27.0.md
+   ✅  (8000 chars)
+📄 [445/752] https://docs.flutter.dev/release/release-notes/release-notes-2.8.0
+   ✅ Flutter 2.8.0 release notes (8000 chars)
+📄 [446/752] https://docs.flutter.dev/release/release-notes/release-notes-2.8.0.md
+   ✅  (8000 chars)
+📄 [447/752] https://docs.flutter.dev/release/release-notes/release-notes-2.0.0
+   ✅ Flutter 2.0.0 release notes (8000 chars)
+📄 [448/752] https://docs.flutter.dev/release/release-notes/release-notes-2.0.0.md
+   ✅  (8000 chars)
+📄 [449/752] https://docs.flutter.dev/release/release-notes/release-notes-3.38.0
+   ✅ Flutter 3.38.0 release notes (8000 chars)
+📄 [450/752] https://docs.flutter.dev/release/release-notes/release-notes-3.38.0.md
+   ✅  (8000 chars)
+
+📊 Progress: 450/752 (60%)
+   ✅ Success: 450
+   ❌ Failed: 0
+
+📄 [451/752] https://docs.flutter.dev/release/release-notes/release-notes-3.35.0
+   ✅ Flutter 3.35.0 release notes (8000 chars)
+📄 [452/752] https://docs.flutter.dev/release/release-notes/release-notes-3.35.0.md
+   ✅  (8000 chars)
+📄 [453/752] https://docs.flutter.dev/release/release-notes/release-notes-1.20.0
+   ✅ Flutter 1.20.0 release notes (8000 chars)
+📄 [454/752] https://docs.flutter.dev/release/release-notes/release-notes-1.20.0.md
+   ✅  (8000 chars)
+📄 [455/752] https://docs.flutter.dev/release/release-notes/release-notes-1.17.0
+   ✅ Flutter 1.17.0 release notes (8000 chars)
+📄 [456/752] https://docs.flutter.dev/release/release-notes/release-notes-1.17.0.md
+   ✅  (8000 chars)
+📄 [457/752] https://docs.flutter.dev/release/release-notes/release-notes-3.10.0
+   ✅ Flutter 3.10.0 release notes (8000 chars)
+📄 [458/752] https://docs.flutter.dev/release/release-notes/release-notes-3.10.0.md
+   ✅  (8000 chars)
+📄 [459/752] https://docs.flutter.dev/release/release-notes/release-notes-3.3.0
+   ✅ Flutter 3.3.0 release notes (8000 chars)
+📄 [460/752] https://docs.flutter.dev/release/release-notes/release-notes-3.3.0.md
+   ✅  (8000 chars)
+📄 [461/752] https://docs.flutter.dev/release/release-notes/release-notes-archive
+   ✅ Archived release notes (859 chars)
+📄 [462/752] https://docs.flutter.dev/release/release-notes/release-notes-3.32.0
+   ✅ Flutter 3.32.0 release notes (8000 chars)
+📄 [463/752] https://docs.flutter.dev/release/release-notes/release-notes-3.32.0.md
+   ✅  (5133 chars)
+📄 [464/752] https://docs.flutter.dev/release/release-notes/release-notes-1.5.4
+   ✅ Flutter 1.5.4 release notes (8000 chars)
+📄 [465/752] https://docs.flutter.dev/release/release-notes/release-notes-1.5.4.md
+   ✅  (8000 chars)
+📄 [466/752] https://docs.flutter.dev/release/release-notes/release-notes-3.0.0
+   ✅ Flutter 3.0.0 release notes (8000 chars)
+📄 [467/752] https://docs.flutter.dev/release/release-notes/release-notes-3.0.0.md
+   ✅  (8000 chars)
+📄 [468/752] https://docs.flutter.dev/release/release-notes/release-notes-3.29.0
+   ✅ Flutter 3.29.0 release notes (8000 chars)
+📄 [469/752] https://docs.flutter.dev/release/release-notes/release-notes-3.29.0.md
+   ✅  (8000 chars)
+📄 [470/752] https://docs.flutter.dev/release/release-notes/release-notes-3.13.0
+   ✅ Flutter 3.13.0 release notes (8000 chars)
+📄 [471/752] https://docs.flutter.dev/release/release-notes/release-notes-3.13.0.md
+   ✅  (8000 chars)
+📄 [472/752] https://docs.flutter.dev/release/release-notes/release-notes-3.19.0
+   ✅ Flutter 3.19.0 release notes (8000 chars)
+📄 [473/752] https://docs.flutter.dev/release/release-notes/release-notes-3.19.0.md
+   ✅  (8000 chars)
+📄 [474/752] https://docs.flutter.dev/release/release-notes/release-notes-0.0.21-1.0.0
+   ✅ Flutter Changelog 0.0.21 - 1.0.0 (8000 chars)
+📄 [475/752] https://docs.flutter.dev/release/release-notes/release-notes-0.0.21-1.0.0.md
+   ✅  (8000 chars)
+📄 [476/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.12.13
+   ✅ Change log for Flutter 1.12.13 (8000 chars)
+📄 [477/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.12.13.md
+   ✅  (8000 chars)
+📄 [478/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.9.1
+   ✅ Change log for Flutter 1.9.1 (8000 chars)
+📄 [479/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.9.1.md
+   ✅  (8000 chars)
+📄 [480/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.5.4
+   ✅ Change log for Flutter 1.5.4 (8000 chars)
+📄 [481/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.5.4.md
+   ✅  (8000 chars)
+📄 [482/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.2.1
+   ✅ Change log for Flutter 1.2.2 (8000 chars)
+📄 [483/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.2.1.md
+   ✅  (8000 chars)
+📄 [484/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.7.8
+   ✅ Change log for Flutter 1.7.8 (8000 chars)
+📄 [485/752] https://docs.flutter.dev/release/release-notes/changelogs/changelog-1.7.8.md
+   ✅  (8000 chars)
+📄 [486/752] https://docs.flutter.dev/release/release-notes/release-notes-3.7.0
+   ✅ Flutter 3.7.0 release notes (8000 chars)
+📄 [487/752] https://docs.flutter.dev/release/release-notes/release-notes-3.7.0.md
+   ✅  (8000 chars)
+📄 [488/752] https://docs.flutter.dev/release/release-notes/release-notes-2.5.0
+   ✅ Flutter 2.5.0 release notes (8000 chars)
+📄 [489/752] https://docs.flutter.dev/release/release-notes/release-notes-2.5.0.md
+   ✅  (8000 chars)
+📄 [490/752] https://docs.flutter.dev/release/release-notes
+   ✅ Flutter release notes (2751 chars)
+📄 [491/752] https://docs.flutter.dev/release/whats-new
+   ✅ What's new in the docs (4373 chars)
+📄 [492/752] https://docs.flutter.dev/add-to-app/android/project-setup
+   ✅ Integrate a Flutter module into your Android project (8000 chars)
+📄 [493/752] https://docs.flutter.dev/add-to-app/android/plugin-setup
+   ✅ Manage plugins and dependencies in add-to-app (4703 chars)
+📄 [494/752] https://docs.flutter.dev/add-to-app/android/add-flutter-fragment
+   ✅ Add a Flutter Fragment to an Android app (8000 chars)
+📄 [495/752] https://docs.flutter.dev/add-to-app/android/add-flutter-screen
+   ✅ Add a Flutter screen to an Android app (8000 chars)
+📄 [496/752] https://docs.flutter.dev/add-to-app/android/add-flutter-view
+   ✅ Add a Flutter View to an Android app (3262 chars)
+📄 [497/752] https://docs.flutter.dev/add-to-app/android
+   ✅ Add Flutter to Android (960 chars)
+📄 [498/752] https://docs.flutter.dev/add-to-app/debugging
+   ✅ Debug your add-to-app module (7412 chars)
+📄 [499/752] https://docs.flutter.dev/add-to-app/performance
+   ✅ Load sequence, performance, and memory (4850 chars)
+📄 [500/752] https://docs.flutter.dev/add-to-app/ios/project-setup
+   ✅ Integrate a Flutter module into your iOS project (8000 chars)
+
+📊 Progress: 500/752 (66%)
+   ✅ Success: 500
+   ❌ Failed: 0
+
+📄 [501/752] https://docs.flutter.dev/add-to-app/ios/add-flutter-screen
+   ✅ Add a Flutter screen to an iOS app (8000 chars)
+📄 [502/752] https://docs.flutter.dev/add-to-app/ios
+   ✅ Add Flutter to iOS (590 chars)
+📄 [503/752] https://docs.flutter.dev/add-to-app/multiple-flutters
+   ✅ Multiple Flutter screens or views (3725 chars)
+📄 [504/752] https://docs.flutter.dev/add-to-app
+   ✅ Add Flutter to an existing app (5721 chars)
+📄 [505/752] https://docs.flutter.dev/data-and-backend/google-apis
+   ✅ Google APIs (5517 chars)
+📄 [506/752] https://docs.flutter.dev/data-and-backend/networking
+   ✅ Networking (1282 chars)
+📄 [507/752] https://docs.flutter.dev/data-and-backend/serialization/json
+   ✅ JSON and serialization (8000 chars)
+📄 [508/752] https://docs.flutter.dev/data-and-backend/serialization
+   ✅ Serialization (409 chars)
+📄 [509/752] https://docs.flutter.dev/data-and-backend/state-mgmt/options
+   ✅ Approaches to state management (3281 chars)
+📄 [510/752] https://docs.flutter.dev/data-and-backend/state-mgmt/declarative
+   ✅ Start thinking declaratively (1599 chars)
+📄 [511/752] https://docs.flutter.dev/data-and-backend/state-mgmt/intro
+   ✅ State management (1000 chars)
+📄 [512/752] https://docs.flutter.dev/data-and-backend/state-mgmt/ephemeral-vs-app
+   ✅ Differentiate between ephemeral state and app state (4860 chars)
+📄 [513/752] https://docs.flutter.dev/data-and-backend/state-mgmt/simple
+   ✅ Simple app state management (8000 chars)
+📄 [514/752] https://docs.flutter.dev/data-and-backend/state-mgmt
+   ✅ State management (809 chars)
+📄 [515/752] https://docs.flutter.dev/data-and-backend/firebase
+   ✅ Firebase (1343 chars)
+📄 [516/752] https://docs.flutter.dev/data-and-backend/persistence
+   ✅ Persistence (352 chars)
+📄 [517/752] https://docs.flutter.dev/data-and-backend
+   ✅ Data & backend (712 chars)
+📄 [518/752] https://docs.flutter.dev/tos
+   ✅ Terms of Service (1704 chars)
+📄 [519/752] https://docs.flutter.dev/app-architecture/case-study/dependency-injection
+   ✅ Communicating between layers (5850 chars)
+📄 [520/752] https://docs.flutter.dev/app-architecture/case-study/testing
+   ✅ Testing each layer (5996 chars)
+📄 [521/752] https://docs.flutter.dev/app-architecture/case-study/ui-layer
+   ✅ UI layer case study (8000 chars)
+📄 [522/752] https://docs.flutter.dev/app-architecture/case-study/data-layer
+   ✅ Data layer (8000 chars)
+📄 [523/752] https://docs.flutter.dev/app-architecture/case-study
+   ✅ Architecture case study (6370 chars)
+📄 [524/752] https://docs.flutter.dev/app-architecture/recommendations
+   ✅ Architecture recommendations and resources (8000 chars)
+📄 [525/752] https://docs.flutter.dev/app-architecture/design-patterns/sql
+   ✅ Persistent storage architecture: SQL (8000 chars)
+📄 [526/752] https://docs.flutter.dev/app-architecture/design-patterns/optimistic-state
+   ✅ Optimistic state (8000 chars)
+📄 [527/752] https://docs.flutter.dev/app-architecture/design-patterns/result
+   ✅ Error handling with Result objects (8000 chars)
+📄 [528/752] https://docs.flutter.dev/app-architecture/design-patterns/key-value-data
+   ✅ Persistent storage architecture: Key-value data (8000 chars)
+📄 [529/752] https://docs.flutter.dev/app-architecture/design-patterns/offline-first
+   ✅ Offline-first support (8000 chars)
+📄 [530/752] https://docs.flutter.dev/app-architecture/design-patterns/command
+   ✅ The command pattern (8000 chars)
+📄 [531/752] https://docs.flutter.dev/app-architecture/guide
+   ✅ Guide to app architecture (8000 chars)
+📄 [532/752] https://docs.flutter.dev/app-architecture/concepts
+   ✅ Common architecture concepts (7166 chars)
+📄 [533/752] https://docs.flutter.dev/app-architecture/design-patterns
+   ✅ Architecture design patterns (5416 chars)
+📄 [534/752] https://docs.flutter.dev/app-architecture
+   ✅ Architecting Flutter apps (2989 chars)
+📄 [535/752] https://docs.flutter.dev/llms.txt
+   ✅  (8000 chars)
+📄 [536/752] https://docs.flutter.dev/cookbook/images/fading-in-images
+   ✅ Fade in images with a placeholder (2693 chars)
+📄 [537/752] https://docs.flutter.dev/cookbook/images/network-image
+   ✅ Display images from the internet (1711 chars)
+📄 [538/752] https://docs.flutter.dev/cookbook/images
+   ✅ Flutter images cookbook (520 chars)
+📄 [539/752] https://docs.flutter.dev/cookbook/animation/animated-container
+   ✅ Animate the properties of a container (6395 chars)
+📄 [540/752] https://docs.flutter.dev/cookbook/animation/page-route-animation
+   ✅ Animate a page route transition (7192 chars)
+📄 [541/752] https://docs.flutter.dev/cookbook/animation/physics-simulation
+   ✅ Animate a widget using a physics simulation (8000 chars)
+📄 [542/752] https://docs.flutter.dev/cookbook/animation/opacity-animation
+   ✅ Fade a widget in and out (5854 chars)
+📄 [543/752] https://docs.flutter.dev/cookbook/animation
+   ✅ Flutter animation cookbook (706 chars)
+📄 [544/752] https://docs.flutter.dev/cookbook/maintenance/error-reporting
+   ✅ Report errors to a service (3358 chars)
+📄 [545/752] https://docs.flutter.dev/cookbook/maintenance
+   ✅ Flutter maintenance cookbook (461 chars)
+📄 [546/752] https://docs.flutter.dev/cookbook/games/achievements-leaderboard
+   ✅ Add achievements and leaderboards to your mobile game (8000 chars)
+📄 [547/752] https://docs.flutter.dev/cookbook/games/firestore-multiplayer
+   ✅ Add multiplayer support using Firestore (8000 chars)
+📄 [548/752] https://docs.flutter.dev/cookbook/games
+   ✅ Flutter games cookbook (623 chars)
+📄 [549/752] https://docs.flutter.dev/cookbook/plugins/play-video
+   ✅ Play and pause a video (8000 chars)
+📄 [550/752] https://docs.flutter.dev/cookbook/plugins/google-mobile-ads
+   ✅ Add ads to your mobile Flutter app or game (8000 chars)
+
+📊 Progress: 550/752 (73%)
+   ✅ Success: 550
+   ❌ Failed: 0
+
+📄 [551/752] https://docs.flutter.dev/cookbook/plugins/picture-using-camera
+   ✅ Take a picture using the camera (8000 chars)
+📄 [552/752] https://docs.flutter.dev/cookbook/plugins
+   ✅ Flutter plugin cookbook (624 chars)
+📄 [553/752] https://docs.flutter.dev/cookbook/navigation/named-routes
+   ✅ Navigate with named routes (5359 chars)
+📄 [554/752] https://docs.flutter.dev/cookbook/navigation/set-up-universal-links
+   ✅ Set up universal links for iOS (6603 chars)
+📄 [555/752] https://docs.flutter.dev/cookbook/navigation/navigation-basics
+   ✅ Navigate to a new screen and back (7332 chars)
+📄 [556/752] https://docs.flutter.dev/cookbook/navigation/navigate-with-arguments
+   ✅ Pass arguments to a named route (8000 chars)
+📄 [557/752] https://docs.flutter.dev/cookbook/navigation/set-up-app-links
+   ✅ Set up app links for Android (6163 chars)
+📄 [558/752] https://docs.flutter.dev/cookbook/navigation/passing-data
+   ✅ Send data to a new screen (8000 chars)
+📄 [559/752] https://docs.flutter.dev/cookbook/navigation/hero-animations
+   ✅ Animate a widget across screens (4280 chars)
+📄 [560/752] https://docs.flutter.dev/cookbook/navigation/returning-data
+   ✅ Return data from a screen (7521 chars)
+📄 [561/752] https://docs.flutter.dev/cookbook/navigation
+   ✅ Flutter navigation cookbook (1039 chars)
+📄 [562/752] https://docs.flutter.dev/cookbook/gestures/dismissible
+   ✅ Implement swipe to dismiss (4691 chars)
+📄 [563/752] https://docs.flutter.dev/cookbook/gestures/ripples
+   ✅ Add Material touch ripples (2096 chars)
+📄 [564/752] https://docs.flutter.dev/cookbook/gestures/handling-taps
+   ✅ Handle taps (2949 chars)
+📄 [565/752] https://docs.flutter.dev/cookbook/gestures
+   ✅ Flutter gestures cookbook (561 chars)
+📄 [566/752] https://docs.flutter.dev/cookbook/testing/integration/introduction
+   ✅ Integration testing concepts (1913 chars)
+📄 [567/752] https://docs.flutter.dev/cookbook/testing/integration/profiling
+   ✅ Measure performance with an integration test (8000 chars)
+📄 [568/752] https://docs.flutter.dev/cookbook/testing/integration
+   ✅ Integration testing (553 chars)
+📄 [569/752] https://docs.flutter.dev/cookbook/testing/widget/scrolling
+   ✅ Handle scrolling (4357 chars)
+📄 [570/752] https://docs.flutter.dev/cookbook/testing/widget/finders
+   ✅ Find widgets (4693 chars)
+📄 [571/752] https://docs.flutter.dev/cookbook/testing/widget/tap-drag
+   ✅ Tap, drag, and enter text (6838 chars)
+📄 [572/752] https://docs.flutter.dev/cookbook/testing/widget/introduction
+   ✅ An introduction to widget testing (7979 chars)
+📄 [573/752] https://docs.flutter.dev/cookbook/testing/widget/orientation
+   ✅ Test orientation (7378 chars)
+📄 [574/752] https://docs.flutter.dev/cookbook/testing/widget
+   ✅ Widget testing (721 chars)
+📄 [575/752] https://docs.flutter.dev/cookbook/testing/unit/introduction
+   ✅ An introduction to unit testing (5123 chars)
+📄 [576/752] https://docs.flutter.dev/cookbook/testing/unit/mocking
+   ✅ Mock dependencies using Mockito (8000 chars)
+📄 [577/752] https://docs.flutter.dev/cookbook/testing/unit
+   ✅ Unit testing (535 chars)
+📄 [578/752] https://docs.flutter.dev/cookbook/testing
+   ✅ Testing (617 chars)
+📄 [579/752] https://docs.flutter.dev/cookbook/effects/staggered-menu-animation
+   ✅ Create a staggered menu animation (8000 chars)
+📄 [580/752] https://docs.flutter.dev/cookbook/effects/parallax-scrolling
+   ✅ Create a scrolling parallax effect (8000 chars)
+📄 [581/752] https://docs.flutter.dev/cookbook/effects/expandable-fab
+   ✅ Create an expandable FAB (8000 chars)
+📄 [582/752] https://docs.flutter.dev/cookbook/effects/download-button
+   ✅ Create a download button (8000 chars)
+📄 [583/752] https://docs.flutter.dev/cookbook/effects/drag-a-widget
+   ✅ Drag a UI element (8000 chars)
+📄 [584/752] https://docs.flutter.dev/cookbook/effects/typing-indicator
+   ✅ Create a typing indicator (8000 chars)
+📄 [585/752] https://docs.flutter.dev/cookbook/effects/shimmer-loading
+   ✅ Create a shimmer loading effect (8000 chars)
+📄 [586/752] https://docs.flutter.dev/cookbook/effects/nested-nav
+   ✅ Create a nested navigation flow (8000 chars)
+📄 [587/752] https://docs.flutter.dev/cookbook/effects
+   ✅ Flutter effects cookbook (974 chars)
+📄 [588/752] https://docs.flutter.dev/cookbook/forms/text-input
+   ✅ Create and style a text field (2750 chars)
+📄 [589/752] https://docs.flutter.dev/cookbook/forms/text-field-changes
+   ✅ Handle changes to a text field (5820 chars)
+📄 [590/752] https://docs.flutter.dev/cookbook/forms/focus
+   ✅ Focus and text fields (5665 chars)
+📄 [591/752] https://docs.flutter.dev/cookbook/forms/validation
+   ✅ Build a form with validation (7036 chars)
+📄 [592/752] https://docs.flutter.dev/cookbook/forms/retrieve-input
+   ✅ Retrieve the value of a text field (4517 chars)
+📄 [593/752] https://docs.flutter.dev/cookbook/forms
+   ✅ Flutter forms cookbook (687 chars)
+📄 [594/752] https://docs.flutter.dev/cookbook/persistence/key-value
+   ✅ Store key-value data on disk (5269 chars)
+📄 [595/752] https://docs.flutter.dev/cookbook/persistence/reading-writing-files
+   ✅ Read and write files (5284 chars)
+📄 [596/752] https://docs.flutter.dev/cookbook/persistence/sqlite
+   ✅ Persist data with SQLite (8000 chars)
+📄 [597/752] https://docs.flutter.dev/cookbook/persistence
+   ✅ Flutter persistence cookbook (629 chars)
+📄 [598/752] https://docs.flutter.dev/cookbook/networking/background-parsing
+   ✅ Parse JSON in the background (7671 chars)
+📄 [599/752] https://docs.flutter.dev/cookbook/networking/web-sockets
+   ✅ Communicate with WebSockets (4489 chars)
+📄 [600/752] https://docs.flutter.dev/cookbook/networking/fetch-data
+   ✅ Fetch data from the internet (8000 chars)
+
+📊 Progress: 600/752 (80%)
+   ✅ Success: 600
+   ❌ Failed: 0
+
+📄 [601/752] https://docs.flutter.dev/cookbook/networking/authenticated-requests
+   ✅ Make authenticated requests (2027 chars)
+📄 [602/752] https://docs.flutter.dev/cookbook/networking/delete-data
+   ✅ Delete data on the internet (7416 chars)
+📄 [603/752] https://docs.flutter.dev/cookbook/networking/send-data
+   ✅ Send data to the internet (8000 chars)
+📄 [604/752] https://docs.flutter.dev/cookbook/networking/update-data
+   ✅ Update data over the internet (8000 chars)
+📄 [605/752] https://docs.flutter.dev/cookbook/networking
+   ✅ Flutter networking cookbook (943 chars)
+📄 [606/752] https://docs.flutter.dev/cookbook/lists/basic-list
+   ✅ Use lists (1649 chars)
+📄 [607/752] https://docs.flutter.dev/cookbook/lists/horizontal-list
+   ✅ Create a horizontal list (1687 chars)
+📄 [608/752] https://docs.flutter.dev/cookbook/lists/grid-lists
+   ✅ Create a grid list (1940 chars)
+📄 [609/752] https://docs.flutter.dev/cookbook/lists/spaced-items
+   ✅ List with spaced items (5874 chars)
+📄 [610/752] https://docs.flutter.dev/cookbook/lists/mixed-list
+   ✅ Create lists with different types of items (5375 chars)
+📄 [611/752] https://docs.flutter.dev/cookbook/lists/floating-app-bar
+   ✅ Place a floating app bar above a list (7478 chars)
+📄 [612/752] https://docs.flutter.dev/cookbook/lists/long-lists
+   ✅ Work with long lists (2812 chars)
+📄 [613/752] https://docs.flutter.dev/cookbook/lists
+   ✅ Flutter lists cookbook (889 chars)
+📄 [614/752] https://docs.flutter.dev/cookbook/design/package-fonts
+   ✅ Export fonts from a package (3664 chars)
+📄 [615/752] https://docs.flutter.dev/cookbook/design/fonts
+   ✅ Use a custom font (8000 chars)
+📄 [616/752] https://docs.flutter.dev/cookbook/design/themes
+   ✅ Use themes to share colors and font styles (7140 chars)
+📄 [617/752] https://docs.flutter.dev/cookbook/design/snackbars
+   ✅ Display a snackbar (3690 chars)
+📄 [618/752] https://docs.flutter.dev/cookbook/design/orientation
+   ✅ Update the UI based on orientation (4576 chars)
+📄 [619/752] https://docs.flutter.dev/cookbook/design/drawer
+   ✅ Add a drawer to a screen (6516 chars)
+📄 [620/752] https://docs.flutter.dev/cookbook/design/tabs
+   ✅ Work with tabs (2991 chars)
+📄 [621/752] https://docs.flutter.dev/cookbook/design
+   ✅ Flutter design cookbook (854 chars)
+📄 [622/752] https://docs.flutter.dev/testing/errors
+   ✅ Handling errors in Flutter (5311 chars)
+📄 [623/752] https://docs.flutter.dev/testing/plugins-in-tests
+   ✅ Plugins in Flutter tests (4709 chars)
+📄 [624/752] https://docs.flutter.dev/testing/integration-tests
+   ✅ Check app functionality with an integration test (8000 chars)
+📄 [625/752] https://docs.flutter.dev/testing/debugging
+   ✅ Debug Flutter apps (1271 chars)
+📄 [626/752] https://docs.flutter.dev/testing/testing-plugins
+   ✅ Testing plugins (5930 chars)
+📄 [627/752] https://docs.flutter.dev/testing/overview
+   ✅ Testing Flutter apps (4186 chars)
+📄 [628/752] https://docs.flutter.dev/testing/code-debugging
+   ✅ Debug Flutter apps from code (8000 chars)
+📄 [629/752] https://docs.flutter.dev/testing/common-errors
+   ✅ Common Flutter errors (8000 chars)
+📄 [630/752] https://docs.flutter.dev/testing/build-modes
+   ✅ Flutter's build modes (4405 chars)
+📄 [631/752] https://docs.flutter.dev/testing/native-debugging
+   ✅ Use a native language debugger (8000 chars)
+📄 [632/752] https://docs.flutter.dev/testing
+   ✅ Testing & debugging (1194 chars)
+📄 [633/752] https://docs.flutter.dev/platform-integration/platform-channels
+   ✅ Writing custom platform-specific code (8000 chars)
+📄 [634/752] https://docs.flutter.dev/platform-integration/android/setup
+   ✅ Set up Android development (8000 chars)
+📄 [635/752] https://docs.flutter.dev/platform-integration/android/call-jetpack-apis
+   ✅ Calling JetPack APIs (3148 chars)
+📄 [636/752] https://docs.flutter.dev/platform-integration/android/platform-views
+   ✅ Hosting native Android views in your Flutter app with Platform Views (8000 chars)
+📄 [637/752] https://docs.flutter.dev/platform-integration/android/restore-state-android
+   ✅ Restore state on Android (4675 chars)
+📄 [638/752] https://docs.flutter.dev/platform-integration/android/chromeos
+   ✅ Targeting ChromeOS with Android (2219 chars)
+📄 [639/752] https://docs.flutter.dev/platform-integration/android/c-interop
+   ✅ Binding to native Android code using dart:ffi (6843 chars)
+📄 [640/752] https://docs.flutter.dev/platform-integration/android/predictive-back
+   ✅ Add the predictive-back gesture (2049 chars)
+📄 [641/752] https://docs.flutter.dev/platform-integration/android/sensitive-content
+   ✅ Protect your app's sensitive content (2449 chars)
+📄 [642/752] https://docs.flutter.dev/platform-integration/android/compose-activity
+   ✅ Launching a Jetpack Compose activity from your Flutter application (8000 chars)
+📄 [643/752] https://docs.flutter.dev/platform-integration/android/splash-screen
+   ✅ Adding a splash screen to your Android app (6093 chars)
+📄 [644/752] https://docs.flutter.dev/platform-integration/android
+   ✅ Android (1451 chars)
+📄 [645/752] https://docs.flutter.dev/platform-integration/macos/setup
+   ✅ Set up macOS development (3607 chars)
+📄 [646/752] https://docs.flutter.dev/platform-integration/macos/platform-views
+   ✅ Hosting native macOS views in your Flutter app with Platform Views (6451 chars)
+📄 [647/752] https://docs.flutter.dev/platform-integration/macos/c-interop
+   ✅ Binding to native macOS code using dart:ffi (6723 chars)
+📄 [648/752] https://docs.flutter.dev/platform-integration/macos/building
+   ✅ Building macOS apps with Flutter (5893 chars)
+📄 [649/752] https://docs.flutter.dev/platform-integration/macos
+   ✅ macOS (836 chars)
+📄 [650/752] https://docs.flutter.dev/platform-integration/linux/setup
+   ✅ Set up Linux development (2662 chars)
+
+📊 Progress: 650/752 (86%)
+   ✅ Success: 650
+   ❌ Failed: 0
+
+📄 [651/752] https://docs.flutter.dev/platform-integration/linux/building
+   ✅ Build Linux apps with Flutter (3096 chars)
+📄 [652/752] https://docs.flutter.dev/platform-integration/linux
+   ✅ Linux (580 chars)
+📄 [653/752] https://docs.flutter.dev/platform-integration/ios/launch-screen
+   ✅ Adding a launch screen to your iOS app (1252 chars)
+📄 [654/752] https://docs.flutter.dev/platform-integration/ios/setup
+   ✅ Set up iOS development (5502 chars)
+📄 [655/752] https://docs.flutter.dev/platform-integration/ios/ios-latest
+   ✅ Flutter on latest iOS (1074 chars)
+📄 [656/752] https://docs.flutter.dev/platform-integration/ios/app-extensions
+   ✅ Adding iOS app extensions (8000 chars)
+📄 [657/752] https://docs.flutter.dev/platform-integration/ios/platform-views
+   ✅ Host native iOS views in your Flutter app with platform views (8000 chars)
+📄 [658/752] https://docs.flutter.dev/platform-integration/ios/c-interop
+   ✅ Binding to native iOS code using dart:ffi (6525 chars)
+📄 [659/752] https://docs.flutter.dev/platform-integration/ios/ios-debugging
+   ✅ iOS debugging (720 chars)
+📄 [660/752] https://docs.flutter.dev/platform-integration/ios/restore-state-ios
+   ✅ Restore state on iOS (950 chars)
+📄 [661/752] https://docs.flutter.dev/platform-integration/ios/ios-app-clip
+   ✅ Adding an iOS App Clip target (7584 chars)
+📄 [662/752] https://docs.flutter.dev/platform-integration/ios/apple-frameworks
+   ✅ Leveraging Apple's system APIs and frameworks (4220 chars)
+📄 [663/752] https://docs.flutter.dev/platform-integration/ios
+   ✅ iOS (1376 chars)
+📄 [664/752] https://docs.flutter.dev/platform-integration/windows/setup
+   ✅ Set up Windows development (3104 chars)
+📄 [665/752] https://docs.flutter.dev/platform-integration/windows/extern_win
+   ✅ External windows in Flutter Windows apps (1639 chars)
+📄 [666/752] https://docs.flutter.dev/platform-integration/windows/building
+   ✅ Building Windows apps with Flutter (8000 chars)
+📄 [667/752] https://docs.flutter.dev/platform-integration/windows
+   ✅ Windows (694 chars)
+📄 [668/752] https://docs.flutter.dev/platform-integration/web/faq
+   ✅ Web FAQ (6435 chars)
+📄 [669/752] https://docs.flutter.dev/platform-integration/web/renderers
+   ✅ Web renderers (5639 chars)
+📄 [670/752] https://docs.flutter.dev/platform-integration/web/setup
+   ✅ Set up web development (2135 chars)
+📄 [671/752] https://docs.flutter.dev/platform-integration/web/web-dev-config-file
+   ✅ Set up a web development configuration file (3939 chars)
+📄 [672/752] https://docs.flutter.dev/platform-integration/web/wasm
+   ✅ Support for WebAssembly (Wasm) (4699 chars)
+📄 [673/752] https://docs.flutter.dev/platform-integration/web/web-content-in-flutter
+   ✅ Embedding web content into a Flutter web app (2883 chars)
+📄 [674/752] https://docs.flutter.dev/platform-integration/web/initialization
+   ✅ Flutter web app initialization (8000 chars)
+📄 [675/752] https://docs.flutter.dev/platform-integration/web/embedding-flutter-web
+   ✅ Adding Flutter to any web application (8000 chars)
+📄 [676/752] https://docs.flutter.dev/platform-integration/web/building
+   ✅ Building a web application with Flutter (4253 chars)
+📄 [677/752] https://docs.flutter.dev/platform-integration/web/web-images
+   ✅ Display images on the web (4280 chars)
+📄 [678/752] https://docs.flutter.dev/platform-integration/web
+   ✅ Web support for Flutter (3512 chars)
+📄 [679/752] https://docs.flutter.dev/platform-integration/bind-native-code
+   ✅ Bind to native code using FFI (6308 chars)
+📄 [680/752] https://docs.flutter.dev/platform-integration/desktop
+   ✅ Desktop support for Flutter (5969 chars)
+📄 [681/752] https://docs.flutter.dev/platform-integration
+   ✅ Build for and integrate with multiple platforms (5645 chars)
+📄 [682/752] https://docs.flutter.dev/perf/metrics
+   ✅ Performance metrics (1827 chars)
+📄 [683/752] https://docs.flutter.dev/perf/faq
+   ✅ Performance FAQ (2915 chars)
+📄 [684/752] https://docs.flutter.dev/perf/web-performance
+   ✅ Debug performance for web apps (1839 chars)
+📄 [685/752] https://docs.flutter.dev/perf/isolates
+   ✅ Concurrency and isolates (8000 chars)
+📄 [686/752] https://docs.flutter.dev/perf/rendering-performance
+   ✅ Improving rendering performance (2232 chars)
+📄 [687/752] https://docs.flutter.dev/perf/app-size
+   ✅ Measuring your app's size (7196 chars)
+📄 [688/752] https://docs.flutter.dev/perf/ui-performance
+   ✅ Flutter performance profiling (8000 chars)
+📄 [689/752] https://docs.flutter.dev/perf/best-practices
+   ✅ Performance best practices (8000 chars)
+📄 [690/752] https://docs.flutter.dev/perf/deferred-components
+   ✅ Deferred components for Android and web (8000 chars)
+📄 [691/752] https://docs.flutter.dev/perf/appendix
+   ✅ More thoughts about performance (8000 chars)
+📄 [692/752] https://docs.flutter.dev/perf/impeller
+   ✅ Impeller rendering engine (4352 chars)
+📄 [693/752] https://docs.flutter.dev/perf
+   ✅ Performance (2302 chars)
+📄 [694/752] https://docs.flutter.dev/jobs/swe_ios_iii
+   ✅ Software Engineer III, Flutter (iOS) (4055 chars)
+📄 [695/752] https://docs.flutter.dev/jobs
+   ✅ Flutter and Dart team job openings (458 chars)
+📄 [696/752] https://docs.flutter.dev/embedded
+   ✅ Embedded support for Flutter (1588 chars)
+📄 [697/752] https://docs.flutter.dev/ai/ai-toolkit/chat-client-sample
+   ✅ Chat client sample (1281 chars)
+📄 [698/752] https://docs.flutter.dev/ai/ai-toolkit/user-experience
+   ✅ User experience (5324 chars)
+📄 [699/752] https://docs.flutter.dev/ai/ai-toolkit/custom-llm-providers
+   ✅ Custom LLM providers (7589 chars)
+📄 [700/752] https://docs.flutter.dev/ai/ai-toolkit
+   ✅ Flutter AI Toolkit (6396 chars)
+
+📊 Progress: 700/752 (93%)
+   ✅ Success: 700
+   ❌ Failed: 0
+
+📄 [701/752] https://docs.flutter.dev/ai/ai-toolkit/feature-integration
+   ✅ Feature integration (8000 chars)
+📄 [702/752] https://docs.flutter.dev/ai/ai-rules
+   ✅ AI rules for Flutter and Dart (2988 chars)
+📄 [703/752] https://docs.flutter.dev/ai/gemini-cli-extension
+   ✅ Flutter extension for Gemini CLI (7008 chars)
+📄 [704/752] https://docs.flutter.dev/ai/create-with-ai
+   ✅ Create with AI (6364 chars)
+📄 [705/752] https://docs.flutter.dev/ai/genui/components
+   ✅ GenUI SDK main components and concepts (3647 chars)
+📄 [706/752] https://docs.flutter.dev/ai/genui/get-started
+   ✅ Get started with the GenUI SDK for Flutter (8000 chars)
+📄 [707/752] https://docs.flutter.dev/ai/genui/input-events
+   ✅ Input and events (6335 chars)
+📄 [708/752] https://docs.flutter.dev/ai/genui
+   ✅ GenUI SDK for Flutter (1900 chars)
+📄 [709/752] https://docs.flutter.dev/ai/mcp-server
+   ✅ Dart and Flutter MCP server (8000 chars)
+📄 [710/752] https://docs.flutter.dev/ai/best-practices/mode-of-interaction
+   ✅ Mode of interaction (5467 chars)
+📄 [711/752] https://docs.flutter.dev/ai/best-practices/structure-output
+   ✅ Structure & output (4010 chars)
+📄 [712/752] https://docs.flutter.dev/ai/best-practices/tool-calls
+   ✅ Tool calls (aka function calls) (8000 chars)
+📄 [713/752] https://docs.flutter.dev/ai/best-practices/developer-experience
+   ✅ Developer experience (7021 chars)
+📄 [714/752] https://docs.flutter.dev/ai/best-practices/prompting
+   ✅ Prompting (7889 chars)
+📄 [715/752] https://docs.flutter.dev/ai/best-practices
+   ✅ Flutter AI best practices (2592 chars)
+📄 [716/752] https://docs.flutter.dev/ai
+   ✅ Flutter & AI (1363 chars)
+📄 [717/752] https://docs.flutter.dev/robots.txt
+📄 [718/752] https://docs.flutter.dev/deployment/web
+   ✅ Build and release a web app (4136 chars)
+📄 [719/752] https://docs.flutter.dev/deployment/windows
+   ✅ Build and release a Windows desktop app (7975 chars)
+📄 [720/752] https://docs.flutter.dev/deployment/macos
+   ✅ Build and release a macOS app (8000 chars)
+📄 [721/752] https://docs.flutter.dev/deployment/flavors-ios
+   ✅ Set up Flutter flavors for iOS and macOS (8000 chars)
+📄 [722/752] https://docs.flutter.dev/deployment/ios
+   ✅ Build and release an iOS app (8000 chars)
+📄 [723/752] https://docs.flutter.dev/deployment/flavors
+   ✅ Set up Flutter flavors for Android (8000 chars)
+📄 [724/752] https://docs.flutter.dev/deployment/cd
+   ✅ Continuous delivery with Flutter (8000 chars)
+📄 [725/752] https://docs.flutter.dev/deployment/obfuscate
+   ✅ Obfuscate Dart code (4542 chars)
+📄 [726/752] https://docs.flutter.dev/deployment/linux
+   ✅ Build and release a Linux app to the Snap Store (8000 chars)
+📄 [727/752] https://docs.flutter.dev/deployment/android
+   ✅ Build and release an Android app (8000 chars)
+📄 [728/752] https://docs.flutter.dev/deployment
+   ✅ Deployment (1290 chars)
+📄 [729/752] https://docs.flutter.dev/reference/crash-reporting
+   ✅ Flutter crash reporting (2097 chars)
+📄 [730/752] https://docs.flutter.dev/reference/supported-platforms
+   ✅ Supported deployment platforms (2149 chars)
+📄 [731/752] https://docs.flutter.dev/reference/create-new-app
+   ✅ Create a new Flutter app (8000 chars)
+📄 [732/752] https://docs.flutter.dev/reference/security-false-positives
+   ✅ Security false positives (8000 chars)
+📄 [733/752] https://docs.flutter.dev/reference/flutter-cli
+   ✅ flutter: The Flutter command-line tool (3420 chars)
+📄 [734/752] https://docs.flutter.dev/reference/widgets
+   ✅ Flutter widget index (8000 chars)
+📄 [735/752] https://docs.flutter.dev/reference/user-surveys
+   ✅ User surveys (1429 chars)
+📄 [736/752] https://docs.flutter.dev/reference
+   ✅ Flutter reference docs (1054 chars)
+📄 [737/752] https://docs.flutter.dev/resources/glossary
+   ✅ Glossary (8000 chars)
+📄 [738/752] https://docs.flutter.dev/ui/widgets/accessibility
+   ✅ Accessibility widgets (808 chars)
+📄 [739/752] https://docs.flutter.dev/ui/widgets/animation
+   ✅ Animation and motion widgets (3337 chars)
+📄 [740/752] https://docs.flutter.dev/ui/widgets/assets
+   ✅ Assets, images, and icon widgets (766 chars)
+📄 [741/752] https://docs.flutter.dev/ui/widgets/async
+   ✅ Async widgets (651 chars)
+📄 [742/752] https://docs.flutter.dev/ui/widgets/basics
+   ✅ Basic widgets (1295 chars)
+📄 [743/752] https://docs.flutter.dev/ui/widgets/cupertino
+   ✅ Cupertino widgets (5954 chars)
+📄 [744/752] https://docs.flutter.dev/ui/widgets/input
+   ✅ Input widgets (1003 chars)
+📄 [745/752] https://docs.flutter.dev/ui/widgets/interaction
+   ✅ Interaction model widgets (2224 chars)
+📄 [746/752] https://docs.flutter.dev/ui/widgets/layout
+   ✅ Layout widgets (4967 chars)
+📄 [747/752] https://docs.flutter.dev/ui/widgets/material2
+   ✅ Material 2 component widgets (5416 chars)
+📄 [748/752] https://docs.flutter.dev/ui/widgets/material
+   ✅ Material component widgets (3873 chars)
+📄 [749/752] https://docs.flutter.dev/ui/widgets/painting
+   ✅ Painting and effect widgets (1423 chars)
+📄 [750/752] https://docs.flutter.dev/ui/widgets/scrolling
+   ✅ Scrolling widgets (3398 chars)
+
+📊 Progress: 750/752 (100%)
+   ✅ Success: 749
+   ❌ Failed: 1
+
+📄 [751/752] https://docs.flutter.dev/ui/widgets/styling
+   ✅ Styling widgets (782 chars)
+📄 [752/752] https://docs.flutter.dev/ui/widgets/text
+   ✅ Text widgets (687 chars)
+
+✅ Crawling completed!
+   Total: 752
+   Success: 751
+   Failed: 1
+
+
+📊 Crawling Statistics:
+   Total URLs: 752
+   Documents crawled: 751
+   Average length: 4630 chars
+   Total size: 3395 KB
+
+📤 Syncing 751 documents to Vectorize...
+   Batch size: 2 (slow but reliable)
+   Estimated time: ~51 minutes
+
+📦 Batch 1/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 2/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 3/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 4/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 5/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 6/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 7/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 8/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 9/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 10/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 11/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 12/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 13/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 14/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 15/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 16/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 17/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 18/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 19/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 20/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 21/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 22/376: Syncing 2 documents...
+   ✅ Inserted 2 documents
+📦 Batch 23/376: Syncing 2 documents...
+   ✅ Inserted 2 documents

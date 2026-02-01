@@ -68,6 +68,16 @@ export default {
       return handleSyncVectors(request, env, corsHeaders);
     }
 
+    // 문서 해시 조회 (증분 동기화용)
+    if (url.pathname === '/api/doc-hashes' && request.method === 'GET') {
+      return handleGetDocHashes(request, env, corsHeaders);
+    }
+
+    // 문서 해시 저장 (증분 동기화용)
+    if (url.pathname === '/api/doc-hashes' && request.method === 'POST') {
+      return handleSaveDocHashes(request, env, corsHeaders);
+    }
+
     return Response.json(
       { error: 'Not found' },
       { status: 404, headers: corsHeaders }
@@ -264,6 +274,80 @@ async function handleSyncVectors(request, env, corsHeaders) {
       success: false,
       error: error.message,
       vectorIds: vectorIds,
+    }, { status: 500, headers: corsHeaders });
+  }
+}
+
+/**
+ * 문서 해시 조회 (증분 동기화용)
+ * D1 DB에서 저장된 문서 해시 목록 반환
+ */
+async function handleGetDocHashes(request, env, corsHeaders) {
+  try {
+    const result = await env.DB.prepare(
+      'SELECT doc_id, content_hash FROM doc_hashes'
+    ).all();
+
+    const hashes = {};
+    for (const row of result.results) {
+      hashes[row.doc_id] = row.content_hash;
+    }
+
+    return Response.json({ hashes }, { headers: corsHeaders });
+  } catch (error) {
+    // 테이블이 없으면 빈 객체 반환
+    return Response.json({ hashes: {} }, { headers: corsHeaders });
+  }
+}
+
+/**
+ * 문서 해시 저장 (증분 동기화용)
+ * D1 DB에 문서 해시 저장 (upsert)
+ */
+async function handleSaveDocHashes(request, env, corsHeaders) {
+  try {
+    const { hashes } = await request.json();
+
+    if (!hashes || typeof hashes !== 'object') {
+      return Response.json(
+        { error: 'hashes object is required' },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    // 테이블 생성 (없으면)
+    await env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS doc_hashes (
+        doc_id TEXT PRIMARY KEY,
+        content_hash TEXT NOT NULL,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+
+    // 배치로 upsert
+    const entries = Object.entries(hashes);
+    const batchSize = 100;
+
+    for (let i = 0; i < entries.length; i += batchSize) {
+      const batch = entries.slice(i, i + batchSize);
+      const stmt = env.DB.prepare(`
+        INSERT OR REPLACE INTO doc_hashes (doc_id, content_hash, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+      `);
+
+      await env.DB.batch(batch.map(([docId, hash]) => stmt.bind(docId, hash)));
+    }
+
+    return Response.json({
+      success: true,
+      message: `Saved ${entries.length} hashes`,
+    }, { headers: corsHeaders });
+
+  } catch (error) {
+    console.error('Save doc hashes error:', error);
+    return Response.json({
+      success: false,
+      error: error.message,
     }, { status: 500, headers: corsHeaders });
   }
 }

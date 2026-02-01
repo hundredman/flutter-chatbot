@@ -25,11 +25,11 @@ jobs:
         working-directory: ./cloudflare-worker/scripts
         run: npm install axios cheerio xml2js
 
-      - name: Run crawler with Gemini embeddings
+      - name: Run incremental sync (changed docs only)
         working-directory: ./cloudflare-worker/scripts
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: node crawl-with-gemini.js
+        run: node sync-incremental.js
 
       - name: Notify on failure
         if: failure()
