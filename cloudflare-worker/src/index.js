@@ -1097,7 +1097,10 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       /https?:\/\/[^\s]*#[^\s]*/g,  // 앵커(#) 포함 URL 제거 (AI가 임의로 생성한 앵커)
       /권환|권限/g,  // AI가 생성하는 이상한 한자 혼합
       /[\u3040-\u309F\u30A0-\u30FF]+/g,  // 일본어 히라가나/가타카나 제거
+      /\$\w*>[\w<>\s\/]+<\/\w+>/g,  // $lang>key</lang> 같은 이상한 태그 제거
+      /<\/?lang>/g,  // <lang> 태그 제거
       // AI가 생성하는 잘못된/존재하지 않는 URL 제거
+      /https?:\/\/api\.dart\.dev[^\s]*/g,  // 관련 없는 Dart API 링크
       /https?:\/\/api\.dartlang\.org[^\s]*/g,  // 존재하지 않는 dartlang API URL
       /https?:\/\/www\.youtube\.com[^\s]*/g,  // 관련 없는 YouTube 링크
       /https?:\/\/youtube\.com[^\s]*/g,
@@ -1221,6 +1224,13 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       .replace(/\.\.+/g, '.')
       .replace(/違い점/g, '차이점')
       .replace(/\s+\./g, '.')
+      // 한글 띄어쓰기 오류 수정
+      .replace(/됩니\s+다/g, '됩니다')
+      .replace(/합니\s+다/g, '합니다')
+      .replace(/입니\s+다/g, '입니다')
+      .replace(/습니\s+다/g, '습니다')
+      .replace(/있습니\s+다/g, '있습니다')
+      .replace(/없습니\s+다/g, '없습니다')
       .replace(/appBar\s*:\s*title\s*:\s*"([^"]+)"/g, 'appBar: AppBar(title: Text("$1"))')
       .replace(/homepage\(\)/gi, 'HomePage()')
       .replace(/backgroundColorColors\./g, 'backgroundColor: Colors.')
