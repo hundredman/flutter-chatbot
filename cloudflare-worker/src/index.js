@@ -1105,6 +1105,9 @@ NO greetings, NO casual language, NO exclamation marks. Technical content only.`
       /https?:\/\/stackoverflow\.com[^\s]*/g,  // StackOverflow 링크
       /https?:\/\/github\.com\/[^\s]*\/issues[^\s]*/g,  // GitHub issues 링크
       /https?:\/\/dartpad\.dev[^\s]*/g,  // DartPad 링크 (보통 잘못된 것)
+      // Flutter 공식 문서 중 존재하지 않는 경로 패턴
+      /https?:\/\/docs\.flutter\.dev\/tutorial[^\s]*/g,  // /tutorial 경로는 존재하지 않음
+      /https?:\/\/flutter\.dev\/docs\/[^\s]*/g,  // flutter.dev/docs는 잘못된 경로 (docs.flutter.dev가 맞음)
     ];
     chatPatterns.forEach(pattern => {
       answer = answer.replace(pattern, '');
