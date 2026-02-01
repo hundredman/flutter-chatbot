@@ -200,8 +200,8 @@ async function syncChangedDocuments(changedDocs) {
       failCount++;
     }
 
-    // Rate limiting
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Rate limiting - Gemini 무료 계정 제한 대응 (분당 60 요청)
+    await new Promise(resolve => setTimeout(resolve, 1500));
   }
 
   return { success: successCount, failed: failCount };
