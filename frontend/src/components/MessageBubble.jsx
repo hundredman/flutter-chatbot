@@ -112,71 +112,61 @@ const MessageBubble = ({ message, language, onRegenerate }) => {
           </ReactMarkdown>
         </div>
 
-        {message.sources && message.sources.length > 0 && (
-          <div className="sources-section">
-            <div className="sources-header">
-              <button
-                className="sources-toggle"
-                onClick={() => setShowSources(!showSources)}
-              >
-                <span className="sources-toggle-text">
-                  {language === 'ko' ? `참고 문서 ${message.sources.length}개` : `${message.sources.length} Sources`}
-                </span>
-                <span className={`arrow ${showSources ? 'up' : 'down'}`}>›</span>
-              </button>
-              {message.confidence && (
-                <span className={`confidence-badge ${
-                  message.confidence > 0.6 ? 'high' : message.confidence > 0.4 ? 'medium' : 'low'
-                }`}>
-                  {Math.round(Math.min(50 + message.confidence * 60, 95))}%
-                </span>
-              )}
-            </div>
-
-            {showSources && (
-              <div className="sources-list">
-                {message.sources.map((source, index) => (
-                  <a
-                    key={index}
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="source-item"
-                  >
-                    <span className="source-title">{source.title || 'Flutter Documentation'}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="message-actions">
+        {/* Single row: Sources + Confidence + Actions + Time */}
+        <div className="message-footer">
+          {message.sources && message.sources.length > 0 && (
+            <button
+              className="sources-toggle"
+              onClick={() => setShowSources(!showSources)}
+            >
+              <span className="sources-toggle-text">
+                {message.sources.length} {language === 'ko' ? '문서' : 'Sources'}
+              </span>
+              <span className={`arrow ${showSources ? 'up' : 'down'}`}>›</span>
+            </button>
+          )}
+          {message.confidence && (
+            <span className={`confidence-badge ${
+              message.confidence > 0.6 ? 'high' : message.confidence > 0.4 ? 'medium' : 'low'
+            }`}>
+              {Math.round(Math.min(50 + message.confidence * 60, 95))}%
+            </span>
+          )}
           <button
-            className="copy-answer-btn"
+            className="action-btn"
             onClick={handleCopyAnswer}
             title={language === 'ko' ? '답변 복사' : 'Copy answer'}
           >
             {copied ? <HiClipboardCheck /> : <HiClipboardCopy />}
-            {copied
-              ? (language === 'ko' ? '복사됨!' : 'Copied!')
-              : (language === 'ko' ? '복사' : 'Copy')
-            }
           </button>
-
           {onRegenerate && (
             <button
-              className="regenerate-btn"
+              className="action-btn"
               onClick={() => onRegenerate(message.id)}
               title={language === 'ko' ? '다시 생성' : 'Regenerate'}
             >
               <HiRefresh />
-              {language === 'ko' ? '다시 생성' : 'Regenerate'}
             </button>
           )}
+          <span className="message-time">{formatTimestamp(message.timestamp)}</span>
         </div>
 
-        <div className="message-time">{formatTimestamp(message.timestamp)}</div>
+        {/* Expandable sources list */}
+        {showSources && message.sources && message.sources.length > 0 && (
+          <div className="sources-list">
+            {message.sources.map((source, index) => (
+              <a
+                key={index}
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="source-item"
+              >
+                <span className="source-title">{source.title || 'Flutter Documentation'}</span>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
