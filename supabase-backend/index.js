@@ -139,6 +139,7 @@ app.post('/api/chat', async (req, res) => {
     // 3. LLM 호출
     const systemPrompt = language === 'ko'
       ? `당신은 Flutter 전문가입니다. 다음 문서를 참고하여 질문에 답변하세요.
+- 반드시 한국어로 답변하세요. 중국어나 일본어를 섞지 마세요. 영어 기술 용어는 허용됩니다.
 - 정확하고 실용적인 답변을 제공하세요
 - 필요하면 코드 예제를 포함하세요
 - 마크다운 형식으로 답변하세요
@@ -146,6 +147,7 @@ app.post('/api/chat', async (req, res) => {
 참고 문서:
 ${context || '(관련 문서 없음 - 일반 지식으로 답변)'}`
       : `You are a Flutter expert. Answer based on the following documents.
+- Respond only in English. Do not mix other languages.
 - Provide accurate and practical answers
 - Include code examples if needed
 - Use markdown format
