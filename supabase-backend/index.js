@@ -117,7 +117,7 @@ app.post('/api/chat', async (req, res) => {
       // 2. pgvector로 유사도 검색
       const { data: results, error } = await supabase.rpc('match_documents', {
         query_embedding: queryVector,
-        match_threshold: 0.5,
+        match_threshold: 0.3,
         match_count: 5
       });
 
