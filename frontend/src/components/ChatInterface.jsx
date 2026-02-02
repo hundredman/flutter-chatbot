@@ -5,7 +5,7 @@ import LanguageToggle from './LanguageToggle';
 import { addMessageToConversation } from '../firebase/chatService';
 import { markQuestionCompleted, markChapterCompleted, findNextChapter } from '../services/learningProgress';
 import { curriculum } from '../data/curriculum';
-import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft } from 'react-icons/hi';
+import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft, HiPlus } from 'react-icons/hi';
 
 const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, user, showBackButton = true, language = 'en', onLanguageChange }) => {
   const [messages, setMessages] = useState([]);
@@ -526,45 +526,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       </div>
 
       <div className="chat-input-container">
-        {/* Attachment toolbar */}
-        <div className="attachment-toolbar">
-          <button
-            className="attachment-btn"
-            onClick={() => setShowAttachments(!showAttachments)}
-            title={currentLang.attachLink}
-          >
-            <HiLink />
-          </button>
-          <button
-            className="attachment-btn"
-            onClick={() => fileInputRef.current?.click()}
-            title={currentLang.attachFile}
-          >
-            <HiDocumentText />
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".txt,.md,.dart,.js,.json,.yaml,.yml"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-          />
-        </div>
-
-        {/* Link input (shown when attachments button clicked) */}
-        {showAttachments && (
-          <div className="link-input-container">
-            <input
-              type="url"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder={currentLang.linkPlaceholder}
-              className="link-input"
-            />
-          </div>
-        )}
-
-        {/* Show attached items */}
+        {/* Show attached items above input */}
         {(linkUrl || attachedFile) && (
           <div className="attached-items">
             {linkUrl && (
@@ -589,6 +551,49 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
         )}
 
         <div className="chat-input">
+          {/* Plus button with dropdown menu */}
+          <div className="attachment-menu-container">
+            <button
+              className={`plus-btn ${showAttachments ? 'active' : ''}`}
+              onClick={() => setShowAttachments(!showAttachments)}
+              title={language === 'ko' ? '첨부' : 'Attach'}
+            >
+              <HiPlus />
+            </button>
+            {showAttachments && (
+              <div className="attachment-dropdown">
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    const url = prompt(currentLang.linkPlaceholder);
+                    if (url) setLinkUrl(url);
+                    setShowAttachments(false);
+                  }}
+                >
+                  <HiLink />
+                  <span>{currentLang.attachLink}</span>
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setShowAttachments(false);
+                  }}
+                >
+                  <HiDocumentText />
+                  <span>{currentLang.attachFile}</span>
+                </button>
+              </div>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".txt,.md,.dart,.js,.json,.yaml,.yml"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+
           <textarea
             ref={textareaRef}
             value={inputValue}

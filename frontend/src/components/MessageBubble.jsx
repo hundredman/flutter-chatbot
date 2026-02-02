@@ -112,59 +112,39 @@ const MessageBubble = ({ message, language, onRegenerate }) => {
           </ReactMarkdown>
         </div>
 
-        {message.confidence && (
-          <div className="confidence-indicator">
-            <span className="confidence-label">Confidence:</span>
-            <div className="confidence-bar">
-              <div
-                className="confidence-fill"
-                style={{
-                  width: `${message.confidence * 100}%`,
-                  backgroundColor: message.confidence > 0.8 ? '#4CAF50' :
-                                   message.confidence > 0.6 ? '#FF9800' : '#f44336'
-                }}
-              />
-            </div>
-            <span className="confidence-value">{Math.round(message.confidence * 100)}%</span>
-          </div>
-        )}
-
         {message.sources && message.sources.length > 0 && (
           <div className="sources-section">
-            <button
-              className="sources-toggle"
-              onClick={() => setShowSources(!showSources)}
-            >
-              📚 Sources ({message.sources.length})
-              <span className={`arrow ${showSources ? 'up' : 'down'}`}>▼</span>
-            </button>
+            <div className="sources-header">
+              <button
+                className="sources-toggle"
+                onClick={() => setShowSources(!showSources)}
+              >
+                <span className="sources-toggle-text">
+                  {language === 'ko' ? `참고 문서 ${message.sources.length}개` : `${message.sources.length} Sources`}
+                </span>
+                <span className={`arrow ${showSources ? 'up' : 'down'}`}>›</span>
+              </button>
+              {message.confidence && (
+                <span className={`confidence-badge ${
+                  message.confidence > 0.6 ? 'high' : message.confidence > 0.4 ? 'medium' : 'low'
+                }`}>
+                  {Math.round(Math.min(50 + message.confidence * 60, 95))}%
+                </span>
+              )}
+            </div>
 
             {showSources && (
               <div className="sources-list">
                 {message.sources.map((source, index) => (
-                  <div key={index} className="source-item">
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="source-link"
-                    >
-                      <div className="source-title">{source.title}</div>
-                      <div className="source-meta">
-                        <span className="source-url">{source.url}</span>
-                        {source.lastUpdated && (
-                          <span className="source-date">
-                            Updated: {source.lastUpdated}
-                          </span>
-                        )}
-                        {source.similarity && (
-                          <span className="source-similarity">
-                            Relevance: {Math.round(source.similarity * 100)}%
-                          </span>
-                        )}
-                      </div>
-                    </a>
-                  </div>
+                  <a
+                    key={index}
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="source-item"
+                  >
+                    <span className="source-title">{source.title || 'Flutter Documentation'}</span>
+                  </a>
                 ))}
               </div>
             )}
