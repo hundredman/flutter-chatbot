@@ -426,6 +426,43 @@ async function callGeminiAI(messages, env) {
 }
 
 /**
+ * Gemini 임베딩 생성 (768차원)
+ * 동기화 스크립트와 동일한 모델 사용
+ */
+async function getGeminiEmbedding(text, env) {
+  if (!env.GEMINI_API_KEY) {
+    console.log('GEMINI_API_KEY not configured for embeddings');
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'models/text-embedding-004',
+          content: { parts: [{ text: text.substring(0, 8000) }] }
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.log(`Gemini embedding error: ${response.status} - ${error}`);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.embedding.values;
+  } catch (error) {
+    console.log(`Gemini embedding failed: ${error.message}`);
+    return null;
+  }
+}
+
+/**
  * Multi-Provider AI with Fallback Chain
  * Priority: Gemini → Cloudflare Workers AI
  * (Gemini가 코드 품질이 더 좋음)
@@ -497,24 +534,31 @@ async function handleChat(request, env, corsHeaders) {
 
     console.log(`Processing question: "${question}"`);
 
-    // 1. 임베딩 생성 (Workers AI - 무료)
-    console.log('Generating embeddings...');
-    const embeddings = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
-      text: question,
-    });
+    // 1. 임베딩 생성 (Gemini API - 동기화 스크립트와 동일한 모델 768차원)
+    console.log('Generating embeddings with Gemini...');
+    let queryVector = await getGeminiEmbedding(question, env);
 
-    const queryVector = embeddings.data[0];
-    console.log(`Generated ${queryVector.length}-dimensional vector`);
+    if (!queryVector) {
+      // Gemini 실패 시 벡터 검색 스킵 (차원 불일치 문제)
+      console.log('Gemini embedding failed, skipping vector search');
+      queryVector = null;
+    } else {
+      console.log(`Generated ${queryVector.length}-dimensional vector`);
+    }
 
     // 2. 벡터 검색 (Vectorize - 무료)
-    console.log('Searching vector database...');
-    const results = await env.VECTORIZE.query(queryVector, {
-      topK: 5,  // 앱 템플릿 매칭을 위해 5개로 확장
-      returnValues: false,
-      returnMetadata: 'all',
-    });
-
-    console.log(`Found ${results.matches.length} similar documents`);
+    let results = { matches: [] };
+    if (queryVector) {
+      console.log('Searching vector database...');
+      results = await env.VECTORIZE.query(queryVector, {
+        topK: 5,
+        returnValues: false,
+        returnMetadata: 'all',
+      });
+      console.log(`Found ${results.matches.length} similar documents`);
+    } else {
+      console.log('Skipping vector search (no embedding)');
+    }
 
     // 질문 유형 감지
     const isExplanationQuestion = /뭔가요|무엇인가요|뭐야|뭐예요|무엇이야|무엇인지|뭔데|뭐지|뭐임|뭔지|알려줘|설명해|어떻게\s*작동|차이점|차이가|비교|사용법|사용방법|what\s*is|what'?s|explain|how\s*to\s*use|how\s*does/i.test(question);

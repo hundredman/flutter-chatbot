@@ -1,4 +1,4 @@
-name: Sync Flutter Docs to Vectorize
+name: Sync Flutter Docs to Supabase
 
 on:
   # 매주 월요일 오전 9시 (한국 시간) 실행
@@ -22,14 +22,16 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./cloudflare-worker/scripts
-        run: npm install axios cheerio xml2js
+        working-directory: ./supabase-backend
+        run: npm install
 
       - name: Run incremental sync (changed docs only)
-        working-directory: ./cloudflare-worker/scripts
+        working-directory: ./supabase-backend
         env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: node sync-incremental.js
+        run: npm run sync
 
       - name: Notify on failure
         if: failure()
