@@ -16,6 +16,7 @@ app.use(express.json({ limit: '10mb' }));
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const PORT = process.env.PORT || 3000;
 
 // Supabase client
@@ -42,7 +43,34 @@ async function getGeminiEmbedding(text) {
 }
 
 /**
- * Gemini Chat 호출
+ * Groq Chat 호출 (LLM)
+ */
+async function callGroqChat(messages) {
+  const response = await axios.post(
+    'https://api.groq.com/openai/v1/chat/completions',
+    {
+      model: 'llama-3.3-70b-versatile',
+      messages: messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
+      temperature: 0.3,
+      max_tokens: 1500,
+    },
+    {
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 60000
+    }
+  );
+
+  return response.data.choices[0].message.content;
+}
+
+/**
+ * Gemini Chat 호출 (fallback)
  */
 async function callGeminiChat(messages) {
   const contents = messages.map(msg => ({
@@ -126,10 +154,23 @@ Reference documents:
 ${context || '(No relevant documents - answer from general knowledge)'}`;
 
     const messages = [
-      { role: 'user', content: `${systemPrompt}\n\n질문: ${question}` }
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: question }
     ];
 
-    const answer = await callGeminiChat(messages);
+    // Groq 우선, 실패시 Gemini fallback
+    let answer;
+    try {
+      answer = await callGroqChat(messages);
+      console.log('LLM: Groq');
+    } catch (groqError) {
+      console.log('Groq failed, trying Gemini:', groqError.message);
+      const geminiMessages = [
+        { role: 'user', content: `${systemPrompt}\n\n질문: ${question}` }
+      ];
+      answer = await callGeminiChat(geminiMessages);
+      console.log('LLM: Gemini (fallback)');
+    }
 
     res.json({
       success: true,

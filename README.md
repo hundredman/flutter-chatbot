@@ -43,7 +43,7 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 | **Hosting** | Firebase Hosting | $0 |
 | **Backend** | Vercel Serverless | $0 |
 | **Vector DB** | Supabase pgvector | $0 |
-| **LLM** | Gemini 2.0 Flash | $0 |
+| **LLM** | Groq (Llama 3.3 70B) | $0 |
 | **Embeddings** | Gemini text-embedding-004 | $0 |
 | **Auth** | Firebase Auth | $0 |
 | **Chat Storage** | Firestore | $0 |
