@@ -7,7 +7,7 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 ## Live Demo
 
 - **Frontend**: [https://hi-project-flutter-chatbot.web.app](https://hi-project-flutter-chatbot.web.app)
-- **API**: [https://supabase-backend-green.vercel.app](https://supabase-backend-green.vercel.app)
+- **API**: [https://flutter-chatbot.vercel.app](https://flutter-chatbot.vercel.app)
 
 ## Tech Stack
 
