@@ -52,7 +52,8 @@ export const markQuestionCompleted = (questionId, chapterId, partId) => {
     progress.stats.totalQuestionsLearned = progress.completedQuestions.length;
   }
 
-  // Update current position
+  // Update current position - This is now redundant if updateLastViewedQuestion is always called immediately after.
+  // For now, keep it for existing calls not yet updated, but this function's primary role is completion.
   progress.currentPosition = {
     partId,
     chapterId,
@@ -62,6 +63,18 @@ export const markQuestionCompleted = (questionId, chapterId, partId) => {
   // Update streak
   updateStreak(progress);
 
+  saveProgress(progress);
+  return progress;
+};
+
+// Update the last viewed question without marking it completed
+export const updateLastViewedQuestion = (partId, chapterId, questionId) => {
+  const progress = getProgress();
+  progress.currentPosition = {
+    partId,
+    chapterId,
+    questionId
+  };
   saveProgress(progress);
   return progress;
 };

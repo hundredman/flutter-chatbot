@@ -3,7 +3,7 @@ import './HomePage.css';
 import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
-import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo } from '../services/learningProgress';
+import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo, updateLastViewedQuestion } from '../services/learningProgress';
 
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
@@ -222,6 +222,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   const handleQuestionClick = (question, chapter, part) => {
     // Mark the question as completed immediately
     markQuestionCompleted(question.id, chapter.id, part.id);
+    updateLastViewedQuestion(part.id, chapter.id, question.id); // Update last viewed position
     loadProgress(); // Reload progress to update UI state
 
     // Find the index of the clicked question in the chapter
@@ -262,6 +263,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       chapterId: chapter.id,
       partId: part.id
     });
+    updateLastViewedQuestion(part.id, chapter.id, chapterQs[0].id); // Update last viewed position
   };
 
   // Get last-viewed question info for display
@@ -287,6 +289,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       chapterId: next.chapter.id,
       partId: next.part.id
     });
+    updateLastViewedQuestion(next.part.id, next.chapter.id, next.question.id); // Update last viewed position
   };
 
   // Reset learning progress

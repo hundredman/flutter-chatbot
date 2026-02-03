@@ -3,7 +3,7 @@ import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
 import { addMessageToConversation } from '../firebase/chatService';
-import { markQuestionCompleted, markChapterCompleted, findNextChapter } from '../services/learningProgress';
+import { markQuestionCompleted, markChapterCompleted, findNextChapter, updateLastViewedQuestion } from '../services/learningProgress';
 import { curriculum } from '../data/curriculum';
 import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft, HiPlus } from 'react-icons/hi';
 
@@ -427,10 +427,10 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   const handlePreviousQuestion = () => {
     if (hasPreviousQuestion) {
       const prevIndex = currentQuestionIndex - 1;
-      const prevQuestion = chapterQuestions[prevIndex];
-      markQuestionCompleted(prevQuestion.id, chapterId, partId);
-      setCurrentQuestionIndex(prevIndex);
-      handleSendMessage(prevQuestion.text, true);
+          const prevQuestion = chapterQuestions[prevIndex];
+          markQuestionCompleted(prevQuestion.id, chapterId, partId);
+          updateLastViewedQuestion(partId, chapterId, prevQuestion.id); // Update last viewed position
+          setCurrentQuestionIndex(prevIndex);      handleSendMessage(prevQuestion.text, true);
     }
   };
 
@@ -438,10 +438,10 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   const handleNextQuestion = () => {
     if (hasNextQuestion) {
       const nextIndex = currentQuestionIndex + 1;
-      const nextQuestion = chapterQuestions[nextIndex];
-      markQuestionCompleted(nextQuestion.id, chapterId, partId);
-      setCurrentQuestionIndex(nextIndex);
-      handleSendMessage(nextQuestion.text, true);
+          const nextQuestion = chapterQuestions[nextIndex];
+          markQuestionCompleted(nextQuestion.id, chapterId, partId);
+          updateLastViewedQuestion(partId, chapterId, nextQuestion.id); // Update last viewed position
+          setCurrentQuestionIndex(nextIndex);      handleSendMessage(nextQuestion.text, true);
     }
   };
 
