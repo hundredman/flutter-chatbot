@@ -7,9 +7,9 @@ const getDefaultProgress = () => ({
   completedQuestions: [],      // Array of question IDs
   completedChapters: [],       // Array of chapter IDs
   currentPosition: {           // Last learning position
-    partId: 1,
-    chapterId: '1.1',
-    questionIndex: 0
+    partId: null,
+    chapterId: null,
+    questionId: null
   },
   stats: {
     totalQuestionsLearned: 0,
