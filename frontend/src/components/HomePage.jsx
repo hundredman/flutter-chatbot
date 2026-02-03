@@ -3,7 +3,7 @@ import './HomePage.css';
 import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
-import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, findNextQuestion, isChapterCompleted } from '../services/learningProgress';
+import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, findNextQuestion, isChapterCompleted, markQuestionCompleted } from '../services/learningProgress';
 
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
@@ -220,6 +220,10 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   };
 
   const handleQuestionClick = (question, chapter, part) => {
+    // Mark the question as completed immediately
+    markQuestionCompleted(question.id, chapter.id, part.id);
+    loadProgress(); // Reload progress to update UI state
+
     // Find the index of the clicked question in the chapter
     const questionIndex = chapter.questions.findIndex(q => q.id === question.id);
 
