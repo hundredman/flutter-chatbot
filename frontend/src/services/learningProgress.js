@@ -238,6 +238,41 @@ export const findNextChapter = (currentChapterId, curriculum) => {
   return null;
 };
 
+// Get the last interacted question info from currentPosition
+export const getLastPositionInfo = (curriculum) => {
+  const progress = getProgress();
+  const { partId, chapterId, questionId } = progress.currentPosition;
+
+  // Check if currentPosition has been updated from the default and has a valid questionId
+  if (partId && chapterId && questionId) {
+    const part = curriculum.parts.find(p => p.id === partId);
+    if (part) {
+      const chapter = part.chapters.find(c => c.id === chapterId);
+      if (chapter) {
+        const questionIndex = chapter.questions.findIndex(q => q.id === questionId);
+        if (questionIndex !== -1) {
+          return {
+            question: chapter.questions[questionIndex],
+            chapter,
+            part,
+            questionIndex
+          };
+        }
+      }
+    }
+  }
+
+  // Fallback for default state or if the stored position is somehow invalid
+  const firstPart = curriculum.parts[0];
+  const firstChapter = firstPart.chapters[0];
+  return {
+    question: firstChapter.questions[0],
+    chapter: firstChapter,
+    part: firstPart,
+    questionIndex: 0
+  };
+};
+
 // Reset all progress
 export const resetProgress = () => {
   saveProgress(getDefaultProgress());

@@ -3,7 +3,7 @@ import './HomePage.css';
 import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
-import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, findNextQuestion, isChapterCompleted, markQuestionCompleted } from '../services/learningProgress';
+import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo } from '../services/learningProgress';
 
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
@@ -264,15 +264,15 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     });
   };
 
-  // Get next question info for display
-  const nextQuestionInfo = useMemo(() => {
-    return findNextQuestion(curriculum);
+  // Get last-viewed question info for display
+  const continueLearningInfo = useMemo(() => {
+    return getLastPositionInfo(curriculum);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress]);
 
   // Quick start - continue from last position or start from beginning
   const handleContinueLearning = () => {
-    const next = nextQuestionInfo;
+    const next = continueLearningInfo;
     const chapterQs = next.chapter.questions.map(q => ({
       id: q.id,
       text: q[language] || q.en
@@ -344,7 +344,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
             <span className="continue-btn-text">
               <span className="continue-btn-main">{text.continueLearning}</span>
               <span className="continue-btn-position">
-                Part {nextQuestionInfo.part.id} • Ch. {nextQuestionInfo.chapter.id} • Q{nextQuestionInfo.questionIndex + 1}
+                Part {continueLearningInfo.part.id} • Ch. {continueLearningInfo.chapter.id} • Q{continueLearningInfo.questionIndex + 1}
               </span>
             </span>
           </button>
