@@ -52,14 +52,6 @@ export const markQuestionCompleted = (questionId, chapterId, partId) => {
     progress.stats.totalQuestionsLearned = progress.completedQuestions.length;
   }
 
-  // Update current position - This is now redundant if updateLastViewedQuestion is always called immediately after.
-  // For now, keep it for existing calls not yet updated, but this function's primary role is completion.
-  progress.currentPosition = {
-    partId,
-    chapterId,
-    questionId
-  };
-
   // Update streak
   updateStreak(progress);
 
