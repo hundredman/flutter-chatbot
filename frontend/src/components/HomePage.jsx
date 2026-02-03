@@ -571,10 +571,13 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
                                   className={`question-btn ${questionComplete ? 'completed' : ''}`}
                                   onClick={() => handleQuestionClick(question, chapter, part)}
                                 >
-                                  <span className="question-id">
-                                    {questionComplete ? <HiCheckCircle className="question-complete-icon" /> : question.id}
-                                  </span>
-                                  <span className="question-text">{question[language] || question.en}</span>
+                                  <div className="question-content">
+                                    <span className="question-id">
+                                      {question.id}
+                                    </span>
+                                    <span className="question-text">{question[language] || question.en}</span>
+                                  </div>
+                                  {questionComplete && <HiCheckCircle className="question-complete-icon" />}
                                 </button>
                               );
                             })}
