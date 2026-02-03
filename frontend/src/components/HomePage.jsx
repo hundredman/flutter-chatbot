@@ -112,7 +112,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       thisWeek: 'This Week',
       startChapter: 'Start Chapter',
       continueLearning: 'Continue Learning',
-      startFromBeginning: 'Start from Beginning',
       // Settings
       settings: 'Settings',
       settingsTitle: 'Settings',
@@ -151,7 +150,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       thisWeek: '이번 주',
       startChapter: '챕터 시작',
       continueLearning: '이어서 학습하기',
-      startFromBeginning: '처음부터 시작',
       // Settings
       settings: '설정',
       settingsTitle: '설정',
@@ -287,25 +285,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     });
   };
 
-  const handleStartFromBeginning = () => {
-    const firstPart = curriculum.parts[0];
-    const firstChapter = firstPart.chapters[0];
-    const chapterQs = firstChapter.questions.map(q => ({
-      id: q.id,
-      text: q[language] || q.en
-    }));
-    onStartConversation({
-      week: `Part ${firstPart.id}`,
-      title: firstChapter.title[language] || firstChapter.title.en,
-      initialPrompt: firstChapter.questions[0][language] || firstChapter.questions[0].en,
-      prompt: firstChapter.questions[0][language] || firstChapter.questions[0].en,
-      chapterQuestions: chapterQs,
-      currentQuestionIndex: 0,
-      chapterId: firstChapter.id,
-      partId: firstPart.id
-    });
-  };
-
   // Reset learning progress
   const handleResetProgress = () => {
     if (window.confirm(text.confirmReset)) {
@@ -365,13 +344,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
               </span>
             </span>
           </button>
-          <button
-            className="start-beginning-btn"
-            onClick={handleStartFromBeginning}
-          >
-            <HiArrowRight />
-            {text.startFromBeginning}
-          </button>
+
           <button
             className="new-chat-btn"
             onClick={() => onStartConversation({
