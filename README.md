@@ -33,7 +33,7 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 │  Supabase         │   │  Gemini API       │
 │  (pgvector)       │   │  (Google AI)      │
 │  - 3,700+ docs    │   │  - Embeddings     │
-│  - Vector search  │   │  - LLM Chat       │
+│  - LLM Chat       │   │  - LLM Chat       │
 └───────────────────┘   └───────────────────┘
 ```
 
@@ -102,6 +102,7 @@ vercel --prod
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
 - `GEMINI_API_KEY`
+- `GROQ_API_KEY`
 
 ### 3. 문서 동기화
 
@@ -116,7 +117,7 @@ npm run init-hashes
 npm run sync
 ```
 
-### 4. Frontend 배포
+### 4. Frontend 배포 (수동)
 
 ```bash
 cd frontend
