@@ -1,3 +1,4 @@
+// This comment is added to trigger the CI/CD pipeline for Firebase Hosting deployment.
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import AuthPage from './components/AuthPage';
