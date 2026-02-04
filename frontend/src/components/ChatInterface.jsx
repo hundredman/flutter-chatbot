@@ -223,26 +223,11 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
         fileName = attachedFile.name;
       }
 
-      // Call chat API (Cloudflare Worker - 100% 무료 통합)
-      const workerUrl = import.meta.env.VITE_CLOUDFLARE_WORKER_URL;
-      const apiUrl = workerUrl ? `${workerUrl}/api/chat` : '/api/chat';
-
-      const requestBody = {
-        question: messageText,
-        conversationId: conversation.id,
-        language: language
-      };
-
-      // Add attachments if present
-      if (linkUrl && !isInitial) {
-        requestBody.linkUrl = linkUrl;
-      }
-      if (fileContent && !isInitial) {
-        requestBody.fileContent = fileContent;
-        requestBody.fileName = fileName;
-      }
-
-      const response = await fetch(apiUrl, {
+      // Call chat API (Vercel Backend)
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api'; // Use VITE_API_BASE_URL or fallback to relative '/api'
+      const chatEndpoint = `${apiUrl}/api/chat`; // Ensure endpoint includes /api/chat
+      
+      const response = await fetch(chatEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
