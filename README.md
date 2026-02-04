@@ -6,7 +6,6 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 
 ## Live Demo
 
-
 - **Frontend**: [https://hi-project-flutter-chatbot.web.app](https://hi-project-flutter-chatbot.web.app)
 - **API**: [https://flutter-chatbot.vercel.app](https://flutter-chatbot.vercel.app)
 
@@ -118,14 +117,19 @@ npm run init-hashes
 npm run sync
 ```
 
-### 4. Frontend 배포 (수동)
+### 4. Frontend 배포 (자동화)
 
-```bash
-cd frontend
-npm install
-npm run build
-firebase deploy --only hosting
-```
+`frontend/` 디렉토리 내의 코드를 `main` 브랜치에 Push하면 GitHub Actions를 통해 Firebase Hosting으로 자동 배포됩니다.
+
+**GitHub Secrets 필요**:
+- `FIREBASE_SERVICE_ACCOUNT_HI_PROJECT_FLUTTER_CHATBOT`
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_API_BASE_URL` (Vercel 백엔드 API URL)
 
 ## API Endpoints
 
@@ -172,15 +176,8 @@ Response:
 
 ### 1. 프론트엔드 (React 앱) 업데이트
 
-프론트엔드 코드를 수정한 경우:
-
-```bash
-cd frontend
-npm install # 의존성 변경이 있는 경우
-npm run build # 최신 코드로 빌드
-firebase deploy --only hosting # Firebase Hosting에 배포
-```
-
+프론트엔드 코드를 수정한 경우 `main` 브랜치에 Push하면 GitHub Actions를 통해 Firebase Hosting으로 자동 배포됩니다.
+(자세한 내용은 "4. Frontend 배포 (자동화)" 섹션 참조)
 ### 2. 백엔드 API (`supabase-backend`) 업데이트
 
 백엔드 API 코드를 수정한 경우:
