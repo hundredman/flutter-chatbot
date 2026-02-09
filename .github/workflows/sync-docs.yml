@@ -1,9 +1,9 @@
 name: Sync Flutter Docs to Supabase
 
 on:
-  # 매주 월요일 오전 9시 (한국 시간) 실행
+  # 매주 월/목 오전 9시 (한국 시간) 실행
   schedule:
-    - cron: '0 0 * * 1'  # UTC 00:00 = KST 09:00
+    - cron: '0 0 * * 1,4'  # UTC 00:00 = KST 09:00
 
   # 수동 실행 가능
   workflow_dispatch:
