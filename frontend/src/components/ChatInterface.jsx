@@ -201,7 +201,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
 
     // Save user message to Firestore immediately
     if (conversation?.id) {
-      await addMessageToConversation(conversation.id, userMessage);
+      addMessageToConversation(conversation.id, userMessage).catch(e =>
+        console.error('Failed to save user message to Firestore:', e)
+      );
     }
 
     if (!isInitial) {
@@ -224,7 +226,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       }
 
       // Call chat API (Vercel Backend)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || ''; // Use VITE_API_BASE_URL or fallback to relative path
+      const apiUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
       const chatEndpoint = `${apiUrl}/api/chat`;
 
       const requestBody = {
@@ -268,7 +270,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
 
       // Save bot message to Firestore immediately
       if (conversation?.id) {
-        await addMessageToConversation(conversation.id, botMessage);
+        addMessageToConversation(conversation.id, botMessage).catch(e =>
+          console.error('Failed to save bot message to Firestore:', e)
+        );
       }
 
       // Update conversation
@@ -301,7 +305,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
 
       // Save error message to Firestore immediately
       if (conversation?.id) {
-        await addMessageToConversation(conversation.id, errorMessage);
+        addMessageToConversation(conversation.id, errorMessage).catch(e =>
+          console.error('Failed to save error message to Firestore:', e)
+        );
       }
     }
 
@@ -327,13 +333,10 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
     setIsLoading(true);
 
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL;
+      const apiUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+      const chatEndpoint = `${apiUrl}/api/chat`;
 
-      if (!apiUrl) {
-        throw new Error(currentLang.apiConfigError);
-      }
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch(chatEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -367,7 +370,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
 
       // Update Firestore
       if (conversation?.id) {
-        await addMessageToConversation(conversation.id, newBotMessage);
+        addMessageToConversation(conversation.id, newBotMessage).catch(e =>
+          console.error('Failed to save regenerated message to Firestore:', e)
+        );
       }
 
       // Update conversation
@@ -392,7 +397,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       setMessages(updatedMessages);
 
       if (conversation?.id) {
-        await addMessageToConversation(conversation.id, errorMessage);
+        addMessageToConversation(conversation.id, errorMessage).catch(e =>
+          console.error('Failed to save regenerate error to Firestore:', e)
+        );
       }
     }
 
