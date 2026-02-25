@@ -224,9 +224,17 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       }
 
       // Call chat API (Vercel Backend)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api'; // Use VITE_API_BASE_URL or fallback to relative '/api'
-      const chatEndpoint = `${apiUrl}/api/chat`; // Ensure endpoint includes /api/chat
-      
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || ''; // Use VITE_API_BASE_URL or fallback to relative path
+      const chatEndpoint = `${apiUrl}/api/chat`;
+
+      const requestBody = {
+        question: messageText,
+        language: language,
+        conversationId: conversation?.id || null,
+        ...(linkUrl && { linkUrl }),
+        ...(fileContent && { fileContent, fileName }),
+      };
+
       const response = await fetch(chatEndpoint, {
         method: 'POST',
         headers: {
