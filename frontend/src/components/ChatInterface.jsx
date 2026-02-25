@@ -137,20 +137,16 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   }, [inputValue]);
 
   useEffect(() => {
-    // Send initial prompt if this is a new conversation with a different ID
-    const isNewConversation = conversation?.id && conversation.id !== lastConversationIdRef.current;
+    if (!conversation?.id) return;
+    lastConversationIdRef.current = conversation.id;
 
-    if (isNewConversation && conversation.initialPrompt) {
-      // Update the ref to track this conversation
-      lastConversationIdRef.current = conversation.id;
-      // Send the initial prompt
+    // Only send initial prompt for brand-new conversations (no existing messages)
+    const hasExistingMessages = conversation.messages && conversation.messages.length > 0;
+    if (conversation.initialPrompt && !hasExistingMessages) {
       handleSendMessage(conversation.initialPrompt, true);
-    } else if (conversation?.id) {
-      // Just update the ref without sending (for existing conversations)
-      lastConversationIdRef.current = conversation.id;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversation?.id, conversation?.initialPrompt]);
+  }, [conversation?.id]);
 
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
