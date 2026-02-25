@@ -113,13 +113,13 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   const lastConversationIdRef = useRef(null);
 
   useEffect(() => {
-    // Load messages from conversation when it changes
+    // Load messages only when switching to a different conversation
     if (conversation && conversation.messages) {
       setMessages(conversation.messages);
     } else {
       setMessages([]);
     }
-  }, [conversation]);
+  }, [conversation?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset question index and chapter completion only when conversation ID changes (new conversation)
   useEffect(() => {

@@ -214,6 +214,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
           </div>
         ) : (
           <ChatInterface
+            key={currentConversation?.id}
             conversation={currentConversation}
             onGoHome={handleGoHome}
             onUpdateConversation={handleUpdateConversation}
