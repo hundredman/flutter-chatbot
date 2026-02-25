@@ -104,6 +104,8 @@ export const getConversation = async (conversationId) => {
   }
 };
 
+const MESSAGE_SIZE_LIMIT_BYTES = 900 * 1024; // 900KB (Firestore 1MB doc limit)
+
 // Update conversation (add message, update title, etc.)
 export const updateConversation = async (conversationId, updates) => {
   try {
@@ -114,8 +116,12 @@ export const updateConversation = async (conversationId, updates) => {
       updatedAt: serverTimestamp()
     };
 
-    // If adding messages, also update message count
+    // If adding messages, check size limit and update message count
     if (updates.messages) {
+      const sizeBytes = new Blob([JSON.stringify(updates.messages)]).size;
+      if (sizeBytes > MESSAGE_SIZE_LIMIT_BYTES) {
+        return { success: false, limitReached: true, error: 'conversation_limit_reached' };
+      }
       updateData.messageCount = updates.messages.length;
     }
 
@@ -124,38 +130,6 @@ export const updateConversation = async (conversationId, updates) => {
     return { success: true };
   } catch (error) {
     console.error('Error updating conversation:', error);
-    return { success: false, error: error.message };
-  }
-};
-
-const MESSAGE_SIZE_LIMIT_BYTES = 900 * 1024; // 900KB (Firestore 1MB doc limit)
-
-// Add a single message to conversation
-export const addMessageToConversation = async (conversationId, message) => {
-  try {
-    // Get current conversation
-    const result = await getConversation(conversationId);
-    if (!result.success) {
-      return result;
-    }
-
-    const conversation = result.conversation;
-    const updatedMessages = [...(conversation.messages || []), message];
-
-    // Check size before saving
-    const sizeBytes = new Blob([JSON.stringify(updatedMessages)]).size;
-    if (sizeBytes > MESSAGE_SIZE_LIMIT_BYTES) {
-      return { success: false, limitReached: true, error: 'conversation_limit_reached' };
-    }
-
-    // Update the conversation with new message
-    await updateConversation(conversationId, {
-      messages: updatedMessages
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error adding message:', error);
     return { success: false, error: error.message };
   }
 };

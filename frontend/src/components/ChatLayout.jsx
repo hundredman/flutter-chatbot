@@ -17,6 +17,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [currentView, setCurrentView] = useState('home');
   const [loading, setLoading] = useState(true);
+  const [isConversationFull, setIsConversationFull] = useState(false);
 
   // Load conversations from Firestore on mount
   useEffect(() => {
@@ -87,6 +88,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
   };
 
   const handleSelectConversation = async (conversation) => {
+    setIsConversationFull(false);
     // Fetch latest messages from Firestore
     const result = await getConversation(conversation.id);
     if (result.success) {
@@ -103,6 +105,11 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
       messages: updatedConversation.messages,
       title: updatedConversation.title
     });
+
+    if (result.limitReached) {
+      setIsConversationFull(true);
+      return;
+    }
 
     if (result.success) {
       // Update local state
@@ -219,6 +226,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
             onGoHome={handleGoHome}
             onUpdateConversation={handleUpdateConversation}
             onStartNewChapter={handleStartNewChapter}
+            isConversationFull={isConversationFull}
             user={user}
             showBackButton={false} // Remove back button since we have sidebar
             language={language}

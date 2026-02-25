@@ -2,12 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import './ChatInterface.css';
 import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
-import { addMessageToConversation } from '../firebase/chatService';
 import { markQuestionCompleted, markChapterCompleted, findNextChapter, updateLastViewedQuestion } from '../services/learningProgress';
 import { curriculum } from '../data/curriculum';
 import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft, HiPlus } from 'react-icons/hi';
 
-const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, user, showBackButton = true, language = 'en', onLanguageChange }) => {
+const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, isConversationFull = false, user, showBackButton = true, language = 'en', onLanguageChange }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +15,6 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   const [showAttachments, setShowAttachments] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [chapterCompleted, setChapterCompleted] = useState(false);
-  const [isConversationFull, setIsConversationFull] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -127,7 +125,6 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       setCurrentQuestionIndex(conversation.currentQuestionIndex);
     }
     setChapterCompleted(false);
-    setIsConversationFull(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation?.id]);
 
@@ -199,13 +196,6 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
 
-    // Save user message to Firestore immediately
-    if (conversation?.id) {
-      addMessageToConversation(conversation.id, userMessage).catch(e =>
-        console.error('Failed to save user message to Firestore:', e)
-      );
-    }
-
     if (!isInitial) {
       setInputValue('');
       // Reset textarea height and hide scrollbar
@@ -268,16 +258,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       const updatedMessages = [...newMessages, botMessage];
       setMessages(updatedMessages);
 
-      // Save bot message to Firestore immediately
-      if (conversation?.id) {
-        addMessageToConversation(conversation.id, botMessage).then(result => {
-          if (result?.limitReached) setIsConversationFull(true);
-        }).catch(e =>
-          console.error('Failed to save bot message to Firestore:', e)
-        );
-      }
-
-      // Update conversation
+      // Save all messages via onUpdateConversation (single save path)
       onUpdateConversation({
         ...conversation,
         messages: updatedMessages
@@ -305,12 +286,10 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       const updatedMessages = [...newMessages, errorMessage];
       setMessages(updatedMessages);
 
-      // Save error message to Firestore immediately
-      if (conversation?.id) {
-        addMessageToConversation(conversation.id, errorMessage).catch(e =>
-          console.error('Failed to save error message to Firestore:', e)
-        );
-      }
+      onUpdateConversation({
+        ...conversation,
+        messages: updatedMessages
+      });
     }
 
     setIsLoading(false);
@@ -370,14 +349,6 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       updatedMessages[messageIndex] = newBotMessage;
       setMessages(updatedMessages);
 
-      // Update Firestore
-      if (conversation?.id) {
-        addMessageToConversation(conversation.id, newBotMessage).catch(e =>
-          console.error('Failed to save regenerated message to Firestore:', e)
-        );
-      }
-
-      // Update conversation
       onUpdateConversation({
         ...conversation,
         messages: updatedMessages
@@ -398,11 +369,10 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       updatedMessages[messageIndex] = errorMessage;
       setMessages(updatedMessages);
 
-      if (conversation?.id) {
-        addMessageToConversation(conversation.id, errorMessage).catch(e =>
-          console.error('Failed to save regenerate error to Firestore:', e)
-        );
-      }
+      onUpdateConversation({
+        ...conversation,
+        messages: updatedMessages
+      });
     }
 
     setIsLoading(false);
