@@ -6,6 +6,7 @@ import HomePage from './HomePage';
 import {
   createConversation,
   getUserConversations,
+  getConversation,
   updateConversation,
   deleteConversation,
   generateConversationTitle
@@ -85,8 +86,14 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
     await handleStartConversation(chapterData);
   };
 
-  const handleSelectConversation = (conversation) => {
-    setCurrentConversation(conversation);
+  const handleSelectConversation = async (conversation) => {
+    // Fetch latest messages from Firestore
+    const result = await getConversation(conversation.id);
+    if (result.success) {
+      setCurrentConversation({ ...conversation, messages: result.conversation.messages });
+    } else {
+      setCurrentConversation(conversation);
+    }
     setCurrentView('chat');
   };
 

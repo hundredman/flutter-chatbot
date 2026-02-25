@@ -16,6 +16,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
   const [showAttachments, setShowAttachments] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [chapterCompleted, setChapterCompleted] = useState(false);
+  const [isConversationFull, setIsConversationFull] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -54,6 +55,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       nextChapter: 'Next Chapter',
       goHome: 'Back to Home',
       allChaptersComplete: 'Congratulations! You have completed all chapters!',
+      conversationFull: 'This conversation has reached its limit. Please start a new chat to continue.',
     },
     ko: {
       backButton: '홈으로 돌아가기',
@@ -76,6 +78,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       nextChapter: '다음 챕터',
       goHome: '홈으로 돌아가기',
       allChaptersComplete: '축하합니다! 모든 챕터를 완료했습니다!',
+      conversationFull: '이 대화방의 저장 한도에 도달했습니다. 새 채팅을 시작해주세요.',
     },
   };
 
@@ -124,6 +127,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       setCurrentQuestionIndex(conversation.currentQuestionIndex);
     }
     setChapterCompleted(false);
+    setIsConversationFull(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation?.id]);
 
@@ -270,7 +274,9 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
 
       // Save bot message to Firestore immediately
       if (conversation?.id) {
-        addMessageToConversation(conversation.id, botMessage).catch(e =>
+        addMessageToConversation(conversation.id, botMessage).then(result => {
+          if (result?.limitReached) setIsConversationFull(true);
+        }).catch(e =>
           console.error('Failed to save bot message to Firestore:', e)
         );
       }
@@ -600,16 +606,22 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
             onKeyPress={handleKeyPress}
             placeholder={currentLang.placeholder}
             rows={1}
-            disabled={isLoading}
+            disabled={isLoading || isConversationFull}
           />
           <button
             onClick={() => handleSendMessage()}
-            disabled={!inputValue.trim() || isLoading}
+            disabled={!inputValue.trim() || isLoading || isConversationFull}
             className="send-btn"
           >
             <HiPaperAirplane />
           </button>
         </div>
+
+        {isConversationFull && (
+          <div className="conversation-full-banner">
+            {currentLang.conversationFull}
+          </div>
+        )}
 
         <div className="input-help">
           <span>{currentLang.inputHelp}</span>

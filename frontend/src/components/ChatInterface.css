@@ -594,3 +594,14 @@
     font-size: 0.9rem;
   }
 }
+
+.conversation-full-banner {
+  margin: 8px 0 4px;
+  padding: 10px 14px;
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  text-align: center;
+}

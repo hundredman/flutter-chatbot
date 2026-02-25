@@ -128,6 +128,8 @@ export const updateConversation = async (conversationId, updates) => {
   }
 };
 
+const MESSAGE_SIZE_LIMIT_BYTES = 900 * 1024; // 900KB (Firestore 1MB doc limit)
+
 // Add a single message to conversation
 export const addMessageToConversation = async (conversationId, message) => {
   try {
@@ -139,6 +141,12 @@ export const addMessageToConversation = async (conversationId, message) => {
 
     const conversation = result.conversation;
     const updatedMessages = [...(conversation.messages || []), message];
+
+    // Check size before saving
+    const sizeBytes = new Blob([JSON.stringify(updatedMessages)]).size;
+    if (sizeBytes > MESSAGE_SIZE_LIMIT_BYTES) {
+      return { success: false, limitReached: true, error: 'conversation_limit_reached' };
+    }
 
     // Update the conversation with new message
     await updateConversation(conversationId, {
