@@ -16,6 +16,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   const [recentHistory, setRecentHistory] = useState([]);
   const [dailyTipIndex, setDailyTipIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  const [showSavedNotes, setShowSavedNotes] = useState(false);
   const [savedNotes, setSavedNotes] = useState([]);
   const [expandedNote, setExpandedNote] = useState(null);
 
@@ -120,7 +121,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       searchPlaceholder: 'Search questions...',
       searchResults: 'Search Results',
       searchNoResults: 'No questions found.',
-      // Saved Notes
+      // Saved Notes modal
       savedNotesTitle: 'Saved Answers',
       savedNotesEmpty: 'No saved answers yet. Click the bookmark icon on any answer to save it.',
       savedNoteFrom: 'From',
@@ -166,7 +167,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       searchPlaceholder: '질문 검색...',
       searchResults: '검색 결과',
       searchNoResults: '검색 결과가 없습니다.',
-      // Saved Notes
+      // Saved Notes modal
       savedNotesTitle: '저장된 답변',
       savedNotesEmpty: '저장된 답변이 없습니다. 답변의 북마크 아이콘을 클릭하여 저장하세요.',
       savedNoteFrom: '출처',
@@ -565,50 +566,6 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
         </div>
       </div>
 
-      {/* Saved Notes */}
-      <div className="saved-notes-section">
-        <h2>
-          <HiBookmarkAlt className="section-icon" />
-          {text.savedNotesTitle}
-        </h2>
-        {savedNotes.length === 0 ? (
-          <p className="saved-notes-empty">{text.savedNotesEmpty}</p>
-        ) : (
-          <div className="saved-notes-list">
-            {savedNotes.map((note) => (
-              <div key={note.id} className={`saved-note-item ${expandedNote === note.id ? 'expanded' : ''}`}>
-                <div className="saved-note-header" onClick={() => setExpandedNote(expandedNote === note.id ? null : note.id)}>
-                  <div className="saved-note-meta">
-                    {note.conversationTitle && (
-                      <span className="saved-note-source">{text.savedNoteFrom}: {note.conversationTitle}</span>
-                    )}
-                    <span className="saved-note-date">
-                      {new Date(note.savedAt).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
-                  <div className="saved-note-actions">
-                    <button
-                      className="saved-note-delete-btn"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
-                      title={text.savedNoteDelete}
-                    >
-                      <HiTrash />
-                    </button>
-                    <span className="saved-note-arrow">{expandedNote === note.id ? <HiChevronDown /> : <HiChevronRight />}</span>
-                  </div>
-                </div>
-                <div className="saved-note-preview">
-                  {note.content.substring(0, 120)}{note.content.length > 120 ? '...' : ''}
-                </div>
-                {expandedNote === note.id && (
-                  <div className="saved-note-full">{note.content}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Recent Learning History */}
       {recentHistory.length > 0 && (
         <div className="recent-section">
@@ -767,6 +724,70 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       )}
 
       {/* Settings Modal */}
+      {/* Saved Notes Floating Button */}
+      <button
+        className="saved-notes-fab"
+        onClick={() => { setSavedNotes(getSavedNotes()); setShowSavedNotes(true); }}
+        title={text.savedNotesTitle}
+      >
+        <HiBookmarkAlt />
+        {savedNotes.length > 0 && (
+          <span className="saved-notes-fab-badge">{savedNotes.length}</span>
+        )}
+      </button>
+
+      {/* Saved Notes Modal */}
+      {showSavedNotes && (
+        <div className="settings-modal-overlay" onClick={() => setShowSavedNotes(false)}>
+          <div className="settings-modal saved-notes-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="settings-modal-header">
+              <h2><HiBookmarkAlt /> {text.savedNotesTitle}</h2>
+              <button className="settings-close-btn" onClick={() => setShowSavedNotes(false)}>
+                <HiX />
+              </button>
+            </div>
+            <div className="saved-notes-modal-content">
+              {savedNotes.length === 0 ? (
+                <p className="saved-notes-empty">{text.savedNotesEmpty}</p>
+              ) : (
+                <div className="saved-notes-list">
+                  {savedNotes.map((note) => (
+                    <div key={note.id} className={`saved-note-item ${expandedNote === note.id ? 'expanded' : ''}`}>
+                      <div className="saved-note-header" onClick={() => setExpandedNote(expandedNote === note.id ? null : note.id)}>
+                        <div className="saved-note-meta">
+                          {note.conversationTitle && (
+                            <span className="saved-note-source">{text.savedNoteFrom}: {note.conversationTitle}</span>
+                          )}
+                          <span className="saved-note-date">
+                            {new Date(note.savedAt).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <div className="saved-note-actions">
+                          <button
+                            className="saved-note-delete-btn"
+                            onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
+                            title={text.savedNoteDelete}
+                          >
+                            <HiTrash />
+                          </button>
+                          <span className="saved-note-arrow">{expandedNote === note.id ? <HiChevronDown /> : <HiChevronRight />}</span>
+                        </div>
+                      </div>
+                      <div className="saved-note-preview">
+                        {note.content.substring(0, 120)}{note.content.length > 120 ? '...' : ''}
+                      </div>
+                      {expandedNote === note.id && (
+                        <div className="saved-note-full">{note.content}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showSettings && (
         <div className="settings-modal-overlay" onClick={() => setShowSettings(false)}>
           <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
