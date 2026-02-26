@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './HomePage.css';
-import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash } from 'react-icons/hi';
+import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash, HiSearch } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
 import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo, updateLastViewedQuestion } from '../services/learningProgress';
@@ -8,6 +8,7 @@ import { getProgress, getStats, getOverallProgress, getPartProgress as getPartPr
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
   const [expandedChapter, setExpandedChapter] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [progress, setProgress] = useState(null);
   const [stats, setStats] = useState({ totalQuestionsLearned: 0, streakDays: 0, thisWeekCount: 0 });
   const [overallProgress, setOverallProgress] = useState({ completed: 0, total: 138, percentage: 0 });
@@ -112,6 +113,9 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       thisWeek: 'This Week',
       startChapter: 'Start Chapter',
       continueLearning: 'Continue Learning',
+      searchPlaceholder: 'Search questions...',
+      searchResults: 'Search Results',
+      searchNoResults: 'No questions found.',
       // Settings
       settings: 'Settings',
       settingsTitle: 'Settings',
@@ -150,6 +154,9 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       thisWeek: '이번 주',
       startChapter: '챕터 시작',
       continueLearning: '이어서 학습하기',
+      searchPlaceholder: '질문 검색...',
+      searchResults: '검색 결과',
+      searchNoResults: '검색 결과가 없습니다.',
       // Settings
       settings: '설정',
       settingsTitle: '설정',
@@ -177,6 +184,16 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     });
     return questions;
   }, []);
+
+  // Search results
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return allQuestions.filter(question =>
+      (question[language] || question.en).toLowerCase().includes(q) ||
+      (question.chapter.title[language] || question.chapter.title.en).toLowerCase().includes(q)
+    ).slice(0, 20);
+  }, [searchQuery, allQuestions, language]);
 
   // Get random recommended questions
   const [recommendedQuestions, setRecommendedQuestions] = useState([]);
@@ -364,7 +381,57 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
             {text.startNewChat}
           </button>
         </div>
+
+        {/* Search Bar */}
+        <div className="search-bar-container">
+          <HiSearch className="search-bar-icon" />
+          <input
+            type="text"
+            className="search-bar-input"
+            placeholder={text.searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="search-bar-clear" onClick={() => setSearchQuery('')}>
+              <HiX />
+            </button>
+          )}
+        </div>
       </header>
+
+      {/* Search Results */}
+      {searchQuery.trim() && (
+        <div className="search-results-section">
+          <h2 className="search-results-title">
+            <HiSearch className="section-icon" />
+            {text.searchResults} ({searchResults.length})
+          </h2>
+          {searchResults.length === 0 ? (
+            <p className="search-no-results">{text.searchNoResults}</p>
+          ) : (
+            <div className="search-results-list">
+              {searchResults.map((question) => (
+                <button
+                  key={question.id}
+                  className="search-result-item"
+                  onClick={() => handleQuestionClick(question, question.chapter, question.part)}
+                >
+                  <div className="search-result-meta">
+                    <span className="search-result-part" style={{ backgroundColor: question.part.color }}>
+                      Part {question.part.id}
+                    </span>
+                    <span className="search-result-chapter">
+                      {question.chapter.title[language] || question.chapter.title.en}
+                    </span>
+                  </div>
+                  <p className="search-result-text">{question[language] || question.en}</p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Progress Dashboard */}
       <div className="dashboard-grid">
