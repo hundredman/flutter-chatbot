@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './HomePage.css';
 import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash, HiSearch, HiBookmarkAlt } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
@@ -777,7 +779,11 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
                         {note.content.substring(0, 120)}{note.content.length > 120 ? '...' : ''}
                       </div>
                       {expandedNote === note.id && (
-                        <div className="saved-note-full">{note.content}</div>
+                        <div className="saved-note-full">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {note.content}
+                          </ReactMarkdown>
+                        </div>
                       )}
                     </div>
                   ))}
