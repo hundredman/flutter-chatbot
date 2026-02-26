@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './HomePage.css';
-import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash, HiSearch } from 'react-icons/hi';
+import { HiCode, HiSparkles, HiChevronDown, HiChevronRight, HiLightningBolt, HiClock, HiTrendingUp, HiAcademicCap, HiRefresh, HiPlay, HiArrowRight, HiCheckCircle, HiCog, HiX, HiExclamation, HiTrash, HiSearch, HiBookmarkAlt } from 'react-icons/hi';
 import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
 import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo, updateLastViewedQuestion } from '../services/learningProgress';
+import { getSavedNotes, removeNote } from '../services/savedNotes';
 
 const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
@@ -15,6 +16,8 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
   const [recentHistory, setRecentHistory] = useState([]);
   const [dailyTipIndex, setDailyTipIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  const [savedNotes, setSavedNotes] = useState([]);
+  const [expandedNote, setExpandedNote] = useState(null);
 
   // Flutter tips data - comprehensive list for daily rotation
   const flutterTips = useMemo(() => [
@@ -80,6 +83,7 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
     if (history) {
       setRecentHistory(JSON.parse(history));
     }
+    setSavedNotes(getSavedNotes());
     // Set random tip on page load/visit
     refreshTip();
   }, [loadProgress, refreshTip]);
@@ -116,6 +120,11 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       searchPlaceholder: 'Search questions...',
       searchResults: 'Search Results',
       searchNoResults: 'No questions found.',
+      // Saved Notes
+      savedNotesTitle: 'Saved Answers',
+      savedNotesEmpty: 'No saved answers yet. Click the bookmark icon on any answer to save it.',
+      savedNoteFrom: 'From',
+      savedNoteDelete: 'Delete',
       // Settings
       settings: 'Settings',
       settingsTitle: 'Settings',
@@ -157,6 +166,11 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       searchPlaceholder: '질문 검색...',
       searchResults: '검색 결과',
       searchNoResults: '검색 결과가 없습니다.',
+      // Saved Notes
+      savedNotesTitle: '저장된 답변',
+      savedNotesEmpty: '저장된 답변이 없습니다. 답변의 북마크 아이콘을 클릭하여 저장하세요.',
+      savedNoteFrom: '출처',
+      savedNoteDelete: '삭제',
       // Settings
       settings: '설정',
       settingsTitle: '설정',
@@ -318,6 +332,13 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       loadProgress();
       setShowSettings(false);
     }
+  };
+
+  // Delete a saved note
+  const handleDeleteNote = (noteId) => {
+    removeNote(noteId);
+    setSavedNotes(prev => prev.filter(n => n.id !== noteId));
+    if (expandedNote === noteId) setExpandedNote(null);
   };
 
   // Delete all conversations
@@ -542,6 +563,50 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
             <HiRefresh />
           </button>
         </div>
+      </div>
+
+      {/* Saved Notes */}
+      <div className="saved-notes-section">
+        <h2>
+          <HiBookmarkAlt className="section-icon" />
+          {text.savedNotesTitle}
+        </h2>
+        {savedNotes.length === 0 ? (
+          <p className="saved-notes-empty">{text.savedNotesEmpty}</p>
+        ) : (
+          <div className="saved-notes-list">
+            {savedNotes.map((note) => (
+              <div key={note.id} className={`saved-note-item ${expandedNote === note.id ? 'expanded' : ''}`}>
+                <div className="saved-note-header" onClick={() => setExpandedNote(expandedNote === note.id ? null : note.id)}>
+                  <div className="saved-note-meta">
+                    {note.conversationTitle && (
+                      <span className="saved-note-source">{text.savedNoteFrom}: {note.conversationTitle}</span>
+                    )}
+                    <span className="saved-note-date">
+                      {new Date(note.savedAt).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                  <div className="saved-note-actions">
+                    <button
+                      className="saved-note-delete-btn"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
+                      title={text.savedNoteDelete}
+                    >
+                      <HiTrash />
+                    </button>
+                    <span className="saved-note-arrow">{expandedNote === note.id ? <HiChevronDown /> : <HiChevronRight />}</span>
+                  </div>
+                </div>
+                <div className="saved-note-preview">
+                  {note.content.substring(0, 120)}{note.content.length > 120 ? '...' : ''}
+                </div>
+                {expandedNote === note.id && (
+                  <div className="saved-note-full">{note.content}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Recent Learning History */}

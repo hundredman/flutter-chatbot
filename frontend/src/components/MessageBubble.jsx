@@ -4,11 +4,13 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import './MessageBubble.css';
-import { HiUser, HiLightningBolt, HiRefresh, HiClipboardCopy, HiClipboardCheck } from 'react-icons/hi';
+import { HiUser, HiLightningBolt, HiRefresh, HiClipboardCopy, HiClipboardCheck, HiBookmark, HiBookmarkAlt } from 'react-icons/hi';
+import { saveNote, removeNote, isNoteSaved, getNoteIdByMessageId } from '../services/savedNotes';
 
-const MessageBubble = ({ message, language, onRegenerate }) => {
+const MessageBubble = ({ message, language, onRegenerate, conversationTitle }) => {
   const [showSources, setShowSources] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(() => isNoteSaved(message.id));
 
   const formatTimestamp = (timestamp) => {
     let date;
@@ -45,6 +47,21 @@ const MessageBubble = ({ message, language, onRegenerate }) => {
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     } catch (err) {
       console.error('Failed to copy text:', err);
+    }
+  };
+
+  const handleSaveNote = () => {
+    if (saved) {
+      const noteId = getNoteIdByMessageId(message.id);
+      if (noteId) {
+        removeNote(noteId);
+        setSaved(false);
+      }
+    } else {
+      const result = saveNote(message.id, message.content, conversationTitle || '');
+      if (result.success || result.alreadySaved) {
+        setSaved(true);
+      }
     }
   };
 
@@ -138,6 +155,16 @@ const MessageBubble = ({ message, language, onRegenerate }) => {
             title={language === 'ko' ? '답변 복사' : 'Copy answer'}
           >
             {copied ? <HiClipboardCheck /> : <HiClipboardCopy />}
+          </button>
+          <button
+            className={`action-btn ${saved ? 'action-btn-saved' : ''}`}
+            onClick={handleSaveNote}
+            title={saved
+              ? (language === 'ko' ? '저장 취소' : 'Remove from saved')
+              : (language === 'ko' ? '답변 저장' : 'Save answer')
+            }
+          >
+            {saved ? <HiBookmarkAlt /> : <HiBookmark />}
           </button>
           {onRegenerate && (
             <button

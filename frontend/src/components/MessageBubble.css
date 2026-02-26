@@ -380,6 +380,10 @@
   transform: scale(0.95);
 }
 
+.action-btn-saved {
+  color: #667eea !important;
+}
+
 /* Message time - inline */
 .message-time {
   color: var(--color-dark-text-tertiary);

@@ -479,6 +479,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
             message={message}
             language={language}
             onRegenerate={handleRegenerate}
+            conversationTitle={conversation?.title}
           />
         ))}
 
