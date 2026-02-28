@@ -776,7 +776,22 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
                         </div>
                       </div>
                       <div className="saved-note-preview">
-                        {note.content.substring(0, 120)}{note.content.length > 120 ? '...' : ''}
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            h1: ({children}) => <span>{children} </span>,
+                            h2: ({children}) => <span>{children} </span>,
+                            h3: ({children}) => <span>{children} </span>,
+                            p: ({children}) => <span>{children} </span>,
+                            ul: ({children}) => <span>{children}</span>,
+                            ol: ({children}) => <span>{children}</span>,
+                            li: ({children}) => <span>{children} </span>,
+                            code: ({children}) => <span>{children}</span>,
+                            strong: ({children}) => <strong>{children}</strong>,
+                          }}
+                        >
+                          {note.content.substring(0, 120) + (note.content.length > 120 ? '...' : '')}
+                        </ReactMarkdown>
                       </div>
                       {expandedNote === note.id && (
                         <div className="saved-note-full">

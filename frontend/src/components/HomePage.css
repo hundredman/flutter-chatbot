@@ -1366,6 +1366,13 @@
   font-size: 0.83rem;
   color: rgba(255, 255, 255, 0.45);
   line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-note-preview * {
+  display: inline;
 }
 
 .saved-note-item.expanded .saved-note-preview {
