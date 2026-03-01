@@ -197,6 +197,27 @@
   transform: translateY(-2px);
 }
 
+.quiz-mode-btn {
+  background: rgba(102, 126, 234, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(102, 126, 234, 0.35);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.quiz-mode-btn:hover {
+  background: rgba(102, 126, 234, 0.28);
+  color: white;
+  transform: translateY(-2px);
+}
+
 /* Curriculum Section */
 .curriculum-section {
   margin-bottom: 40px;

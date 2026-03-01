@@ -8,7 +8,7 @@ import { curriculum } from '../data/curriculum';
 import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo, updateLastViewedQuestion } from '../services/learningProgress';
 import { getSavedNotes, removeNote } from '../services/savedNotes';
 
-const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
+const HomePage = ({ onStartConversation, onStartQuiz, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
   const [expandedChapter, setExpandedChapter] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -123,6 +123,8 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       searchPlaceholder: 'Search questions...',
       searchResults: 'Search Results',
       searchNoResults: 'No questions found.',
+      // Quiz
+      startQuiz: 'Quiz Mode',
       // Saved Notes modal
       savedNotesTitle: 'Saved Answers',
       savedNotesEmpty: 'No saved answers yet. Click the bookmark icon on any answer to save it.',
@@ -169,6 +171,8 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
       searchPlaceholder: '질문 검색...',
       searchResults: '검색 결과',
       searchNoResults: '검색 결과가 없습니다.',
+      // Quiz
+      startQuiz: '퀴즈 모드',
       // Saved Notes modal
       savedNotesTitle: '저장된 답변',
       savedNotesEmpty: '저장된 답변이 없습니다. 답변의 북마크 아이콘을 클릭하여 저장하세요.',
@@ -403,6 +407,14 @@ const HomePage = ({ onStartConversation, user, onSignOut, onTestConversations, o
           >
             <HiSparkles />
             {text.startNewChat}
+          </button>
+
+          <button
+            className="quiz-mode-btn"
+            onClick={onStartQuiz}
+          >
+            <HiAcademicCap />
+            {text.startQuiz}
           </button>
         </div>
 

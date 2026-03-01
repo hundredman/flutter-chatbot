@@ -191,6 +191,105 @@ ${context || '(No relevant documents - answer from general knowledge)'}`;
 });
 
 /**
+ * 퀴즈 생성 API
+ * 파트의 챕터 목록을 받아 챕터당 3문제씩 객관식 퀴즈를 생성
+ */
+app.post('/api/quiz', async (req, res) => {
+  try {
+    const { partId, chapters, language = 'ko' } = req.body;
+
+    if (!partId || !chapters || !Array.isArray(chapters)) {
+      return res.status(400).json({ error: 'partId and chapters array required' });
+    }
+
+    console.log(`Generating quiz for Part ${partId}, ${chapters.length} chapters`);
+
+    const chaptersText = chapters.map(ch =>
+      `챕터 ${ch.id}: ${ch.title} (주요 주제: ${ch.topics.join(', ')})`
+    ).join('\n');
+
+    const prompt = language === 'ko'
+      ? `다음 Flutter 학습 챕터들에 대한 객관식 퀴즈를 생성해주세요.
+각 챕터마다 정확히 3개의 문제를 만들어야 합니다.
+
+챕터 목록:
+${chaptersText}
+
+요구사항:
+- 각 문제는 Flutter 개념을 정확히 테스트해야 합니다
+- 보기는 4개, 정답은 1개
+- 오답 보기도 그럴듯하게 만들어주세요 (완전히 엉뚱한 내용 X)
+- 반드시 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이)
+
+{
+  "questions": [
+    {
+      "chapterId": 숫자,
+      "question": "문제 내용",
+      "options": ["보기1", "보기2", "보기3", "보기4"],
+      "answerIndex": 정답인덱스(0~3),
+      "explanation": "정답 설명 (1-2문장)"
+    }
+  ]
+}`
+      : `Generate multiple choice quiz questions for the following Flutter learning chapters.
+Create exactly 3 questions per chapter.
+
+Chapters:
+${chaptersText}
+
+Requirements:
+- Each question must accurately test Flutter concepts
+- 4 options per question, 1 correct answer
+- Make wrong options plausible (not completely unrelated)
+- Respond ONLY in the following JSON format (no other text)
+
+{
+  "questions": [
+    {
+      "chapterId": number,
+      "question": "question text",
+      "options": ["option1", "option2", "option3", "option4"],
+      "answerIndex": correctIndex(0~3),
+      "explanation": "explanation of the correct answer (1-2 sentences)"
+    }
+  ]
+}`;
+
+    const messages = [
+      { role: 'user', content: prompt }
+    ];
+
+    let rawAnswer;
+    try {
+      rawAnswer = await callGroqChat(messages);
+    } catch (groqError) {
+      console.log('Groq failed, trying Gemini:', groqError.message);
+      rawAnswer = await callGeminiChat(messages);
+    }
+
+    // JSON 파싱
+    const jsonMatch = rawAnswer.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Failed to parse quiz JSON from LLM response');
+    }
+
+    const quizData = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      success: true,
+      partId,
+      questions: quizData.questions,
+      generatedAt: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Quiz generation error:', error);
+    res.status(500).json({ error: error.message, success: false });
+  }
+});
+
+/**
  * 벡터 동기화 API
  */
 app.post('/api/sync-vectors', async (req, res) => {

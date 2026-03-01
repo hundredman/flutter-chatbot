@@ -3,6 +3,7 @@ import './ChatLayout.css';
 import Sidebar from './Sidebar';
 import ChatInterface from './ChatInterface';
 import HomePage from './HomePage';
+import QuizMode from './QuizMode';
 import {
   createConversation,
   getUserConversations,
@@ -18,6 +19,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
   const [currentView, setCurrentView] = useState('home');
   const [loading, setLoading] = useState(true);
   const [isConversationFull, setIsConversationFull] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   // Load conversations from Firestore on mount
   useEffect(() => {
@@ -211,6 +213,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
           <div className="home-wrapper">
             <HomePage
               onStartConversation={handleStartConversation}
+              onStartQuiz={() => setShowQuiz(true)}
               user={user}
               onSignOut={onSignOut}
               isCompact={true} // Add compact mode for sidebar layout
@@ -234,6 +237,13 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
           />
         )}
       </div>
+
+      {showQuiz && (
+        <QuizMode
+          onClose={() => setShowQuiz(false)}
+          language={language}
+        />
+      )}
     </div>
   );
 };
