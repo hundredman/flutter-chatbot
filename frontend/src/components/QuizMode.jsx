@@ -76,7 +76,7 @@ const QuizMode = ({ onClose, language = 'ko' }) => {
 
   const handleSelectPart = (part) => {
     setSelectedPart(part);
-    setSelectedChapterIds(part.chapters.map(c => c.id)); // default: all
+    setSelectedChapterIds([]); // default: none selected
   };
 
   const toggleChapter = (chapterId) => {
