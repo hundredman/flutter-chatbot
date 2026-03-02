@@ -20,6 +20,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
   const [loading, setLoading] = useState(true);
   const [isConversationFull, setIsConversationFull] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [quizTarget, setQuizTarget] = useState(null); // { partId, chapterIds }
 
   // Load conversations from Firestore on mount
   useEffect(() => {
@@ -229,6 +230,10 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
             onGoHome={handleGoHome}
             onUpdateConversation={handleUpdateConversation}
             onStartNewChapter={handleStartNewChapter}
+            onStartQuizForChapter={(partId, chapterId) => {
+              setQuizTarget({ partId, chapterIds: [chapterId] });
+              setShowQuiz(true);
+            }}
             isConversationFull={isConversationFull}
             user={user}
             showBackButton={false} // Remove back button since we have sidebar
@@ -240,8 +245,10 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
 
       {showQuiz && (
         <QuizMode
-          onClose={() => setShowQuiz(false)}
+          onClose={() => { setShowQuiz(false); setQuizTarget(null); }}
           language={language}
+          initialPartId={quizTarget?.partId || null}
+          initialChapterIds={quizTarget?.chapterIds || null}
         />
       )}
     </div>

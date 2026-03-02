@@ -4,10 +4,13 @@ import { HiX, HiCheckCircle, HiXCircle, HiChevronRight, HiRefresh, HiAcademicCap
 import { curriculum } from '../data/curriculum';
 import { generateQuiz } from '../firebase/quizService';
 
-const QuizMode = ({ onClose, language = 'ko' }) => {
+const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapterIds = null }) => {
+  const getInitialPart = () =>
+    initialPartId ? curriculum.parts.find(p => p.id === initialPartId) || null : null;
+
   const [phase, setPhase] = useState('select'); // select | loading | quiz | result
-  const [selectedPart, setSelectedPart] = useState(null);
-  const [selectedChapterIds, setSelectedChapterIds] = useState([]);
+  const [selectedPart, setSelectedPart] = useState(getInitialPart);
+  const [selectedChapterIds, setSelectedChapterIds] = useState(initialChapterIds || []);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);

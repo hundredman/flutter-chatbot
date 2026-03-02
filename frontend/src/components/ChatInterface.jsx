@@ -4,9 +4,9 @@ import MessageBubble from './MessageBubble';
 import LanguageToggle from './LanguageToggle';
 import { markQuestionCompleted, markChapterCompleted, findNextChapter, updateLastViewedQuestion } from '../services/learningProgress';
 import { curriculum } from '../data/curriculum';
-import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft, HiPlus } from 'react-icons/hi';
+import { HiChevronLeft, HiPaperAirplane, HiLink, HiDocumentText, HiX, HiArrowRight, HiCheckCircle, HiArrowLeft, HiPlus, HiAcademicCap } from 'react-icons/hi';
 
-const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, isConversationFull = false, user, showBackButton = true, language = 'en', onLanguageChange }) => {
+const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNewChapter, onStartQuizForChapter, isConversationFull = false, user, showBackButton = true, language = 'en', onLanguageChange }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +51,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       chapterComplete: 'Chapter Complete!',
       chapterCompleteDesc: 'Great job! You have completed all questions in this chapter.',
       nextChapter: 'Next Chapter',
+      reviewQuiz: 'Review with Quiz',
       goHome: 'Back to Home',
       allChaptersComplete: 'Congratulations! You have completed all chapters!',
       conversationFull: 'This conversation has reached its limit. Please start a new chat to continue.',
@@ -74,6 +75,7 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
       chapterComplete: '챕터 완료!',
       chapterCompleteDesc: '훌륭합니다! 이 챕터의 모든 질문을 완료했습니다.',
       nextChapter: '다음 챕터',
+      reviewQuiz: '퀴즈로 복습하기',
       goHome: '홈으로 돌아가기',
       allChaptersComplete: '축하합니다! 모든 챕터를 완료했습니다!',
       conversationFull: '이 대화방의 저장 한도에 도달했습니다. 새 채팅을 시작해주세요.',
@@ -648,6 +650,15 @@ const ChatInterface = ({ conversation, onGoHome, onUpdateConversation, onStartNe
                 </button>
               ) : (
                 <p className="all-complete-message">{currentLang.allChaptersComplete}</p>
+              )}
+              {onStartQuizForChapter && chapterId && partId && (
+                <button
+                  className="quiz-review-btn"
+                  onClick={() => onStartQuizForChapter(partId, chapterId)}
+                >
+                  <HiAcademicCap />
+                  {currentLang.reviewQuiz}
+                </button>
               )}
               <button
                 className="go-home-btn"

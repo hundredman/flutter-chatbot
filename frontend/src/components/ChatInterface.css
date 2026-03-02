@@ -409,6 +409,29 @@
   color: white;
 }
 
+.quiz-review-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 24px;
+  background: rgba(102, 126, 234, 0.15);
+  border: 1px solid rgba(102, 126, 234, 0.35);
+  border-radius: 12px;
+  color: #a5b4fc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quiz-review-btn:hover {
+  background: rgba(102, 126, 234, 0.28);
+  color: white;
+  transform: translateY(-2px);
+}
+
 .all-complete-message {
   text-align: center;
   color: #10b981;
