@@ -3,16 +3,16 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-// Firestore cache key: quiz_cache/{partId}_{YYYY-MM-DD}
-const getCacheKey = (partId) => {
+// Firestore cache key: quiz_cache/{partId}_{language}_{YYYY-MM-DD}
+const getCacheKey = (partId, language) => {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  return `${partId}_${today}`;
+  return `${partId}_${language}_${today}`;
 };
 
 // Get cached quiz from Firestore
-export const getCachedQuiz = async (partId) => {
+export const getCachedQuiz = async (partId, language) => {
   try {
-    const cacheKey = getCacheKey(partId);
+    const cacheKey = getCacheKey(partId, language);
     const docRef = doc(db, 'quiz_cache', cacheKey);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -26,11 +26,12 @@ export const getCachedQuiz = async (partId) => {
 };
 
 // Save generated quiz to Firestore
-const saveQuizCache = async (partId, questions) => {
+const saveQuizCache = async (partId, language, questions) => {
   try {
-    const cacheKey = getCacheKey(partId);
+    const cacheKey = getCacheKey(partId, language);
     await setDoc(doc(db, 'quiz_cache', cacheKey), {
       partId,
+      language,
       questions,
       generatedAt: new Date().toISOString()
     });
@@ -43,7 +44,7 @@ const saveQuizCache = async (partId, questions) => {
 export const generateQuiz = async (partId, chapters, language = 'ko') => {
   try {
     // Check cache first
-    const cached = await getCachedQuiz(partId);
+    const cached = await getCachedQuiz(partId, language);
     if (cached.success) {
       console.log(`Quiz cache hit for Part ${partId}`);
       return { success: true, questions: cached.questions, fromCache: true };
@@ -66,7 +67,7 @@ export const generateQuiz = async (partId, chapters, language = 'ko') => {
     }
 
     // Save to cache
-    await saveQuizCache(partId, data.questions);
+    await saveQuizCache(partId, language, data.questions);
 
     return { success: true, questions: data.questions, fromCache: false };
   } catch (error) {
