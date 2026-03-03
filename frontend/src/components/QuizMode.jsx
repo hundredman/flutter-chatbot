@@ -3,6 +3,7 @@ import './QuizMode.css';
 import { HiX, HiCheckCircle, HiXCircle, HiChevronRight, HiRefresh, HiAcademicCap, HiLightningBolt } from 'react-icons/hi';
 import { curriculum } from '../data/curriculum';
 import { generateQuiz } from '../firebase/quizService';
+import { saveQuizResult } from '../services/quizResults';
 
 const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapterIds = null }) => {
   const getInitialPart = () =>
@@ -138,6 +139,7 @@ const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapt
 
   const handleNext = () => {
     if (currentIndex + 1 >= questions.length) {
+      saveQuizResult(selectedPart?.id, score, questions.length);
       setPhase('result');
     } else {
       setCurrentIndex(i => i + 1);

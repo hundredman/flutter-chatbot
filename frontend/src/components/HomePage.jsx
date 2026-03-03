@@ -7,6 +7,7 @@ import LanguageToggle from './LanguageToggle';
 import { curriculum } from '../data/curriculum';
 import { getProgress, getStats, getOverallProgress, getPartProgress as getPartProgressFromService, isChapterCompleted, markQuestionCompleted, getLastPositionInfo, updateLastViewedQuestion } from '../services/learningProgress';
 import { getSavedNotes, removeNote } from '../services/savedNotes';
+import { getQuizCount } from '../services/quizResults';
 
 const HomePage = ({ onStartConversation, onStartQuiz, user, onSignOut, onTestConversations, onTestRetrieval, onDeleteAllConversations, language = 'en', onLanguageChange }) => {
   const [expandedPart, setExpandedPart] = useState(null);
@@ -125,6 +126,9 @@ const HomePage = ({ onStartConversation, onStartQuiz, user, onSignOut, onTestCon
       searchNoResults: 'No questions found.',
       // Quiz
       startQuiz: 'Quiz Mode',
+      quizTaken: 'Quizzes Taken',
+      savedAnswers: 'Saved Answers',
+      chaptersCompleted: 'Chapters Done',
       // Saved Notes modal
       savedNotesTitle: 'Saved Answers',
       savedNotesEmpty: 'No saved answers yet. Click the bookmark icon on any answer to save it.',
@@ -173,6 +177,9 @@ const HomePage = ({ onStartConversation, onStartQuiz, user, onSignOut, onTestCon
       searchNoResults: '검색 결과가 없습니다.',
       // Quiz
       startQuiz: '퀴즈 모드',
+      quizTaken: '퀴즈 응시',
+      savedAnswers: '저장된 답변',
+      chaptersCompleted: '완료한 챕터',
       // Saved Notes modal
       savedNotesTitle: '저장된 답변',
       savedNotesEmpty: '저장된 답변이 없습니다. 답변의 북마크 아이콘을 클릭하여 저장하세요.',
@@ -529,6 +536,20 @@ const HomePage = ({ onStartConversation, onStartQuiz, user, onSignOut, onTestCon
             <div className="stat-item">
               <span className="stat-value">{thisWeekCount}</span>
               <span className="stat-label">{text.thisWeek}</span>
+            </div>
+          </div>
+          <div className="stats-grid stats-grid-bottom">
+            <div className="stat-item">
+              <span className="stat-value stat-value-sm">{getQuizCount()}</span>
+              <span className="stat-label">{text.quizTaken}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value stat-value-sm">{savedNotes.length}</span>
+              <span className="stat-label">{text.savedAnswers}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value stat-value-sm">{progress?.completedChapters?.length || 0}</span>
+              <span className="stat-label">{text.chaptersCompleted}</span>
             </div>
           </div>
         </div>

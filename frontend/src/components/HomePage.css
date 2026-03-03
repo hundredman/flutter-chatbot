@@ -598,8 +598,9 @@
 }
 
 .stats-grid {
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
   text-align: center;
 }
 
@@ -618,6 +619,16 @@
 .stat-label {
   color: #888;
   font-size: 0.8rem;
+}
+
+.stats-grid-bottom {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-value-sm {
+  font-size: 1.5rem !important;
 }
 
 /* Recommended Section */
