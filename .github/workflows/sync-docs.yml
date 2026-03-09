@@ -33,6 +33,16 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run sync
 
-      - name: Notify on failure
+      - name: Report success
+        if: success()
+        run: echo "✅ 동기화 성공"
+
+      - name: Report failure
         if: failure()
-        run: echo "Sync failed! Check the logs."
+        run: |
+          echo "❌ 동기화 실패 - 원인을 확인하세요"
+          echo "가능한 원인:"
+          echo "  1. GEMINI_API_KEY 만료 또는 권한 없음"
+          echo "  2. SUPABASE_URL / SUPABASE_SERVICE_KEY 오류"
+          echo "  3. 성공률 50% 미만 (임베딩 API 오류)"
+          exit 1

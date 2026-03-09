@@ -348,6 +348,8 @@ async function main() {
     await new Promise(r => setTimeout(r, 100));
   }
 
+  const successRate = totalChunks > 0 ? (successCount / totalChunks) * 100 : 100;
+
   console.log('\n' + '═'.repeat(60));
   console.log('📊 동기화 결과:');
   console.log(`   🔄 처리된 파일: ${changedFiles.length}개`);
@@ -355,9 +357,18 @@ async function main() {
   console.log(`   ✅ 성공: ${successCount}개`);
   console.log(`   ❌ 실패: ${failCount}개`);
   if (totalChunks > 0) {
-    console.log(`   📈 성공률: ${((successCount / totalChunks) * 100).toFixed(1)}%`);
+    console.log(`   📈 성공률: ${successRate.toFixed(1)}%`);
   }
   console.log('═'.repeat(60));
+
+  // 성공률 50% 미만이면 실패로 처리
+  if (totalChunks > 0 && successRate < 50) {
+    console.error(`\n❌ 동기화 실패: 성공률 ${successRate.toFixed(1)}% (기준: 50% 이상)`);
+    process.exit(1);
+  }
 }
 
-main().catch(console.error);
+main().catch(err => {
+  console.error('❌ 동기화 중 치명적 오류:', err.message);
+  process.exit(1);
+});
