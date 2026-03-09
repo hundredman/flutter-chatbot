@@ -189,22 +189,32 @@ function chunkMarkdown(content, filePath) {
 /**
  * Gemini 임베딩 생성
  */
-async function getEmbedding(text) {
-  try {
-    const res = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
-      {
-        model: 'models/gemini-embedding-001',
-        content: { parts: [{ text: text.substring(0, 8000) }] },
-        outputDimensionality: 768
-      },
-      { timeout: 30000 }
-    );
-    return res.data.embedding.values;
-  } catch (e) {
-    console.error(`   ❌ 임베딩 실패: ${e.message}`);
-    return null;
+async function getEmbedding(text, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
+        {
+          model: 'models/gemini-embedding-001',
+          content: { parts: [{ text: text.substring(0, 8000) }] },
+          outputDimensionality: 768
+        },
+        { timeout: 30000 }
+      );
+      return res.data.embedding.values;
+    } catch (e) {
+      if (e.response?.status === 429) {
+        const wait = attempt * 10000; // 10초, 20초, 30초
+        console.warn(`   ⚠️ Rate limit (429), ${wait/1000}초 후 재시도... (${attempt}/${retries})`);
+        await new Promise(r => setTimeout(r, wait));
+      } else {
+        console.error(`   ❌ 임베딩 실패: ${e.message}`);
+        return null;
+      }
+    }
   }
+  console.error(`   ❌ 임베딩 실패: 재시도 ${retries}회 초과`);
+  return null;
 }
 
 /**
@@ -337,7 +347,7 @@ async function main() {
       }
 
       // Rate limit 대응
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 2000));
     }
 
     // 성공하면 SHA 해시 저장
