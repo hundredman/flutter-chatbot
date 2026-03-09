@@ -30,10 +30,10 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
         ┌────────────┴────────────┐
         ▼                         ▼
 ┌───────────────────┐   ┌───────────────────┐
-│  Supabase         │   │  Gemini API       │
-│  (pgvector)       │   │  (Google AI)      │
-│  - 3,700+ docs    │   │  - Embeddings     │
-│  - LLM Chat       │   │  - LLM Chat       │
+│  Supabase         │   │  Groq / Gemini    │
+│  (pgvector)       │   │  (LLM)            │
+│  - 3,768 docs     │   │  - LLaMA 3.3 70B  │
+│  - Vector Search  │   │  - Gemini fallback│
 └───────────────────┘   └───────────────────┘
 ```
 
@@ -44,7 +44,7 @@ Flutter 개발을 배우는 학생들을 위한 AI 기반 학습 플랫폼입니
 | **Backend** | Vercel Serverless | $0 |
 | **Vector DB** | Supabase pgvector | $0 |
 | **LLM** | Groq (Llama 3.3 70B) | $0 |
-| **Embeddings** | Gemini text-embedding-004 | $0 |
+| **Embeddings** | Hugging Face BAAI/bge-base-en-v1.5 | $0 |
 | **Auth** | Firebase Auth | $0 |
 | **Chat Storage** | Firestore | $0 |
 
@@ -75,7 +75,7 @@ Flutter_Chatbot/
 ## Features
 
 - **AI Chatbot**: Flutter 공식 문서 기반 질의응답
-- **RAG System**: 3,700+ 문서 청크로 학습된 벡터 검색
+- **RAG System**: 3,768개 문서 청크로 학습된 벡터 검색
 - **Multi-language**: 한국어/영어 자동 전환
 - **30 Flutter Tips**: 랜덤 학습 팁 제공
 - **Firebase Auth**: Google 로그인 지원
@@ -101,8 +101,9 @@ vercel --prod
 환경변수 설정:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
-- `GEMINI_API_KEY`
+- `GEMINI_API_KEY` (Gemini LLM fallback용)
 - `GROQ_API_KEY`
+- `HF_API_KEY` (문서 동기화 임베딩용)
 
 ### 3. 문서 동기화
 
@@ -163,12 +164,13 @@ Response:
 
 ## Auto Sync (GitHub Actions)
 
-매주 월요일 오전 9시(KST) 자동으로 Flutter 문서를 동기화합니다.
+매주 월/목 오전 9시(KST) 자동으로 Flutter 문서를 증분 동기화합니다.
+수동 실행 시 "전체 재동기화" 옵션 체크 가능 (모델 변경 후 등).
 
 **GitHub Secrets 필요**:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
-- `GEMINI_API_KEY`
+- `HF_API_KEY` (Hugging Face - 임베딩 생성)
 
 ## 프로젝트 업데이트 절차
 
@@ -240,10 +242,12 @@ vercel --prod # Vercel에 배포
 
 | 키 | 발급처 | 용도 |
 |----|--------|------|
-| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) | 임베딩 생성 + LLM fallback |
+| `HF_API_KEY` | [Hugging Face](https://huggingface.co/settings/tokens) | 문서 임베딩 생성 (동기화용) |
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) | LLM fallback (Groq 실패 시) |
 | `GROQ_API_KEY` | [Groq Console](https://console.groq.com) | 기본 LLM (Llama 3.3 70B) |
 
-> **Gemini API 참고**: 코드에 완전히 구현되어 있으며 `GEMINI_API_KEY` 환경변수만 넣으면 즉시 작동합니다. Groq 실패 시 자동으로 Gemini로 fallback됩니다.
+> **임베딩 모델**: `BAAI/bge-base-en-v1.5` (768차원, 무료, RPD 제한 없음)
+> **Gemini API**: Groq 실패 시 자동 fallback. `GEMINI_API_KEY` 환경변수만 넣으면 즉시 작동.
 
 ### 4. Vercel 재배포 (백엔드)
 
@@ -256,7 +260,7 @@ vercel --prod
 Vercel 대시보드 → 프로젝트 → Settings → Environment Variables에 아래 추가:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
-- `GEMINI_API_KEY`
+- `GEMINI_API_KEY` (LLM fallback)
 - `GROQ_API_KEY`
 
 ### 5. GitHub Secrets 설정
@@ -276,7 +280,7 @@ Repository → Settings → Secrets and variables → Actions에 아래 추가:
 **문서 자동 동기화용**:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
-- `GEMINI_API_KEY`
+- `HF_API_KEY`
 
 ### 6. 로컬 개발 환경 설정
 
