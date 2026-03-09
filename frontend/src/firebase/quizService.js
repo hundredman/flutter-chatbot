@@ -3,10 +3,13 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-// Firestore cache key: quiz_cache/{partId}_{language}_{YYYY-MM-DD}
+// Firestore cache key: quiz_cache/{partId}_{language}_{YYYY-Www}
 const getCacheKey = (partId, language) => {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  return `${partId}_${language}_${today}`;
+  const now = new Date();
+  const year = now.getFullYear();
+  const startOfYear = new Date(year, 0, 1);
+  const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  return `${partId}_${language}_${year}-W${String(week).padStart(2, '0')}`;
 };
 
 // Get cached quiz from Firestore
