@@ -187,33 +187,34 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
- * Gemini 임베딩 생성
+ * Gemini 배치 임베딩 생성 (최대 10개씩 한 번에 요청)
  */
-async function getEmbedding(text, retries = 3) {
+async function getBatchEmbeddings(texts, retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
+      const requests = texts.map(text => ({
+        model: 'models/gemini-embedding-001',
+        content: { parts: [{ text: text.substring(0, 8000) }] },
+        outputDimensionality: 768
+      }));
       const res = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
-        {
-          model: 'models/gemini-embedding-001',
-          content: { parts: [{ text: text.substring(0, 8000) }] },
-          outputDimensionality: 768
-        },
-        { timeout: 30000 }
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents?key=${GEMINI_API_KEY}`,
+        { requests },
+        { timeout: 60000 }
       );
-      return res.data.embedding.values;
+      return res.data.embeddings.map(e => e.values);
     } catch (e) {
       if (e.response?.status === 429) {
-        const wait = attempt * 10000; // 10초, 20초, 30초
+        const wait = attempt * 15000;
         console.warn(`   ⚠️ Rate limit (429), ${wait/1000}초 후 재시도... (${attempt}/${retries})`);
         await new Promise(r => setTimeout(r, wait));
       } else {
-        console.error(`   ❌ 임베딩 실패: ${e.message}`);
+        console.error(`   ❌ 배치 임베딩 실패: ${e.message}`);
         return null;
       }
     }
   }
-  console.error(`   ❌ 임베딩 실패: 재시도 ${retries}회 초과`);
+  console.error(`   ❌ 배치 임베딩 실패: 재시도 ${retries}회 초과`);
   return null;
 }
 
@@ -326,28 +327,30 @@ async function main() {
     console.log(`   📝 ${chunks.length}개 청크 생성`);
 
     let fileSuccess = true;
-    for (let j = 0; j < chunks.length; j++) {
-      const chunk = chunks[j];
+    const BATCH_SIZE = 10;
+    for (let j = 0; j < chunks.length; j += BATCH_SIZE) {
+      const batch = chunks.slice(j, j + BATCH_SIZE);
+      const embeddings = await getBatchEmbeddings(batch.map(c => c.content));
 
-      const embedding = await getEmbedding(chunk.content);
-      if (!embedding) {
-        failCount++;
+      if (!embeddings) {
+        failCount += batch.length;
         fileSuccess = false;
         continue;
       }
 
-      const id = generateVectorId(chunk, j);
-      const saved = await saveToSupabase(id, embedding, chunk);
-
-      if (saved) {
-        successCount++;
-      } else {
-        failCount++;
-        fileSuccess = false;
+      for (let k = 0; k < batch.length; k++) {
+        const id = generateVectorId(batch[k], j + k);
+        const saved = await saveToSupabase(id, embeddings[k], batch[k]);
+        if (saved) {
+          successCount++;
+        } else {
+          failCount++;
+          fileSuccess = false;
+        }
       }
 
-      // Rate limit 대응
-      await new Promise(r => setTimeout(r, 2000));
+      // 배치 간 간격 (Rate limit 대응)
+      await new Promise(r => setTimeout(r, 1000));
     }
 
     // 성공하면 SHA 해시 저장
