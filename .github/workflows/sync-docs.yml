@@ -7,6 +7,12 @@ on:
 
   # 수동 실행 가능
   workflow_dispatch:
+    inputs:
+      full_sync:
+        description: '전체 재동기화 (모델 변경 후 등 필요 시 체크)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   sync-docs:
@@ -25,13 +31,20 @@ jobs:
         working-directory: ./supabase-backend
         run: npm install
 
-      - name: Run incremental sync (changed docs only)
+      - name: Run sync
         working-directory: ./supabase-backend
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: npm run sync
+        run: |
+          if [ "${{ inputs.full_sync }}" = "true" ]; then
+            echo "🔄 전체 재동기화 시작..."
+            npm run sync -- --full
+          else
+            echo "🔄 증분 동기화 시작..."
+            npm run sync
+          fi
 
       - name: Report success
         if: success()
