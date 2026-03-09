@@ -211,6 +211,109 @@ vercel --prod # Vercel에 배포
 3.  **프론트엔드 업데이트**: `frontend` 변경사항을 빌드하고 Firebase Hosting에 배포합니다.
 4.  **필요한 경우 문서 재동기화**: GitHub Actions에서 `Sync Flutter Docs to Supabase` 워크플로우를 수동으로 실행하거나 다음 스케줄을 기다립니다.
 
+## 계정 이전 체크리스트
+
+새 계정/환경으로 프로젝트를 이전할 때 필요한 작업 목록입니다.
+
+### 1. Firebase 새 프로젝트 생성
+
+1. [Firebase Console](https://console.firebase.google.com) → 새 프로젝트 생성
+2. **Authentication** → Sign-in method → Google 활성화
+3. **Firestore Database** → 데이터베이스 생성 (production mode)
+4. **Hosting** → 시작하기
+5. Project Settings → 웹 앱 추가 → 아래 config 값 복사:
+   - `apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`
+6. `firestore.rules` 및 `firestore.indexes.json` 배포:
+   ```bash
+   firebase deploy --only firestore
+   ```
+
+### 2. Supabase 새 프로젝트 생성
+
+1. [Supabase](https://supabase.com) → 새 프로젝트 생성
+2. Project Settings → API → `URL`과 `service_role key` 복사
+3. SQL Editor에서 `supabase-backend/setup.sql` 실행
+4. SQL Editor에서 `supabase-backend/security-fix.sql` 실행
+5. 문서 초기 동기화 실행 (아래 "3. 문서 동기화" 참조)
+
+### 3. API 키 발급
+
+| 키 | 발급처 | 용도 |
+|----|--------|------|
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) | 임베딩 생성 + LLM fallback |
+| `GROQ_API_KEY` | [Groq Console](https://console.groq.com) | 기본 LLM (Llama 3.3 70B) |
+
+> **Gemini API 참고**: 코드에 완전히 구현되어 있으며 `GEMINI_API_KEY` 환경변수만 넣으면 즉시 작동합니다. Groq 실패 시 자동으로 Gemini로 fallback됩니다.
+
+### 4. Vercel 재배포 (백엔드)
+
+```bash
+cd supabase-backend
+vercel login   # 새 계정으로 로그인
+vercel --prod
+```
+
+Vercel 대시보드 → 프로젝트 → Settings → Environment Variables에 아래 추가:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `GEMINI_API_KEY`
+- `GROQ_API_KEY`
+
+### 5. GitHub Secrets 설정
+
+Repository → Settings → Secrets and variables → Actions에 아래 추가:
+
+**Firebase 배포용**:
+- `FIREBASE_SERVICE_ACCOUNT_HI_PROJECT_FLUTTER_CHATBOT` (Firebase 서비스 계정 JSON)
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_API_BASE_URL` (Vercel 백엔드 URL, 예: `https://xxx.vercel.app`)
+
+**문서 자동 동기화용**:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `GEMINI_API_KEY`
+
+### 6. 로컬 개발 환경 설정
+
+`frontend/.env` 파일:
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+VITE_API_BASE_URL=https://xxx.vercel.app
+```
+
+`supabase-backend/.env` 파일 (로컬 테스트용):
+```
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_KEY=eyJ...
+GEMINI_API_KEY=AIza...
+GROQ_API_KEY=gsk_...
+```
+
+### 7. 문서 초기 동기화
+
+```bash
+cd supabase-backend
+npm install
+
+# 전체 동기화 (최초 1회, 약 3,700개 문서)
+SUPABASE_URL=xxx SUPABASE_SERVICE_KEY=xxx GEMINI_API_KEY=xxx node sync-docs.js --full
+
+# 해시 초기화 (이후 증분 동기화 준비)
+SUPABASE_URL=xxx SUPABASE_SERVICE_KEY=xxx node init-hashes.js
+```
+
+---
+
 ## License
 
 MIT License
