@@ -3,12 +3,15 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-// Firestore cache key: quiz_cache/{partId}_{language}_{YYYY-Www}
+// Firestore cache key: quiz_cache/{partId}_{language}_{YYYY-Www} (ISO 8601 week)
 const getCacheKey = (partId, language) => {
   const now = new Date();
-  const year = now.getFullYear();
-  const startOfYear = new Date(year, 0, 1);
-  const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  // ISO 8601: week starts on Monday, week 1 contains the first Thursday
+  const thursday = new Date(now);
+  thursday.setDate(now.getDate() - ((now.getDay() + 6) % 7) + 3); // nearest Thursday
+  const year = thursday.getFullYear();
+  const jan4 = new Date(year, 0, 4); // Jan 4 is always in week 1
+  const week = Math.round((thursday - jan4) / 604800000) + 1;
   return `${partId}_${language}_${year}-W${String(week).padStart(2, '0')}`;
 };
 

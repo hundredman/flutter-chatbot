@@ -120,7 +120,21 @@ const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapt
       selectedChapterIds.includes(q.chapterId)
     );
 
-    setQuestions(filtered.length > 0 ? filtered : result.questions);
+    // Shuffle options for each question (keep answerIndex in sync)
+    const shuffled = (filtered.length > 0 ? filtered : result.questions).map(q => {
+      const indices = q.options.map((_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      return {
+        ...q,
+        options: indices.map(i => q.options[i]),
+        answerIndex: indices.indexOf(q.answerIndex),
+      };
+    });
+
+    setQuestions(shuffled);
     setCurrentIndex(0);
     setScore(0);
     setResults([]);
