@@ -1,5 +1,5 @@
 /**
- * Flutter 문서 증분 동기화 - Supabase + Gemini
+ * Flutter 문서 증분 동기화 - Supabase + Hugging Face
  * GitHub SHA 해시를 비교해서 변경된 문서만 업데이트
  */
 
@@ -14,13 +14,14 @@ const DOCS_PATH = 'src/content';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const HF_API_KEY = process.env.HF_API_KEY;
+const HF_MODEL = 'BAAI/bge-base-en-v1.5'; // 768차원
 
 // 전체 동기화 모드 (--full 플래그)
 const FULL_SYNC = process.argv.includes('--full');
 
-if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_API_KEY) {
-  console.error('❌ 환경변수 필요: SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY');
+if (!SUPABASE_URL || !SUPABASE_KEY || !HF_API_KEY) {
+  console.error('❌ 환경변수 필요: SUPABASE_URL, SUPABASE_SERVICE_KEY, HF_API_KEY');
   process.exit(1);
 }
 
@@ -187,26 +188,25 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
- * Gemini 배치 임베딩 생성 (최대 10개씩 한 번에 요청)
+ * Hugging Face 배치 임베딩 생성 (여러 텍스트 한 번에 요청)
  */
 async function getBatchEmbeddings(texts, retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const requests = texts.map(text => ({
-        model: 'models/gemini-embedding-001',
-        content: { parts: [{ text: text.substring(0, 8000) }] },
-        outputDimensionality: 768
-      }));
       const res = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents?key=${GEMINI_API_KEY}`,
-        { requests },
-        { timeout: 60000 }
+        `https://router.huggingface.co/hf-inference/models/${HF_MODEL}`,
+        { inputs: texts.map(t => t.substring(0, 8000)) },
+        {
+          headers: { Authorization: `Bearer ${HF_API_KEY}` },
+          timeout: 60000
+        }
       );
-      return res.data.embeddings.map(e => e.values);
+      // 응답이 2D 배열 [[vec1], [vec2], ...] 형태
+      return res.data;
     } catch (e) {
-      if (e.response?.status === 429) {
-        const wait = attempt * 15000;
-        console.warn(`   ⚠️ Rate limit (429), ${wait/1000}초 후 재시도... (${attempt}/${retries})`);
+      if (e.response?.status === 429 || e.response?.status === 503) {
+        const wait = attempt * 10000;
+        console.warn(`   ⚠️ 일시 제한 (${e.response.status}), ${wait/1000}초 후 재시도... (${attempt}/${retries})`);
         await new Promise(r => setTimeout(r, wait));
       } else {
         console.error(`   ❌ 배치 임베딩 실패: ${e.message}`);

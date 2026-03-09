@@ -36,7 +36,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_API_KEY: ${{ secrets.HF_API_KEY }}
         run: |
           if [ "${{ inputs.full_sync }}" = "true" ]; then
             echo "🔄 전체 재동기화 시작..."
@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "❌ 동기화 실패 - 원인을 확인하세요"
           echo "가능한 원인:"
-          echo "  1. GEMINI_API_KEY 만료 또는 권한 없음"
+          echo "  1. HF_API_KEY 만료 또는 권한 없음"
           echo "  2. SUPABASE_URL / SUPABASE_SERVICE_KEY 오류"
           echo "  3. 성공률 50% 미만 (임베딩 API 오류)"
           exit 1
