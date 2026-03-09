@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import './QuizMode.css';
-import { HiX, HiCheckCircle, HiXCircle, HiChevronRight, HiRefresh, HiAcademicCap, HiLightningBolt } from 'react-icons/hi';
+import { HiX, HiCheckCircle, HiXCircle, HiChevronRight, HiRefresh, HiAcademicCap, HiLightningBolt, HiHome } from 'react-icons/hi';
 import { curriculum } from '../data/curriculum';
 import { generateQuiz } from '../firebase/quizService';
 import { saveQuizResult } from '../services/quizResults';
@@ -40,6 +40,7 @@ const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapt
       correctCount: '맞힌 문제',
       retry: '다시 풀기',
       backToSelect: '파트 선택으로',
+      goHome: '홈으로',
       close: '닫기',
       errorMsg: '문제 생성에 실패했습니다. 다시 시도해주세요.',
       retry2: '다시 시도',
@@ -67,6 +68,7 @@ const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapt
       correctCount: 'Correct',
       retry: 'Try Again',
       backToSelect: 'Back to Select',
+      goHome: 'Go Home',
       close: 'Close',
       errorMsg: 'Failed to generate questions. Please try again.',
       retry2: 'Retry',
@@ -355,6 +357,9 @@ const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapt
               </button>
               <button className="quiz-back-select-btn" onClick={() => { setSelectedPart(null); setPhase('select'); }}>
                 {text.backToSelect}
+              </button>
+              <button className="quiz-home-btn" onClick={onClose}>
+                <HiHome /> {text.goHome}
               </button>
             </div>
           </div>
