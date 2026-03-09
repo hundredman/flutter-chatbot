@@ -28,10 +28,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 async function getGeminiEmbedding(text) {
   try {
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
       {
-        model: 'models/text-embedding-004',
-        content: { parts: [{ text: text.substring(0, 8000) }] }
+        model: 'models/gemini-embedding-001',
+        content: { parts: [{ text: text.substring(0, 8000) }] },
+        outputDimensionality: 768
       },
       { timeout: 30000 }
     );
