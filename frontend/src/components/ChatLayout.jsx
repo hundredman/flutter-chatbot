@@ -246,6 +246,7 @@ const ChatLayout = ({ user, onSignOut, language, onLanguageChange }) => {
       {showQuiz && (
         <QuizMode
           onClose={() => { setShowQuiz(false); setQuizTarget(null); }}
+          onGoHome={() => { setShowQuiz(false); setQuizTarget(null); handleGoHome(); }}
           language={language}
           initialPartId={quizTarget?.partId || null}
           initialChapterIds={quizTarget?.chapterIds || null}

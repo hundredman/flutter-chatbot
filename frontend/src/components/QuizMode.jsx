@@ -5,7 +5,7 @@ import { curriculum } from '../data/curriculum';
 import { generateQuiz } from '../firebase/quizService';
 import { saveQuizResult } from '../services/quizResults';
 
-const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapterIds = null }) => {
+const QuizMode = ({ onClose, onGoHome, language = 'ko', initialPartId = null, initialChapterIds = null }) => {
   const getInitialPart = () =>
     initialPartId ? curriculum.parts.find(p => p.id === initialPartId) || null : null;
 
@@ -372,7 +372,7 @@ const QuizMode = ({ onClose, language = 'ko', initialPartId = null, initialChapt
               <button className="quiz-back-select-btn" onClick={() => { setSelectedPart(null); setPhase('select'); }}>
                 {text.backToSelect}
               </button>
-              <button className="quiz-home-btn" onClick={onClose}>
+              <button className="quiz-home-btn" onClick={onGoHome || onClose}>
                 <HiHome /> {text.goHome}
               </button>
             </div>
