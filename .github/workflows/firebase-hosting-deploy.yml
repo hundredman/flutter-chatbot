@@ -1,11 +1,13 @@
 name: Deploy Frontend to Firebase Hosting
 
 on:
-  push:
-    branches:
-      - main # main 브랜치에 푸시될 때 워크플로우 실행
-    paths:
-      - 'frontend/**' # frontend 디렉토리 내 변경 사항이 있을 때만 실행
+  # 자동 배포 비활성화 (archived project)
+  # push:
+  #   branches:
+  #     - main # main 브랜치에 푸시될 때 워크플로우 실행
+  #   paths:
+  #     - 'frontend/**' # frontend 디렉토리 내 변경 사항이 있을 때만 실행
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
