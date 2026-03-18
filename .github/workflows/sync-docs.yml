@@ -1,11 +1,11 @@
 name: Sync Flutter Docs to Supabase
 
 on:
-  # 자동 실행 비활성화 (archived project)
-  # schedule:
-  #   - cron: '0 0 * * 1,4'  # UTC 00:00 = KST 09:00
+  # 매주 월/목 오전 9시 (한국 시간) 실행
+  schedule:
+    - cron: '0 0 * * 1,4'  # UTC 00:00 = KST 09:00
 
-  # 수동 실행만 가능
+  # 수동 실행 가능
   workflow_dispatch:
     inputs:
       full_sync:
