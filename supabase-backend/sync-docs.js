@@ -10,7 +10,7 @@ const GITHUB_API = 'https://api.github.com';
 const REPO_OWNER = 'flutter';
 const REPO_NAME = 'website';
 const BRANCH = 'main';
-const DOCS_PATH = 'src/content';
+const DOCS_PATH = 'sites/docs/src/content';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
@@ -172,7 +172,7 @@ function chunkMarkdown(content, filePath) {
     if (cleanText.length < 100) continue;
 
     const docUrl = `https://docs.flutter.dev/${filePath
-      .replace('src/content/', '')
+      .replace('sites/docs/src/content/', '')
       .replace('.md', '')
       .replace('/index', '')}`;
 
