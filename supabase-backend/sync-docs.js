@@ -188,33 +188,35 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
- * Gemini 임베딩 생성 (단일 텍스트)
+ * Gemini 배치 임베딩 생성 (최대 100개 텍스트를 한 번의 API 호출로 처리)
  */
-async function getGeminiEmbedding(text, retries = 3) {
+async function getBatchEmbeddings(texts, retries = 3) {
+  const requests = texts.map(text => ({
+    model: 'models/gemini-embedding-001',
+    content: { parts: [{ text: text.substring(0, 8000) }] },
+    outputDimensionality: 768
+  }));
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
-        {
-          model: 'models/gemini-embedding-001',
-          content: { parts: [{ text: text.substring(0, 8000) }] },
-          outputDimensionality: 768
-        },
-        { timeout: 30000 }
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents?key=${GEMINI_API_KEY}`,
+        { requests },
+        { timeout: 60000 }
       );
-      return res.data.embedding.values;
+      return res.data.embeddings.map(e => e.values);
     } catch (e) {
       if (e.response?.status === 429 || e.response?.status === 503) {
         const wait = attempt * 5000;
-        console.warn(`   ⚠️ 일시 제한 (${e.response.status}), ${wait/1000}초 후 재시도... (${attempt}/${retries})`);
+        console.warn(`   ⚠️ rate limit (${e.response.status}), ${wait/1000}s 후 재시도... (${attempt}/${retries})`);
         await new Promise(r => setTimeout(r, wait));
       } else {
-        console.error(`   ❌ 임베딩 실패: ${e.message}`);
+        console.error(`   ❌ 배치 임베딩 실패: ${e.message}`);
         return null;
       }
     }
   }
-  console.error(`   ❌ 임베딩 실패: 재시도 ${retries}회 초과`);
+  console.error(`   ❌ 배치 임베딩 실패: 재시도 ${retries}회 초과`);
   return null;
 }
 
@@ -302,47 +304,56 @@ async function main() {
     return;
   }
 
-  // 5. 변경된 파일만 처리 (파일 단위 병렬, 청크 단위 직렬)
+  // 5. 변경된 파일만 처리
+  // 전략: 파일 20개 동시 fetch → 청크 100개씩 batchEmbedContents → Supabase upsert 병렬
   let totalChunks = 0;
   let successCount = 0;
   let failCount = 0;
 
   console.log('📄 변경된 문서 처리 중...\n');
 
-  // 파일 10개씩 동시 처리 (Gemini 1500 RPM 안전 범위)
-  const limit = pLimit(10);
+  const fetchLimit = pLimit(20); // 파일 fetch 동시 20개
+  const BATCH_SIZE = 100;        // Gemini batchEmbedContents 최대 100개
   let doneCount = 0;
 
-  const results = await Promise.all(changedFiles.map((file, i) => limit(async () => {
+  const results = await Promise.all(changedFiles.map((file) => fetchLimit(async () => {
     const content = await fetchMarkdownContent(file.path);
-    if (!content) return { chunks: 0, success: 0, fail: 0, fileSuccess: false };
+    if (!content) return { chunks: 0, success: 0, fail: 0 };
 
     await deleteFileChunks(file.path);
-
     const chunks = chunkMarkdown(content, file.path);
     let fileSuccess = true;
     let fileSuccessCount = 0;
     let fileFailCount = 0;
 
-    for (let j = 0; j < chunks.length; j++) {
-      const embedding = await getGeminiEmbedding(chunks[j].content);
-      if (!embedding) {
-        fileFailCount++;
+    // 청크 100개씩 배치로 임베딩
+    for (let j = 0; j < chunks.length; j += BATCH_SIZE) {
+      const batch = chunks.slice(j, j + BATCH_SIZE);
+      const embeddings = await getBatchEmbeddings(batch.map(c => c.content));
+
+      if (!embeddings) {
+        fileFailCount += batch.length;
         fileSuccess = false;
         continue;
       }
-      const id = generateVectorId(chunks[j], j);
-      const saved = await saveToSupabase(id, embedding, chunks[j]);
-      if (saved) fileSuccessCount++;
-      else { fileFailCount++; fileSuccess = false; }
+
+      // Supabase upsert 병렬 처리
+      await Promise.all(batch.map(async (chunk, k) => {
+        const id = generateVectorId(chunk, j + k);
+        const saved = await saveToSupabase(id, embeddings[k], chunk);
+        if (saved) fileSuccessCount++;
+        else { fileFailCount++; fileSuccess = false; }
+      }));
     }
 
     if (fileSuccess) await saveFileHash(file.path, file.sha);
 
     doneCount++;
-    console.log(`[${doneCount}/${changedFiles.length}] ${file.path.split('/').pop()} — ${chunks.length}청크 (✅${fileSuccessCount} ❌${fileFailCount})`);
+    if (doneCount % 50 === 0 || doneCount === changedFiles.length) {
+      console.log(`[${doneCount}/${changedFiles.length}] 처리 중... (✅${fileSuccessCount} ❌${fileFailCount})`);
+    }
 
-    return { chunks: chunks.length, success: fileSuccessCount, fail: fileFailCount, fileSuccess };
+    return { chunks: chunks.length, success: fileSuccessCount, fail: fileFailCount };
   })));
 
   for (const r of results) {
