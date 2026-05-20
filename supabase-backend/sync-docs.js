@@ -312,55 +312,64 @@ async function main() {
 
   console.log('📄 변경된 문서 처리 중...\n');
 
-  const fetchLimit = pLimit(20); // 파일 fetch 동시 20개
-  const BATCH_SIZE = 100;        // Gemini batchEmbedContents 최대 100개
+  const BATCH_SIZE = 100; // Gemini batchEmbedContents 최대 100개
   let doneCount = 0;
 
-  const results = await Promise.all(changedFiles.map((file) => fetchLimit(async () => {
+  // 1단계: 모든 파일 내용 병렬 fetch + 청크 생성
+  console.log('📥 파일 내용 병렬 fetch 중...');
+  const fetchLimit = pLimit(20);
+  const fileChunks = await Promise.all(changedFiles.map((file) => fetchLimit(async () => {
     const content = await fetchMarkdownContent(file.path);
-    if (!content) return { chunks: 0, success: 0, fail: 0 };
-
+    if (!content) return { file, chunks: [] };
     await deleteFileChunks(file.path);
-    const chunks = chunkMarkdown(content, file.path);
-    let fileSuccess = true;
-    let fileSuccessCount = 0;
-    let fileFailCount = 0;
-
-    // 청크 100개씩 배치로 임베딩
-    for (let j = 0; j < chunks.length; j += BATCH_SIZE) {
-      const batch = chunks.slice(j, j + BATCH_SIZE);
-      const embeddings = await getBatchEmbeddings(batch.map(c => c.content));
-
-      if (!embeddings) {
-        fileFailCount += batch.length;
-        fileSuccess = false;
-        continue;
-      }
-
-      // Supabase upsert 병렬 처리
-      await Promise.all(batch.map(async (chunk, k) => {
-        const id = generateVectorId(chunk, j + k);
-        const saved = await saveToSupabase(id, embeddings[k], chunk);
-        if (saved) fileSuccessCount++;
-        else { fileFailCount++; fileSuccess = false; }
-      }));
-    }
-
-    if (fileSuccess) await saveFileHash(file.path, file.sha);
-
-    doneCount++;
-    if (doneCount % 50 === 0 || doneCount === changedFiles.length) {
-      console.log(`[${doneCount}/${changedFiles.length}] 처리 중... (✅${fileSuccessCount} ❌${fileFailCount})`);
-    }
-
-    return { chunks: chunks.length, success: fileSuccessCount, fail: fileFailCount };
+    return { file, chunks: chunkMarkdown(content, file.path) };
   })));
 
-  for (const r of results) {
-    totalChunks += r.chunks;
-    successCount += r.success;
-    failCount += r.fail;
+  // 2단계: 전체 청크를 모아서 100개씩 배치 임베딩 (순차 처리로 rate limit 방지)
+  console.log('🔢 배치 임베딩 처리 중...\n');
+  const allChunks = fileChunks.flatMap(({ file, chunks }) =>
+    chunks.map(chunk => ({ file, chunk }))
+  );
+
+  const allEmbeddings = [];
+  for (let i = 0; i < allChunks.length; i += BATCH_SIZE) {
+    const batch = allChunks.slice(i, i + BATCH_SIZE);
+    const embeddings = await getBatchEmbeddings(batch.map(c => c.chunk.content));
+    if (embeddings) {
+      allEmbeddings.push(...embeddings);
+    } else {
+      allEmbeddings.push(...new Array(batch.length).fill(null));
+    }
+    if ((i + BATCH_SIZE) % 1000 === 0 || i + BATCH_SIZE >= allChunks.length) {
+      console.log(`   임베딩 진행: ${Math.min(i + BATCH_SIZE, allChunks.length)}/${allChunks.length}청크`);
+    }
   }
+
+  // 3단계: Supabase upsert 병렬 처리
+  console.log('\n💾 Supabase 저장 중...');
+  const upsertLimit = pLimit(20);
+  const fileSuccessMap = new Map(fileChunks.map(({ file }) => [file.path, true]));
+
+  await Promise.all(allChunks.map((item, idx) => upsertLimit(async () => {
+    const embedding = allEmbeddings[idx];
+    totalChunks++;
+    if (!embedding) {
+      failCount++;
+      fileSuccessMap.set(item.file.path, false);
+      return;
+    }
+    const id = generateVectorId(item.chunk, idx);
+    const saved = await saveToSupabase(id, embedding, item.chunk);
+    if (saved) successCount++;
+    else { failCount++; fileSuccessMap.set(item.file.path, false); }
+  })));
+
+  // 성공한 파일만 SHA 저장
+  await Promise.all(fileChunks.map(({ file, chunks }) =>
+    fileSuccessMap.get(file.path) && chunks.length > 0
+      ? saveFileHash(file.path, file.sha)
+      : Promise.resolve()
+  ));
 
   const successRate = totalChunks > 0 ? (successCount / totalChunks) * 100 : 100;
 
