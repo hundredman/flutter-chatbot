@@ -1,5 +1,5 @@
 /**
- * Flutter 문서 증분 동기화 - Supabase + Hugging Face
+ * Flutter 문서 증분 동기화 - Supabase + Gemini
  * GitHub SHA 해시를 비교해서 변경된 문서만 업데이트
  */
 
@@ -14,14 +14,13 @@ const DOCS_PATH = 'sites/docs/src/content';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
-const HF_API_KEY = process.env.HF_API_KEY;
-const HF_MODEL = 'BAAI/bge-base-en-v1.5'; // 768차원
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // 전체 동기화 모드 (--full 플래그)
 const FULL_SYNC = process.argv.includes('--full');
 
-if (!SUPABASE_URL || !SUPABASE_KEY || !HF_API_KEY) {
-  console.error('❌ 환경변수 필요: SUPABASE_URL, SUPABASE_SERVICE_KEY, HF_API_KEY');
+if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_API_KEY) {
+  console.error('❌ 환경변수 필요: SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY');
   process.exit(1);
 }
 
@@ -188,33 +187,33 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
- * Hugging Face 배치 임베딩 생성 (여러 텍스트 한 번에 요청)
+ * Gemini 임베딩 생성 (단일 텍스트)
  */
-async function getBatchEmbeddings(texts, retries = 3) {
+async function getGeminiEmbedding(text, retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await axios.post(
-        `https://router.huggingface.co/hf-inference/models/${HF_MODEL}`,
-        { inputs: texts.map(t => t.substring(0, 8000)) },
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
         {
-          headers: { Authorization: `Bearer ${HF_API_KEY}` },
-          timeout: 60000
-        }
+          model: 'models/gemini-embedding-001',
+          content: { parts: [{ text: text.substring(0, 8000) }] },
+          outputDimensionality: 768
+        },
+        { timeout: 30000 }
       );
-      // 응답이 2D 배열 [[vec1], [vec2], ...] 형태
-      return res.data;
+      return res.data.embedding.values;
     } catch (e) {
       if (e.response?.status === 429 || e.response?.status === 503) {
-        const wait = attempt * 10000;
+        const wait = attempt * 5000;
         console.warn(`   ⚠️ 일시 제한 (${e.response.status}), ${wait/1000}초 후 재시도... (${attempt}/${retries})`);
         await new Promise(r => setTimeout(r, wait));
       } else {
-        console.error(`   ❌ 배치 임베딩 실패: ${e.message}`);
+        console.error(`   ❌ 임베딩 실패: ${e.message}`);
         return null;
       }
     }
   }
-  console.error(`   ❌ 배치 임베딩 실패: 재시도 ${retries}회 초과`);
+  console.error(`   ❌ 임베딩 실패: 재시도 ${retries}회 초과`);
   return null;
 }
 
@@ -327,30 +326,27 @@ async function main() {
     console.log(`   📝 ${chunks.length}개 청크 생성`);
 
     let fileSuccess = true;
-    const BATCH_SIZE = 10;
-    for (let j = 0; j < chunks.length; j += BATCH_SIZE) {
-      const batch = chunks.slice(j, j + BATCH_SIZE);
-      const embeddings = await getBatchEmbeddings(batch.map(c => c.content));
+    for (let j = 0; j < chunks.length; j++) {
+      const chunk = chunks[j];
+      const embedding = await getGeminiEmbedding(chunk.content);
 
-      if (!embeddings) {
-        failCount += batch.length;
+      if (!embedding) {
+        failCount++;
         fileSuccess = false;
         continue;
       }
 
-      for (let k = 0; k < batch.length; k++) {
-        const id = generateVectorId(batch[k], j + k);
-        const saved = await saveToSupabase(id, embeddings[k], batch[k]);
-        if (saved) {
-          successCount++;
-        } else {
-          failCount++;
-          fileSuccess = false;
-        }
+      const id = generateVectorId(chunk, j);
+      const saved = await saveToSupabase(id, embedding, chunk);
+      if (saved) {
+        successCount++;
+      } else {
+        failCount++;
+        fileSuccess = false;
       }
 
-      // 배치 간 간격 (Rate limit 대응)
-      await new Promise(r => setTimeout(r, 1000));
+      // Gemini Free Tier rate limit 대응 (1500 RPM)
+      await new Promise(r => setTimeout(r, 100));
     }
 
     // 성공하면 SHA 해시 저장
