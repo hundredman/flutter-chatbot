@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
+import pLimit from 'p-limit';
 
 const GITHUB_API = 'https://api.github.com';
 const REPO_OWNER = 'flutter';
@@ -301,60 +302,53 @@ async function main() {
     return;
   }
 
-  // 5. 변경된 파일만 처리
+  // 5. 변경된 파일만 처리 (파일 단위 병렬, 청크 단위 직렬)
   let totalChunks = 0;
   let successCount = 0;
   let failCount = 0;
 
   console.log('📄 변경된 문서 처리 중...\n');
 
-  for (let i = 0; i < changedFiles.length; i++) {
-    const file = changedFiles[i];
-    console.log(`[${i + 1}/${changedFiles.length}] ${file.path.split('/').pop()}`);
+  // 파일 10개씩 동시 처리 (Gemini 1500 RPM 안전 범위)
+  const limit = pLimit(10);
+  let doneCount = 0;
 
+  const results = await Promise.all(changedFiles.map((file, i) => limit(async () => {
     const content = await fetchMarkdownContent(file.path);
-    if (!content) {
-      console.log('   ⏭️ 스킵 (내용 없음)');
-      continue;
-    }
+    if (!content) return { chunks: 0, success: 0, fail: 0, fileSuccess: false };
 
-    // 기존 청크 삭제 (변경된 파일이므로)
     await deleteFileChunks(file.path);
 
     const chunks = chunkMarkdown(content, file.path);
-    totalChunks += chunks.length;
-    console.log(`   📝 ${chunks.length}개 청크 생성`);
-
     let fileSuccess = true;
-    for (let j = 0; j < chunks.length; j++) {
-      const chunk = chunks[j];
-      const embedding = await getGeminiEmbedding(chunk.content);
+    let fileSuccessCount = 0;
+    let fileFailCount = 0;
 
+    for (let j = 0; j < chunks.length; j++) {
+      const embedding = await getGeminiEmbedding(chunks[j].content);
       if (!embedding) {
-        failCount++;
+        fileFailCount++;
         fileSuccess = false;
         continue;
       }
-
-      const id = generateVectorId(chunk, j);
-      const saved = await saveToSupabase(id, embedding, chunk);
-      if (saved) {
-        successCount++;
-      } else {
-        failCount++;
-        fileSuccess = false;
-      }
-
-      // Gemini Free Tier rate limit 대응 (1500 RPM)
-      await new Promise(r => setTimeout(r, 100));
+      const id = generateVectorId(chunks[j], j);
+      const saved = await saveToSupabase(id, embedding, chunks[j]);
+      if (saved) fileSuccessCount++;
+      else { fileFailCount++; fileSuccess = false; }
     }
 
-    // 성공하면 SHA 해시 저장
-    if (fileSuccess) {
-      await saveFileHash(file.path, file.sha);
-    }
+    if (fileSuccess) await saveFileHash(file.path, file.sha);
 
-    await new Promise(r => setTimeout(r, 100));
+    doneCount++;
+    console.log(`[${doneCount}/${changedFiles.length}] ${file.path.split('/').pop()} — ${chunks.length}청크 (✅${fileSuccessCount} ❌${fileFailCount})`);
+
+    return { chunks: chunks.length, success: fileSuccessCount, fail: fileFailCount, fileSuccess };
+  })));
+
+  for (const r of results) {
+    totalChunks += r.chunks;
+    successCount += r.success;
+    failCount += r.fail;
   }
 
   const successRate = totalChunks > 0 ? (successCount / totalChunks) * 100 : 100;
