@@ -17,28 +17,29 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const HF_API_KEY = process.env.HF_API_KEY;
+const HF_MODEL = 'BAAI/bge-base-en-v1.5';
 const PORT = process.env.PORT || 3000;
 
 // Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /**
- * Gemini 임베딩 생성 (768차원)
+ * HuggingFace 임베딩 생성 (768차원, BAAI/bge-base-en-v1.5)
  */
-async function getGeminiEmbedding(text) {
+async function getHFEmbedding(text) {
   try {
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${GEMINI_API_KEY}`,
+      `https://router.huggingface.co/hf-inference/models/${HF_MODEL}`,
+      { inputs: [text.substring(0, 8000)] },
       {
-        model: 'models/gemini-embedding-001',
-        content: { parts: [{ text: text.substring(0, 8000) }] },
-        outputDimensionality: 768
-      },
-      { timeout: 30000 }
+        headers: { Authorization: `Bearer ${HF_API_KEY}` },
+        timeout: 30000
+      }
     );
-    return response.data.embedding.values;
+    return response.data[0];
   } catch (error) {
-    console.error('Gemini embedding error:', error.message);
+    console.error('HF embedding error:', error.message);
     return null;
   }
 }
@@ -109,7 +110,7 @@ app.post('/api/chat', async (req, res) => {
     console.log(`Processing: "${question}"`);
 
     // 1. 쿼리 임베딩 생성
-    const queryVector = await getGeminiEmbedding(question);
+    const queryVector = await getHFEmbedding(question);
 
     let sources = [];
     let context = '';

@@ -1,5 +1,5 @@
 /**
- * Flutter 문서 증분 동기화 - Supabase + Gemini
+ * Flutter 문서 증분 동기화 - Supabase + HuggingFace
  * GitHub SHA 해시를 비교해서 변경된 문서만 업데이트
  */
 
@@ -15,13 +15,14 @@ const DOCS_PATH = 'sites/docs/src/content';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const HF_API_KEY = process.env.HF_API_KEY;
+const HF_MODEL = 'BAAI/bge-base-en-v1.5';
 
 // 전체 동기화 모드 (--full 플래그)
 const FULL_SYNC = process.argv.includes('--full');
 
-if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_API_KEY) {
-  console.error('❌ 환경변수 필요: SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY');
+if (!SUPABASE_URL || !SUPABASE_KEY || !HF_API_KEY) {
+  console.error('❌ 환경변수 필요: SUPABASE_URL, SUPABASE_SERVICE_KEY, HF_API_KEY');
   process.exit(1);
 }
 
@@ -188,26 +189,23 @@ function chunkMarkdown(content, filePath) {
 }
 
 /**
- * Gemini 배치 임베딩 생성 (최대 100개 텍스트를 한 번의 API 호출로 처리)
+ * HuggingFace 배치 임베딩 생성 (여러 텍스트를 한 번에 처리)
  */
 async function getBatchEmbeddings(texts, retries = 3) {
-  const requests = texts.map(text => ({
-    model: 'models/gemini-embedding-001',
-    content: { parts: [{ text: text.substring(0, 8000) }] },
-    outputDimensionality: 768
-  }));
-
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents?key=${GEMINI_API_KEY}`,
-        { requests },
-        { timeout: 60000 }
+        `https://router.huggingface.co/hf-inference/models/${HF_MODEL}`,
+        { inputs: texts.map(t => t.substring(0, 8000)) },
+        {
+          headers: { Authorization: `Bearer ${HF_API_KEY}` },
+          timeout: 60000
+        }
       );
-      return res.data.embeddings.map(e => e.values);
+      return res.data; // 2D 배열 [[vec1], [vec2], ...]
     } catch (e) {
       if (e.response?.status === 429 || e.response?.status === 503) {
-        const wait = attempt * 5000;
+        const wait = attempt * 10000;
         console.warn(`   ⚠️ rate limit (${e.response.status}), ${wait/1000}s 후 재시도... (${attempt}/${retries})`);
         await new Promise(r => setTimeout(r, wait));
       } else {
